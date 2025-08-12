@@ -1,0 +1,30 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Production build
+dist/
+build/
+
+# Env files
+.env
+
+# Vite cache
+.vite/
+
+# MacOS system files
+.DS_Store
+
+# Editor folders
+.vscode/
+.idea/
+
+# Optional: test coverage
+coverage/
+
+# npm package lock files (optional, pero recomendable dejar)
+package-lock.json
