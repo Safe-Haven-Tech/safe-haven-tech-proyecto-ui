@@ -5,7 +5,7 @@ import logo from '../assets/Logo.png';
 export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  const toggleUserMenu = () => setUserMenuOpen(prev => !prev);
+  const toggleUserMenu = () => setUserMenuOpen((prev) => !prev);
 
   const handleSearchClick = () => {
     // lógica para búsqueda
@@ -15,14 +15,14 @@ export default function Navbar() {
     <nav
       className="navbar navbar-expand-lg"
       style={{
-        backgroundColor: '#A9C5A0', 
+        backgroundColor: '#A9C5A0',
         padding: '0.6rem 1.5rem',
         position: 'fixed',
         top: 0,
         left: 0,
         width: '100%',
         zIndex: 1030,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
       }}
     >
@@ -31,9 +31,13 @@ export default function Navbar() {
         <img
           src={logo}
           alt="SafeHaven Logo"
-          style={{ height: 60, width: 'auto', marginRight: 12, borderRadius: 8 }}
+          style={{
+            height: 60,
+            width: 'auto',
+            marginRight: 12,
+            borderRadius: 8,
+          }}
         />
-
       </Link>
 
       {/* Toggle menú para móviles */}
@@ -60,9 +64,17 @@ export default function Navbar() {
         ☰
       </button>
 
-      <div className="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+      <div
+        className="collapse navbar-collapse justify-content-end"
+        id="navbarSupportedContent"
+      >
         <ul className="navbar-nav mb-2 mb-lg-0" style={{ marginLeft: 'auto' }}>
-          {['Autoevaluación', 'Recursos informativos', 'Contacto de expertos', 'Nuestro foro'].map((item, idx) => {
+          {[
+            'Autoevaluación',
+            'Recursos informativos',
+            'Contacto de expertos',
+            'Nuestro foro',
+          ].map((item, idx) => {
             const toPath = item.toLowerCase().replace(/\s+/g, '');
             return (
               <li className="nav-item" key={idx}>
@@ -73,7 +85,7 @@ export default function Navbar() {
                     color: '#000000',
                     fontWeight: '600',
                     fontSize: '1.1rem',
-                    padding: '1rem 1.2rem',   
+                    padding: '1rem 1.2rem',
                     margin: '0 0.25rem',
                     borderRadius: 6,
                     transition: 'background-color 0.3s ease, color 0.3s ease',
@@ -83,11 +95,11 @@ export default function Navbar() {
                     alignItems: 'center',
                     lineHeight: 1.2,
                   }}
-                  onMouseEnter={e => {
+                  onMouseEnter={(e) => {
                     e.target.style.backgroundColor = '#2d5016';
                     e.target.style.color = '#ffffff';
                   }}
-                  onMouseLeave={e => {
+                  onMouseLeave={(e) => {
                     e.target.style.backgroundColor = 'transparent';
                     e.target.style.color = '#000000';
                   }}
@@ -99,8 +111,10 @@ export default function Navbar() {
           })}
         </ul>
 
-
-        <div className="d-flex align-items-center" style={{ gap: 24, marginLeft: '1rem' }}>
+        <div
+          className="d-flex align-items-center"
+          style={{ gap: 24, marginLeft: '1rem' }}
+        >
           {/* Botón búsqueda */}
           <button
             onClick={handleSearchClick}
@@ -119,8 +133,8 @@ export default function Navbar() {
               transition: 'color 0.3s ease',
             }}
             aria-label="Buscar posts"
-            onMouseEnter={e => (e.currentTarget.style.color = '#2d5016')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#000000')}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#2d5016')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#000000')}
           >
             🔍
           </button>
@@ -151,8 +165,8 @@ export default function Navbar() {
               position: 'relative',
             }}
             aria-label="Notificaciones"
-            onMouseEnter={e => (e.currentTarget.style.color = '#2d5016')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#000000')}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#2d5016')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#000000')}
           >
             🔔
             {/* Indicador de notificaciones no leídas - se implementará dinámicamente */}
@@ -194,8 +208,8 @@ export default function Navbar() {
                 alignItems: 'center',
               }}
               aria-label="Menú usuario"
-              onMouseEnter={e => (e.currentTarget.style.color = '#2d5016')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#000000')}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#2d5016')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = '#000000')}
             >
               ☰
             </button>
@@ -214,24 +228,33 @@ export default function Navbar() {
                   userSelect: 'none',
                 }}
               >
-                <ul style={{ listStyle: 'none', margin: 0, padding: '0.5rem 0' }}>
-                  {['Perfil', 'Configuración', 'Cerrar sesión'].map((action, i) => (
-                    <li
-                      key={i}
-                      style={{
-                        padding: '0.6rem 1.5rem',
-                        cursor: 'pointer',
-                        color: '#000000',
-                        fontWeight: '600',
-                        textAlign: 'center',
-                        transition: 'background-color 0.2s ease',
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#2d5016')}
-                      onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-                    >
-                      {action}
-                    </li>
-                  ))}
+                <ul
+                  style={{ listStyle: 'none', margin: 0, padding: '0.5rem 0' }}
+                >
+                  {['Perfil', 'Configuración', 'Cerrar sesión'].map(
+                    (action, i) => (
+                      <li
+                        key={i}
+                        style={{
+                          padding: '0.6rem 1.5rem',
+                          cursor: 'pointer',
+                          color: '#000000',
+                          fontWeight: '600',
+                          textAlign: 'center',
+                          transition: 'background-color 0.2s ease',
+                        }}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.backgroundColor = '#2d5016')
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.backgroundColor =
+                            'transparent')
+                        }
+                      >
+                        {action}
+                      </li>
+                    )
+                  )}
                 </ul>
               </div>
             )}
