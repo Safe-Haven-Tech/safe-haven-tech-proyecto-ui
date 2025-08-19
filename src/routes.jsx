@@ -5,19 +5,23 @@ import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
 import EmergencyButton from './components/Emergency';
 import Login from './pages/Sing_In';
+import Register from './pages/Register';
 
 export default function AppRoutes() {
   return (
     <Router>
       <MainLayout>
         <Routes>
+          {/* Ruta principal - Login */}
           <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/register"
-            element={<div>Página de registro - En construcción</div>}
-          />
-          {/* Rutas de ejemplo para los links del navbar */}
+          
+          {/* Ruta de registro */}
+          <Route path="/register" element={<Register />} />
+          
+          {/* Ruta principal después del login */}
+          <Route path="/home" element={<Home />} />
+          
+          {/* Rutas del navbar - Páginas en construcción */}
           <Route
             path="/autoevaluacion"
             element={<div>Autoevaluación - Página en construcción</div>}
@@ -34,6 +38,12 @@ export default function AppRoutes() {
             path="/foro"
             element={<div>Nuestro foro - Página en construcción</div>}
           />
+          
+          {/* Ruta de emergencia */}
+          <Route path="/emergency" element={<EmergencyButton />} />
+          
+          {/* Ruta 404 para páginas no encontradas */}
+          <Route path="*" element={<div>Página no encontrada - 404</div>} />
         </Routes>
       </MainLayout>
     </Router>
