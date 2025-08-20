@@ -169,10 +169,33 @@ export default function ConfigurarPerfil() {
           background: '#fff',
         }}
       >
+
+                <div style={{ marginBottom: '10px', alignSelf: 'flex-start' }}>
+          <span
+            onClick={() => navigate('/perfil')}
+            style={{
+              cursor: 'pointer',
+              color: '#555',
+              fontSize: '0.9rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'color 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#22c55e')} // verde sutil
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#555')}
+          >
+            ← Volver a mi perfil
+          </span>
+        </div>
+        
         <h3 className="text-center mb-4">Configurar perfil</h3>
+
+
 
         {error && <div className="alert alert-danger">{error}</div>}
         {mensaje && <div className="alert alert-success">{mensaje}</div>}
+
 
         {/* Contraseña */}
         <div
