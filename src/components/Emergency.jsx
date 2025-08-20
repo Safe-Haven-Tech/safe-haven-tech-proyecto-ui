@@ -1,44 +1,62 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-export default function EmergencyButton() {
+export default function EmergencyButton(menuOpen) {
+  const [topPosition, setTopPosition] = useState(100);
+
+  useEffect(() => {
+    const updatePosition = () => {
+      const navbar = document.querySelector('.navbar');
+      const userMenu = document.querySelector('.user-menu'); // identificamos el div del menú
+
+      if (navbar) {
+        let newTop = navbar.offsetHeight + 20; // posición base
+        if (menuOpen && userMenu) {
+          newTop += userMenu.offsetHeight + 10; // sumamos altura extra
+        }
+        setTopPosition(newTop);
+      }
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+
+    return () => window.removeEventListener('resize', updatePosition);
+  }, [menuOpen]);
+
   const handleEmergencyClick = () => {
-    // Aquí podrías registrar evento en backend antes de redirigir
     window.location.href = 'https://www.google.com';
   };
 
   return (
     <button
       onClick={handleEmergencyClick}
-      title="Botón de emergencia - Salir inmediatamente"
       style={{
         position: 'fixed',
-        top: '100px',
+        top: `${topPosition}px`,
         right: '20px',
-        minWidth: '70px',
-        minHeight: '70px',
-        borderRadius: '50%',
-        backgroundColor: '#bd0d0d',
+        width: '80px', // ancho fijo
+        height: '80px', // alto fijo
+        borderRadius: '50%', // círculo perfecto
+        backgroundColor: '#d32f2f',
         color: '#fff',
-        fontSize: '1rem',
+        fontSize: '0.75rem', // más pequeño para caber
         fontWeight: 'bold',
         border: 'none',
         boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
         cursor: 'pointer',
         zIndex: 2000,
-        display: 'flex',
+        transition: 'top 0.3s ease, transform 0.1s ease',
+        display: 'flex', // centra contenido
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        transition: 'transform 0.1s ease, background-color 0.2s ease',
+        textAlign: 'center',
       }}
-      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#bd0d0d')}
-      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#d32f2f')}
-      onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.95)')}
-      onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-      aria-label="Botón de emergencia"
     >
       ⚠️
-      <span style={{ fontSize: '0.7rem', marginTop: '2px' }}>SALIR</span>
+      <span style={{ fontSize: '0.65rem', lineHeight: '1', marginTop: '2px' }}>
+        SALIR
+      </span>
     </button>
   );
 }

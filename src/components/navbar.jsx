@@ -2,10 +2,16 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/Logo.png';
 
-export default function Navbar() {
+export default function Navbar({ onMenuToggle }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  const toggleUserMenu = () => setUserMenuOpen((prev) => !prev);
+  const toggleUserMenu = () => {
+    setUserMenuOpen((prev) => {
+      const newState = !prev;
+      if (onMenuToggle) onMenuToggle(newState); // Avisamos al padre
+      return newState;
+    });
+  };
 
   const handleSearchClick = () => {
     // lógica para búsqueda
@@ -21,7 +27,7 @@ export default function Navbar() {
         top: 0,
         left: 0,
         width: '100%',
-        zIndex: 1030,
+        zIndex: 2100, // Incrementado para estar por encima del botón de emergencia
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
       }}
@@ -67,6 +73,11 @@ export default function Navbar() {
       <div
         className="collapse navbar-collapse justify-content-end"
         id="navbarSupportedContent"
+        style={{
+          // Asegurar que el menú colapsable tenga z-index alto
+          position: 'relative',
+          zIndex: 2110,
+        }}
       >
         <ul className="navbar-nav mb-2 mb-lg-0" style={{ marginLeft: 'auto' }}>
           {[
@@ -143,11 +154,6 @@ export default function Navbar() {
           <button
             onClick={() => {
               // TODO: Implementar lógica para abrir panel de notificaciones
-              // Aquí se incluirá la funcionalidad para mostrar notificaciones del usuario
-              // - Lista de notificaciones no leídas
-              // - Contador de notificaciones
-              // - Marcar como leídas
-              // - Navegación a contenido relacionado
             }}
             style={{
               background: 'transparent',
@@ -169,24 +175,6 @@ export default function Navbar() {
             onMouseLeave={(e) => (e.currentTarget.style.color = '#000000')}
           >
             🔔
-            {/* Indicador de notificaciones no leídas - se implementará dinámicamente */}
-            {/* <span style={{
-              position: 'absolute',
-              top: -2,
-              right: -2,
-              backgroundColor: '#ff4444',
-              color: 'white',
-              borderRadius: '50%',
-              width: 16,
-              height: 16,
-              fontSize: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 'bold'
-            }}>
-              3
-            </span> */}
           </button>
 
           {/* Menú usuario */}
@@ -216,6 +204,7 @@ export default function Navbar() {
 
             {userMenuOpen && (
               <div
+                className="user-menu"
                 style={{
                   position: 'absolute',
                   right: 0,
@@ -224,7 +213,7 @@ export default function Navbar() {
                   boxShadow: '0 6px 12px rgba(0,0,0,0.15)',
                   borderRadius: 8,
                   minWidth: 180,
-                  zIndex: 1000,
+                  zIndex: 2120, // Z-index específico para el menú desplegable
                   userSelect: 'none',
                 }}
               >
@@ -243,15 +232,21 @@ export default function Navbar() {
                           textAlign: 'center',
                           transition: 'background-color 0.2s ease',
                         }}
-                        onMouseEnter={(e) =>
-                          (e.currentTarget.style.backgroundColor = '#2d5016')
-                        }
-                        onMouseLeave={(e) =>
-                          (e.currentTarget.style.backgroundColor =
-                            'transparent')
-                        }
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#2d5016';
+                          e.currentTarget.style.color = '#ffffff';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = '#000000';
+                        }}
                       >
-                        {action}
+                        <Link
+                          to="/perfil"
+                          style={{ textDecoration: 'none', color: 'inherit' }}
+                        >
+                          {action}
+                        </Link>
                       </li>
                     )
                   )}

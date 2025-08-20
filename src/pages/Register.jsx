@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import background from '../assets/FondoRegister.png'; 
+import background from '../assets/FondoRegister.png';
 import Logo from '../assets/Logo.png';
 
 import { registrarUsuario } from '../services/api';
@@ -110,329 +110,362 @@ const styles = {
 };
 
 // Componente del formulario de registro optimizado
-const RegisterForm = React.memo(({
-  formData,
-  setFormData,
-  error,
-  success,
-  loading,
-  handleSubmit,
-  validationErrors,
-}) => {
-  const [focusedField, setFocusedField] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+const RegisterForm = React.memo(
+  ({
+    formData,
+    setFormData,
+    error,
+    success,
+    loading,
+    handleSubmit,
+    validationErrors,
+  }) => {
+    const [focusedField, setFocusedField] = useState(null);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleInputChange = useCallback((e) => {
-    const { name, value } = e.target;
-    const sanitizedValue = sanitizeInput(value);
-    setFormData(prev => ({
-      ...prev,
-      [name]: sanitizedValue
-    }));
-  }, [setFormData]);
+    const handleInputChange = useCallback(
+      (e) => {
+        const { name, value } = e.target;
+        const sanitizedValue = sanitizeInput(value);
+        setFormData((prev) => ({
+          ...prev,
+          [name]: sanitizedValue,
+        }));
+      },
+      [setFormData]
+    );
 
-  const isFormValid = useMemo(() =>
-    formData.nombre &&
-    formData.email &&
-    formData.password &&
-    formData.confirmPassword &&
-    validateName(formData.nombre) &&
-    validateEmail(formData.email) &&
-    validatePassword(formData.password) &&
-    formData.password === formData.confirmPassword,
-    [formData]
-  );
+    const isFormValid = useMemo(
+      () =>
+        formData.nombre &&
+        formData.email &&
+        formData.password &&
+        formData.confirmPassword &&
+        validateName(formData.nombre) &&
+        validateEmail(formData.email) &&
+        validatePassword(formData.password) &&
+        formData.password === formData.confirmPassword,
+      [formData]
+    );
 
-  return (
-    <div className="w-100">
-      {/* Header del formulario */}
-      <div className="text-center mb-4">
-        <div className="d-flex justify-content-center align-items-center mb-3">
-          <img src={Logo} alt="SafeHaven Logo" style={styles.logo} />
+    return (
+      <div className="w-100">
+        {/* Header del formulario */}
+        <div className="text-center mb-4">
+          <div className="d-flex justify-content-center align-items-center mb-3">
+            <img src={Logo} alt="SafeHaven Logo" style={styles.logo} />
+          </div>
+          <h2 className="fw-bold mb-2" style={styles.title}>
+            Crear Cuenta
+          </h2>
+          <p className="text-muted mb-0" style={{ fontSize: '1rem' }}>
+            Únete a nuestra comunidad de apoyo
+          </p>
         </div>
-        <h2 className="fw-bold mb-2" style={styles.title}>
-          Crear Cuenta
-        </h2>
-        <p className="text-muted mb-0" style={{ fontSize: '1rem' }}>
-          Únete a nuestra comunidad de apoyo
-        </p>
-      </div>
 
-      {/* Formulario */}
-      <form onSubmit={handleSubmit} className="mb-3">
-        {/* Campo de nombre */}
-        <div className="mb-3">
-          <label
-            htmlFor="nombre"
-            className="form-label fw-semibold text-dark mb-2 d-flex align-items-center"
-            style={{ fontSize: '1rem' }}
-          >
-            <i className="fas fa-user me-2" style={{ color: colors.primary }}></i>
-            Nombre Completo
-          </label>
-          <input
-            type="text"
-            id="nombre"
-            name="nombre"
-            className="form-control form-control-lg border-0"
-            style={{
-              ...styles.input,
-              ...(focusedField === 'nombre' ? styles.inputFocus : {}),
-            }}
-            value={formData.nombre}
-            onChange={handleInputChange}
-            onFocus={() => setFocusedField('nombre')}
-            onBlur={() => setFocusedField(null)}
-            placeholder="Tu nombre completo"
-            disabled={loading}
-            required
-            maxLength={50}
-            autoComplete="name"
-          />
-          {validationErrors.nombre && (
-            <div
-              className="mt-2 small d-flex align-items-center"
-              style={{ color: colors.error }}
+        {/* Formulario */}
+        <form onSubmit={handleSubmit} className="mb-3">
+          {/* Campo de nombre */}
+          <div className="mb-3">
+            <label
+              htmlFor="nombre"
+              className="form-label fw-semibold text-dark mb-2 d-flex align-items-center"
+              style={{ fontSize: '1rem' }}
             >
-              <i className="fas fa-exclamation-circle me-2"></i>
-              {validationErrors.nombre}
-            </div>
-          )}
-        </div>
-
-        {/* Campo de email */}
-        <div className="mb-3">
-          <label
-            htmlFor="email"
-            className="form-label fw-semibold text-dark mb-2 d-flex align-items-center"
-            style={{ fontSize: '1rem' }}
-          >
-            <i className="fas fa-envelope me-2" style={{ color: colors.primary }}></i>
-            Correo Electrónico
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            className="form-control form-control-lg border-0"
-            style={{
-              ...styles.input,
-              ...(focusedField === 'email' ? styles.inputFocus : {}),
-            }}
-            value={formData.email}
-            onChange={handleInputChange}
-            onFocus={() => setFocusedField('email')}
-            onBlur={() => setFocusedField(null)}
-            placeholder="tu@correo.com"
-            disabled={loading}
-            required
-            maxLength={254}
-            autoComplete="email"
-          />
-          {validationErrors.email && (
-            <div
-              className="mt-2 small d-flex align-items-center"
-              style={{ color: colors.error }}
-            >
-              <i className="fas fa-exclamation-circle me-2"></i>
-              {validationErrors.email}
-            </div>
-          )}
-        </div>
-
-        <div className="mb-3">
-          <label htmlFor="fechaNacimiento" className="form-label fw-semibold text-dark mb-2 d-flex align-items-center" style={{ fontSize: '1rem' }}>
-            <i className="fas fa-calendar-alt me-2" style={{ color: colors.primary }}></i>
-            Fecha de Nacimiento
-          </label>
-          <input
-            type="date"
-            id="fechaNacimiento"
-            name="fechaNacimiento"
-            className="form-control form-control-lg border-0"
-            style={{
-              ...styles.input,
-              ...(focusedField === 'fechaNacimiento' ? styles.inputFocus : {}),
-            }}
-            value={formData.fechaNacimiento}
-            onChange={handleInputChange}
-            onFocus={() => setFocusedField('fechaNacimiento')}
-            onBlur={() => setFocusedField(null)}
-            disabled={loading}
-            required
-          />
-        </div>
-
-        {/* Campo de contraseña */}
-        <div className="mb-3">
-          <label
-            htmlFor="password"
-            className="form-label fw-semibold text-dark mb-2 d-flex align-items-center"
-            style={{ fontSize: '1rem' }}
-          >
-            <i className="fas fa-lock me-2" style={{ color: colors.primary }}></i>
-            Contraseña
-          </label>
-          <div className="position-relative">
+              <i
+                className="fas fa-user me-2"
+                style={{ color: colors.primary }}
+              ></i>
+              Nombre Completo
+            </label>
             <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              name="password"
-              className="form-control form-control-lg border-0 pe-5"
+              type="text"
+              id="nombre"
+              name="nombre"
+              className="form-control form-control-lg border-0"
               style={{
                 ...styles.input,
-                ...(focusedField === 'password' ? styles.inputFocus : {}),
+                ...(focusedField === 'nombre' ? styles.inputFocus : {}),
               }}
-              value={formData.password}
+              value={formData.nombre}
               onChange={handleInputChange}
-              onFocus={() => setFocusedField('password')}
+              onFocus={() => setFocusedField('nombre')}
               onBlur={() => setFocusedField(null)}
-              placeholder="Contraseña"
+              placeholder="Tu nombre completo"
               disabled={loading}
               required
-              minLength={8}
-              maxLength={128}
-              autoComplete="new-password"
+              maxLength={50}
+              autoComplete="name"
             />
-            <button
-              type="button"
-              className="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3"
-              onClick={() => setShowPassword(!showPassword)}
-              style={{ color: colors.secondary }}
-            >
-              <i className={`fas fa-${showPassword ? 'eye-slash' : 'eye'}`}></i>
-            </button>
+            {validationErrors.nombre && (
+              <div
+                className="mt-2 small d-flex align-items-center"
+                style={{ color: colors.error }}
+              >
+                <i className="fas fa-exclamation-circle me-2"></i>
+                {validationErrors.nombre}
+              </div>
+            )}
           </div>
-          {validationErrors.password && (
-            <div
-              className="mt-2 small d-flex align-items-center"
-              style={{ color: colors.error }}
-            >
-              <i className="fas fa-exclamation-circle me-2"></i>
-              {validationErrors.password}
-            </div>
-          )}
-        </div>
 
-        {/* Campo de confirmar contraseña */}
-        <div className="mb-3">
-          <label
-            htmlFor="confirmPassword"
-            className="form-label fw-semibold text-dark mb-2 d-flex align-items-center"
-            style={{ fontSize: '1rem' }}
-          >
-            <i className="fas fa-shield-alt me-2" style={{ color: colors.primary }}></i>
-            Confirmar Contraseña
-          </label>
-          <div className="position-relative">
+          {/* Campo de email */}
+          <div className="mb-3">
+            <label
+              htmlFor="email"
+              className="form-label fw-semibold text-dark mb-2 d-flex align-items-center"
+              style={{ fontSize: '1rem' }}
+            >
+              <i
+                className="fas fa-envelope me-2"
+                style={{ color: colors.primary }}
+              ></i>
+              Correo Electrónico
+            </label>
             <input
-              type={showConfirmPassword ? "text" : "password"}
-              id="confirmPassword"
-              name="confirmPassword"
-              className="form-control form-control-lg border-0 pe-5"
+              type="email"
+              id="email"
+              name="email"
+              className="form-control form-control-lg border-0"
               style={{
                 ...styles.input,
-                ...(focusedField === 'confirmPassword' ? styles.inputFocus : {}),
+                ...(focusedField === 'email' ? styles.inputFocus : {}),
               }}
-              value={formData.confirmPassword}
+              value={formData.email}
               onChange={handleInputChange}
-              onFocus={() => setFocusedField('confirmPassword')}
+              onFocus={() => setFocusedField('email')}
               onBlur={() => setFocusedField(null)}
-              placeholder="Confirma tu contraseña"
+              placeholder="tu@correo.com"
               disabled={loading}
               required
-              minLength={8}
-              maxLength={128}
-              autoComplete="new-password"
+              maxLength={254}
+              autoComplete="email"
             />
-            <button
-              type="button"
-              className="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              style={{ color: colors.secondary }}
-            >
-              <i className={`fas fa-${showConfirmPassword ? 'eye-slash' : 'eye'}`}></i>
-            </button>
+            {validationErrors.email && (
+              <div
+                className="mt-2 small d-flex align-items-center"
+                style={{ color: colors.error }}
+              >
+                <i className="fas fa-exclamation-circle me-2"></i>
+                {validationErrors.email}
+              </div>
+            )}
           </div>
-          {validationErrors.confirmPassword && (
-            <div
-              className="mt-2 small d-flex align-items-center"
-              style={{ color: colors.error }}
+
+          <div className="mb-3">
+            <label
+              htmlFor="fechaNacimiento"
+              className="form-label fw-semibold text-dark mb-2 d-flex align-items-center"
+              style={{ fontSize: '1rem' }}
             >
-              <i className="fas fa-exclamation-circle me-2"></i>
-              {validationErrors.confirmPassword}
+              <i
+                className="fas fa-calendar-alt me-2"
+                style={{ color: colors.primary }}
+              ></i>
+              Fecha de Nacimiento
+            </label>
+            <input
+              type="date"
+              id="fechaNacimiento"
+              name="fechaNacimiento"
+              className="form-control form-control-lg border-0"
+              style={{
+                ...styles.input,
+                ...(focusedField === 'fechaNacimiento'
+                  ? styles.inputFocus
+                  : {}),
+              }}
+              value={formData.fechaNacimiento}
+              onChange={handleInputChange}
+              onFocus={() => setFocusedField('fechaNacimiento')}
+              onBlur={() => setFocusedField(null)}
+              disabled={loading}
+              required
+            />
+          </div>
+
+          {/* Campo de contraseña */}
+          <div className="mb-3">
+            <label
+              htmlFor="password"
+              className="form-label fw-semibold text-dark mb-2 d-flex align-items-center"
+              style={{ fontSize: '1rem' }}
+            >
+              <i
+                className="fas fa-lock me-2"
+                style={{ color: colors.primary }}
+              ></i>
+              Contraseña
+            </label>
+            <div className="position-relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                className="form-control form-control-lg border-0 pe-5"
+                style={{
+                  ...styles.input,
+                  ...(focusedField === 'password' ? styles.inputFocus : {}),
+                }}
+                value={formData.password}
+                onChange={handleInputChange}
+                onFocus={() => setFocusedField('password')}
+                onBlur={() => setFocusedField(null)}
+                placeholder="Contraseña"
+                disabled={loading}
+                required
+                minLength={8}
+                maxLength={128}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ color: colors.secondary }}
+              >
+                <i
+                  className={`fas fa-${showPassword ? 'eye-slash' : 'eye'}`}
+                ></i>
+              </button>
+            </div>
+            {validationErrors.password && (
+              <div
+                className="mt-2 small d-flex align-items-center"
+                style={{ color: colors.error }}
+              >
+                <i className="fas fa-exclamation-circle me-2"></i>
+                {validationErrors.password}
+              </div>
+            )}
+          </div>
+
+          {/* Campo de confirmar contraseña */}
+          <div className="mb-3">
+            <label
+              htmlFor="confirmPassword"
+              className="form-label fw-semibold text-dark mb-2 d-flex align-items-center"
+              style={{ fontSize: '1rem' }}
+            >
+              <i
+                className="fas fa-shield-alt me-2"
+                style={{ color: colors.primary }}
+              ></i>
+              Confirmar Contraseña
+            </label>
+            <div className="position-relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                id="confirmPassword"
+                name="confirmPassword"
+                className="form-control form-control-lg border-0 pe-5"
+                style={{
+                  ...styles.input,
+                  ...(focusedField === 'confirmPassword'
+                    ? styles.inputFocus
+                    : {}),
+                }}
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                onFocus={() => setFocusedField('confirmPassword')}
+                onBlur={() => setFocusedField(null)}
+                placeholder="Confirma tu contraseña"
+                disabled={loading}
+                required
+                minLength={8}
+                maxLength={128}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                style={{ color: colors.secondary }}
+              >
+                <i
+                  className={`fas fa-${showConfirmPassword ? 'eye-slash' : 'eye'}`}
+                ></i>
+              </button>
+            </div>
+            {validationErrors.confirmPassword && (
+              <div
+                className="mt-2 small d-flex align-items-center"
+                style={{ color: colors.error }}
+              >
+                <i className="fas fa-exclamation-circle me-2"></i>
+                {validationErrors.confirmPassword}
+              </div>
+            )}
+          </div>
+
+          {/* Mensaje de error */}
+          {error && (
+            <div
+              className="alert border-0 mb-3"
+              style={{ ...styles.alert, ...styles.alertError }}
+              role="alert"
+            >
+              <i className="fas fa-exclamation-triangle me-2"></i>
+              {error}
             </div>
           )}
-        </div>
 
-        {/* Mensaje de error */}
-        {error && (
-          <div
-            className="alert border-0 mb-3"
-            style={{ ...styles.alert, ...styles.alertError }}
-            role="alert"
-          >
-            <i className="fas fa-exclamation-triangle me-2"></i>
-            {error}
-          </div>
-        )}
-
-        {/* Mensaje de éxito */}
-        {success && (
-          <div
-            className="alert border-0 mb-3"
-            style={{ ...styles.alert, ...styles.alertSuccess }}
-            role="alert"
-          >
-            <i className="fas fa-check-circle me-2"></i>
-            {success}
-          </div>
-        )}
-
-        {/* Botón de envío */}
-        <button
-          type="submit"
-          className="btn btn-lg w-100 fw-semibold py-3 mb-3"
-          style={{
-            ...styles.button,
-            ...(loading || !isFormValid ? styles.buttonDisabled : {}),
-          }}
-          disabled={loading || !isFormValid}
-        >
-          {loading ? (
-            <>
-              <span
-                className="spinner-border spinner-border-sm me-2"
-                role="status"
-              ></span>
-              Creando cuenta...
-            </>
-          ) : (
-            <>
-              <i className="fas fa-user-plus me-2"></i>
-              Crear Cuenta
-            </>
+          {/* Mensaje de éxito */}
+          {success && (
+            <div
+              className="alert border-0 mb-3"
+              style={{ ...styles.alert, ...styles.alertSuccess }}
+              role="alert"
+            >
+              <i className="fas fa-check-circle me-2"></i>
+              {success}
+            </div>
           )}
-        </button>
-      </form>
 
-      {/* Footer del formulario */}
-      <div className="text-center">
-        <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
-          ¿Ya tienes una cuenta?{' '}
-          <Link
-            to="/"
-            className="fw-semibold text-decoration-none"
-            style={{ color: colors.primary }}
+          {/* Botón de envío */}
+          <button
+            type="submit"
+            className="btn btn-lg w-100 fw-semibold py-3 mb-3"
+            style={{
+              ...styles.button,
+              ...(loading || !isFormValid ? styles.buttonDisabled : {}),
+            }}
+            disabled={loading || !isFormValid}
           >
-            Inicia sesión aquí
-          </Link>
-        </p>
+            {loading ? (
+              <>
+                <span
+                  className="spinner-border spinner-border-sm me-2"
+                  role="status"
+                ></span>
+                Creando cuenta...
+              </>
+            ) : (
+              <>
+                <i className="fas fa-user-plus me-2"></i>
+                Crear Cuenta
+              </>
+            )}
+          </button>
+        </form>
+
+        {/* Footer del formulario */}
+        <div className="text-center">
+          <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+            ¿Ya tienes una cuenta?{' '}
+            <Link
+              to="/"
+              className="fw-semibold text-decoration-none"
+              style={{ color: colors.primary }}
+            >
+              Inicia sesión aquí
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -459,10 +492,14 @@ export default function Register() {
     }
 
     if (!formData.password || !validatePassword(formData.password)) {
-      errors.password = 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número';
+      errors.password =
+        'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número';
     }
 
-    if (!formData.confirmPassword || formData.password !== formData.confirmPassword) {
+    if (
+      !formData.confirmPassword ||
+      formData.password !== formData.confirmPassword
+    ) {
       errors.confirmPassword = 'Las contraseñas no coinciden';
     }
 
@@ -470,37 +507,43 @@ export default function Register() {
     return Object.keys(errors).length === 0;
   }, [formData]);
 
-  const handleSubmit = useCallback(async (e) => {
-  e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
 
-  if (!validateForm()) {
-    setError('Por favor corrige los errores en el formulario');
-    return;
-  }
+      if (!validateForm()) {
+        setError('Por favor corrige los errores en el formulario');
+        return;
+      }
 
-  setError(null);
-  setSuccess(null);
-  setLoading(true);
+      setError(null);
+      setSuccess(null);
+      setLoading(true);
 
-  try {
-    // Llama a la API real
-    await registrarUsuario({
-      correo: sanitizeInput(formData.email),
-      contraseña: sanitizeInput(formData.password),
-      nombreCompleto: sanitizeInput(formData.nombre),
-      fechaNacimiento: formData.fechaNacimiento || "2000-01-01", // Ajusta según tu formulario
-    });
+      try {
+        // Llama a la API real
+        await registrarUsuario({
+          correo: sanitizeInput(formData.email),
+          contraseña: sanitizeInput(formData.password),
+          nombreCompleto: sanitizeInput(formData.nombre),
+          fechaNacimiento: formData.fechaNacimiento || '2000-01-01', // Ajusta según tu formulario
+        });
 
-    setSuccess('¡Cuenta creada exitosamente! Redirigiendo al login...');
-    setTimeout(() => {
-      window.location.href = '/';
-    }, 2000);
-  } catch (error) {
-    setError(error.message || 'Error al crear la cuenta. Inténtalo nuevamente.');
-  } finally {
-    setLoading(false);
-  }
-  }, [formData, validateForm]);
+        setSuccess('¡Cuenta creada exitosamente! Redirigiendo al login...');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+      } catch (error) {
+        console.log(error);
+        setError(
+          error.message || 'Error al crear la cuenta. Inténtalo nuevamente.'
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [formData, validateForm]
+  );
 
   return (
     <div

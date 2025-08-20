@@ -1,103 +1,157 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-export default function Home() {
+// Sistema de colores consistente con Login
+const colors = {
+  primary: '#22c55e',
+  primaryHover: '#16a34a',
+  secondary: '#64748b',
+  white: '#ffffff',
+  lightGray: '#f8fafc',
+  darkGray: '#334155',
+  background: '#ffffff',
+};
+
+// Estilos para la sección de bienvenida
+const styles = {
+  welcomeSection: {
+    minHeight: '60vh',
+    backgroundColor: colors.background,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '4rem 0',
+  },
+  welcomeContainer: {
+    textAlign: 'center',
+    maxWidth: '800px',
+    margin: '0 auto',
+  },
+  welcomeTitle: {
+    fontSize: '3.5rem',
+    fontWeight: 800,
+    color: colors.primary,
+    marginBottom: '1.5rem',
+    lineHeight: 1.2,
+  },
+  welcomeSubtitle: {
+    fontSize: '1.3rem',
+    color: colors.darkGray,
+    marginBottom: '2rem',
+    lineHeight: 1.6,
+  },
+  welcomeDescription: {
+    fontSize: '1.1rem',
+    color: colors.secondary,
+    marginBottom: '3rem',
+    lineHeight: 1.7,
+  },
+  ctaButton: {
+    backgroundColor: colors.primary,
+    border: 'none',
+    borderRadius: '12px',
+    padding: '1rem 2rem',
+    fontSize: '1.1rem',
+    fontWeight: 600,
+    color: colors.white,
+    textDecoration: 'none',
+    display: 'inline-block',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 4px 12px rgba(34, 197, 94, 0.3)',
+  },
+};
+
+// Componente de la sección de bienvenida
+const WelcomeSection = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      {/* Hero Section */}
-      <div className="text-center py-16 px-4">
-        <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-          Bienvenido a <span className="text-green-600">SafeHaven</span>
-        </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-          Tu espacio seguro para encontrar apoyo, recursos y conexiones que te ayuden 
-          en tu camino hacia el bienestar emocional y mental.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            to="/autoevaluacion"
-            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
-          >
-            Realizar Autoevaluación
-          </Link>
-          <Link
-            to="/recursos"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
-          >
-            Explorar Recursos
-          </Link>
-        </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-          ¿Qué ofrecemos?
-        </h2>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="text-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Autoevaluación</h3>
-            <p className="text-gray-600">Herramientas para evaluar tu estado emocional actual</p>
-          </div>
-
-          <div className="text-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Recursos</h3>
-            <p className="text-gray-600">Información y materiales educativos sobre salud mental</p>
-          </div>
-
-          <div className="text-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Foro</h3>
-            <p className="text-gray-600">Conecta con otros en un espacio seguro y de apoyo</p>
-          </div>
-
-          <div className="text-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Contacto</h3>
-            <p className="text-gray-600">Acceso directo a expertos y profesionales</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Emergency Section */}
-      <div className="bg-red-50 border-t border-red-200 py-12">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-red-800 mb-4">
-            ¿Necesitas ayuda inmediata?
-          </h2>
-          <p className="text-red-700 mb-6">
-            Si estás experimentando una crisis, no dudes en buscar ayuda profesional
+    <section style={styles.welcomeSection}>
+      <div className="container">
+        <div style={styles.welcomeContainer}>
+          <h1 style={styles.welcomeTitle}>Bienvenido a SafeHaven</h1>
+          <p style={styles.welcomeSubtitle}>
+            Tu espacio seguro para el bienestar mental
           </p>
-          <Link
-            to="/emergency"
-            className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-            Botón de Emergencia
-          </Link>
+          <p style={styles.welcomeDescription}>
+            Descubre recursos, conecta con una comunidad de apoyo y encuentra
+            las herramientas que necesitas para cuidar tu salud mental. Estamos
+            aquí para acompañarte en cada paso de tu camino hacia el bienestar.
+          </p>
+          <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+            <a
+              href="/autoevaluacion"
+              className="btn btn-lg"
+              style={styles.ctaButton}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = colors.primaryHover;
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 16px rgba(34, 197, 94, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = colors.primary;
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 12px rgba(34, 197, 94, 0.3)';
+              }}
+            >
+              <i className="fas fa-heart me-2"></i>
+              Comenzar Autoevaluación
+            </a>
+            <a
+              href="/recursos"
+              className="btn btn-lg btn-outline-success"
+              style={{
+                borderColor: colors.primary,
+                color: colors.primary,
+                borderRadius: '12px',
+                padding: '1rem 2rem',
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                textDecoration: 'none',
+                border: `2px solid ${colors.primary}`,
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = colors.primary;
+                e.target.style.color = colors.white;
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'transparent';
+                e.target.style.color = colors.primary;
+              }}
+            >
+              <i className="fas fa-book me-2"></i>
+              Explorar Recursos
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Componente principal del Home
+const Home = () => {
+  return (
+    <div className="min-vh-100" style={{ backgroundColor: colors.background }}>
+      {/* Espaciado para el navbar fijo */}
+      <div style={{ paddingTop: '80px' }}>
+        {/* Sección de Bienvenida */}
+        <WelcomeSection />
+
+        {/* Aquí irán las próximas secciones */}
+        <div style={{ minHeight: '200px', backgroundColor: colors.lightGray }}>
+          <div className="container py-5">
+            <div className="text-center">
+              <h3 style={{ color: colors.secondary }}>
+                Próximas secciones en desarrollo...
+              </h3>
+              <p style={{ color: colors.secondary }}>
+                Aquí agregaremos más contenido según tus especificaciones
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Home;
