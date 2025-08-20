@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const colors = {
@@ -142,84 +142,140 @@ function parseJwt(token) {
 export default function Profile() {
   const [usuario, setUsuario] = useState(null);
   const [error, setError] = useState(null);
-  const [sessionExpired, setSessionExpired] = useState(false);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const navigate = useNavigate();
+  const { userId } = useParams()
 
-  useEffect(() => {
-    const fetchUsuario = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) return navigate('/login', { replace: true });
+  // Función para obtener datos del usuario autenticado
+  const getCurrentUser = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    
+    const decoded = parseJwt(token);
+    if (!decoded || !decoded.id || (decoded.exp && decoded.exp < Date.now() / 1000)) {
+      return null;
+    }
+    
+    return decoded;
+  };
 
-        const decoded = parseJwt(token);
-        if (
-          !decoded ||
-          !decoded.id ||
-          (decoded.exp && decoded.exp < Date.now() / 1000)
-        ) {
-          setSessionExpired(true);
-          localStorage.removeItem('token');
-          setTimeout(() => navigate('/login', { replace: true }), 2000);
-          return;
-        }
-
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/usuarios/${decoded.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (!res.ok)
-          throw new Error(
-            res.status === 404
-              ? 'Usuario no encontrado'
-              : 'Error al obtener datos del usuario'
-          );
-        const data = await res.json();
-        if (!data.usuario)
-          throw new Error(
-            'La respuesta del servidor no contiene datos de usuario'
-          );
-
-        setUsuario(data.usuario);
-      } catch (err) {
-        setError(err.message);
+  // Función para obtener datos de cualquier usuario
+const fetchUsuario = async (targetUserId) => {
+  try {
+    // Usar la ruta pública SIN token
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/usuarios/public/${targetUserId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
-    };
-    fetchUsuario();
-  }, [navigate]);
+    );
 
-  if (sessionExpired)
-    return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <div style={styles.alertError}>
-            Sesión expirada. Redirigiendo al login...
-          </div>
-        </div>
-      </div>
-    );
-  if (error)
-    return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <div style={styles.alertError}>{error}</div>
-        </div>
-      </div>
-    );
-  if (!usuario)
+    if (!res.ok) {
+      if (res.status === 404) {
+        throw new Error('Usuario no encontrado');
+      } else if (res.status === 403) {
+        throw new Error('Este perfil es privado');
+      } else {
+        throw new Error('Error al obtener datos del usuario');
+      }
+    }
+
+    const data = await res.json();
+    if (!data.usuario) {
+      throw new Error('La respuesta del servidor no contiene datos de usuario');
+    }
+
+    return data.usuario;
+
+  } catch (err) {
+    console.error('Error en fetchUsuario:', err);
+    throw err;
+  }
+};
+
+
+useEffect(() => {
+  const loadProfile = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Validar que userId existe
+      if (!userId) {
+        setError('ID de usuario no válido');
+        return;
+      }
+
+      // Obtener datos del usuario objetivo (sin verificar autenticación)
+      const userData = await fetchUsuario(userId);
+      setUsuario(userData);
+
+      // Verificar si es perfil propio (opcional, para UI)
+      const currentUserData = getCurrentUser();
+      if (currentUserData) {
+        const isOwn = userId === currentUserData.id.toString();
+        setIsOwnProfile(isOwn);
+      }
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  loadProfile();
+}, [navigate, userId]); // ← Solo depende de userId
+
+
+  // Componente de carga
+  if (isLoading) {
     return (
       <div style={styles.container}>
         <style>{spinnerStyle}</style>
         <div style={styles.loading}>
-          <div style={styles.spinner}></div>Cargando perfil...
+          <div style={styles.spinner}></div>
+          Cargando perfil...
         </div>
       </div>
     );
+  }
+
+
+  // Componente de error
+  if (error) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <div style={styles.alertError}>{error}</div>
+          <div className="text-center mt-3">
+            <button 
+              className="btn btn-primary"
+              onClick={() => navigate('/')}
+            >
+              Volver al inicio
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Función para seguir/dejar de seguir usuario (placeholder)
+  const handleFollowToggle = async () => {
+    // TODO: Implementar lógica para seguir/dejar de seguir
+    console.log('Toggle follow para usuario:', usuario._id);
+  };
+
+  // Función para enviar mensaje (placeholder)
+  const handleSendMessage = () => {
+    // TODO: Implementar lógica de mensajes
+    console.log('Enviar mensaje a usuario:', usuario._id);
+  };
 
   return (
     <div
@@ -228,9 +284,9 @@ export default function Profile() {
         width: '100%',
         background: '#fafafa',
         display: 'flex',
-        justifyContent: 'flex-start', // cambiar de 'center' a 'flex-start'
+        justifyContent: 'flex-start',
         flexDirection: 'column',
-        paddingTop: '80px', // ajustar según altura del navbar
+        paddingTop: '80px',
       }}
     >
       <style>{spinnerStyle}</style>
@@ -272,18 +328,31 @@ export default function Profile() {
             >
               {usuario.rol}
             </span>
-            {usuario.visibilidadPerfil && (
-              <div className="text-muted" style={{ fontSize: '0.8rem' }}>
-                {usuario.visibilidadPerfil === 'publico'
-                  ? 'Perfil público'
-                  : 'Perfil privado'}
-              </div>
-            )}
 
-            {/* agregar bio*/}
-            <p> test de bio </p>
-            {/* agregar pronombres*/}
-            <p>Pronombres</p>
+            {/* Indicador de perfil propio/ajeno */}
+            <div className="text-muted" style={{ fontSize: '0.8rem' }}>
+              {isOwnProfile ? (
+                <span>Tu perfil</span>
+              ) : (
+                <span>Perfil de usuario</span>
+              )}
+              {usuario.visibilidadPerfil && (
+                <span>
+                  {' • '}
+                  {usuario.visibilidadPerfil === 'publico' ? 'Público' : 'Privado'}
+                </span>
+              )}
+            </div>
+
+            {/* Bio */}
+            <p className="mt-2 mb-1">
+              {usuario.bio || (isOwnProfile ? 'Agrega una bio desde configuración' : 'Sin bio')}
+            </p>
+
+            {/* Pronombres */}
+            <p className="text-muted" style={{ fontSize: '0.9rem' }}>
+              {usuario.pronombres || (isOwnProfile ? 'Agrega pronombres' : 'Pronombres no especificados')}
+            </p>
 
             {/* Estadísticas tipo Instagram */}
             <div className="d-flex gap-4 mt-2">
@@ -299,19 +368,46 @@ export default function Profile() {
             </div>
 
             {/* Botones de acción */}
-            <div className="d-flex gap-2 mt-2">
-              <button
-                className="btn btn-outline-primary btn-sm"
-                onClick={() => navigate('/editar-perfil')}
-              >
-                Editar perfil
-              </button>
-              <button
-                className="btn btn-outline-secondary btn-sm"
-                onClick={() => navigate('/configurar-perfil')}
-              >
-                Configurar perfil
-              </button>
+            <div className="d-flex gap-2 mt-3">
+              {isOwnProfile ? (
+                // Botones para perfil propio
+                <>
+                  <button
+                    className="btn btn-outline-primary btn-sm"
+                    onClick={() => navigate('/editar-perfil')}
+                  >
+                    Editar perfil
+                  </button>
+                  <button
+                    className="btn btn-outline-secondary btn-sm"
+                    onClick={() => navigate('/configurar-perfil')}
+                  >
+                    Configurar perfil
+                  </button>
+                </>
+              ) : (
+                // Botones para perfil ajeno
+                <>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={handleFollowToggle}
+                  >
+                    {usuario.isFollowing ? 'Dejar de seguir' : 'Seguir'}
+                  </button>
+                  <button
+                    className="btn btn-outline-secondary btn-sm"
+                    onClick={handleSendMessage}
+                  >
+                    Mensaje
+                  </button>
+                  <button
+                    className="btn btn-outline-secondary btn-sm"
+                    onClick={() => navigate(-1)}
+                  >
+                    Volver
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -320,7 +416,35 @@ export default function Profile() {
       {/* Contenedor posts tipo cuadrícula Instagram */}
       <div className="container py-3">
         {(!usuario.posts || usuario.posts.length === 0) && (
-          <p className="text-center text-muted">Aún no hay publicaciones</p>
+          <p className="text-center text-muted">
+            {isOwnProfile 
+              ? 'Aún no tienes publicaciones' 
+              : 'Este usuario no tiene publicaciones'}
+          </p>
+        )}
+
+        {/* Aquí puedes agregar la cuadrícula de posts cuando la implementes */}
+        {usuario.posts && usuario.posts.length > 0 && (
+          <div className="row g-2">
+            {usuario.posts.map((post, index) => (
+              <div key={index} className="col-4">
+                <div 
+                  className="position-relative"
+                  style={{
+                    aspectRatio: '1/1',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {/* Aquí renderizarías cada post */}
+                  <div className="d-flex align-items-center justify-content-center h-100">
+                    Post {index + 1}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

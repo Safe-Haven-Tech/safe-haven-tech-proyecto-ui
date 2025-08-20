@@ -1,7 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
-import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
 import Login from './pages/Sing_In';
 import Register from './pages/Register';
@@ -11,31 +10,25 @@ import ConfigurarPerfil from './pages/ConfigureProfile';
 
 export default function AppRoutes() {
   return (
-    <Router>
-      <MainLayout>
-        <Routes>
-          {/* Ruta principal  */}
-          <Route path="/" element={<Home />} />
+    <Routes>
+      {/* Ruta principal */}
+      <Route path="/" element={<Home />} />
 
-          {/* Ruta de registro */}
-          <Route path="/register" element={<Register />} />
+      {/* Ruta de registro */}
+      <Route path="/register" element={<Register />} />
 
-          {/* Ruta de login */}
-          <Route path="/login" element={<Login />} />
+      {/* Ruta de login */}
+      <Route path="/login" element={<Login />} />
 
-          {/* Ruta de perfil */}
-          <Route path="/perfil" element={<Profile />} />
+      {/* Ruta de perfil - TODOS los perfiles usan esta ruta */}
+      <Route path="/perfil/:userId" element={<Profile />} />
 
-          {/* Ruta de configuración de perfil */}
-          <Route path="/editar-perfil" element={<EditarPerfil />} />
+      {/* Rutas de configuración - solo para perfil propio */}
+      <Route path="/editar-perfil" element={<EditarPerfil />} />
+      <Route path="/configurar-perfil" element={<ConfigurarPerfil />} />
 
-          {/* Ruta de configuración de perfil */}
-          <Route path="/configurar-perfil" element={<ConfigurarPerfil />} />
-
-          {/* Ruta 404 para páginas no encontradas */}
-          <Route path="*" element={<div>Página no encontrada - 404</div>} />
-        </Routes>
-      </MainLayout>
-    </Router>
+      {/* Ruta 404 para páginas no encontradas */}
+      <Route path="*" element={<div>Página no encontrada - 404</div>} />
+    </Routes>
   );
 }
