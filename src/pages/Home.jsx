@@ -1,6 +1,8 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import background from '../assets/FondoLogin.png';
+
 // Sistema de colores consistente con Login
 const colors = {
   primary: '#22c55e',
@@ -16,7 +18,7 @@ const colors = {
 const styles = {
   welcomeSection: {
     minHeight: '60vh',
-    backgroundColor: colors.background,
+    backgroundImage : background,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

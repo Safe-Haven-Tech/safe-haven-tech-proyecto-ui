@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef, useMemo, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useUser } from '../context/UserContext'; 
 
 import background from '../assets/FondoLogin.png';
 import Logo from '../assets/Logo.png';
@@ -150,6 +151,9 @@ const LoginForm = React.memo(
   }) => {
     const [focusedField, setFocusedField] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
+
+
+  
 
     const handleEmailChange = useCallback(
       (e) => {
@@ -523,6 +527,9 @@ export default function Login() {
     };
   }, [lockoutTime]);
 
+
+    const { loadUsuario } = useUser();
+    
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -552,6 +559,7 @@ export default function Login() {
         if (data.accessToken) {
           localStorage.setItem('token', data.accessToken);
           localStorage.setItem('refreshToken', data.refreshToken);
+          loadUsuario();
 
           // Mostrar mensaje de éxito
           setSuccess('¡Inicio de sesión exitoso! Redirigiendo...');

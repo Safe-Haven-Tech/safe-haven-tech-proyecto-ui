@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Outlet } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import EmergencyButton from '../components/Emergency';
 
-export default function MainLayout({ children }) {
+export default function MainLayout() {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false); // 🔹 estado global del menú usuario
 
@@ -17,10 +17,7 @@ export default function MainLayout({ children }) {
       className="flex flex-col min-h-screen"
       style={{ backgroundColor: '#ffffff' }}
     >
-      {/* 🔹 Pasamos setMenuOpen al Navbar */}
       {!shouldHideNavbar && <Navbar onMenuToggle={setMenuOpen} />}
-
-      {/* 🔹 Pasamos el estado menuOpen al botón */}
       <EmergencyButton menuOpen={menuOpen} />
 
       <main
@@ -30,8 +27,10 @@ export default function MainLayout({ children }) {
           color: '#000000',
         }}
       >
-        {children}
+        <Outlet /> {/* 🔹 Aquí se renderizan las rutas hijas */}
       </main>
+
+      <Footer />
     </div>
   );
 }

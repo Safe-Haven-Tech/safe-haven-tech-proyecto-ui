@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
+import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
 import Login from './pages/Sing_In';
 import Register from './pages/Register';
@@ -11,23 +12,19 @@ import ConfigurarPerfil from './pages/ConfigureProfile';
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Ruta principal */}
-      <Route path="/" element={<Home />} />
-
-      {/* Ruta de registro */}
+      {/* Rutas fuera de layout */}
+      <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Ruta de login */}
-      <Route path="/login" element={<Login />} />
+      {/* Rutas dentro del layout */}
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/perfil/:nickname" element={<Profile />} />
+        <Route path="/editar-perfil" element={<EditarPerfil />} />
+        <Route path="/configurar-perfil" element={<ConfigurarPerfil />} />
+      </Route>
 
-      {/* Ruta de perfil - TODOS los perfiles usan esta ruta */}
-      <Route path="/perfil/:userId" element={<Profile />} />
-
-      {/* Rutas de configuración - solo para perfil propio */}
-      <Route path="/editar-perfil" element={<EditarPerfil />} />
-      <Route path="/configurar-perfil" element={<ConfigurarPerfil />} />
-
-      {/* Ruta 404 para páginas no encontradas */}
+      {/* Ruta 404 */}
       <Route path="*" element={<div>Página no encontrada - 404</div>} />
     </Routes>
   );

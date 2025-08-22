@@ -1,16 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import MainLayout from './layouts/MainLayout';
-import AppRoutes from './routes';
+import Routes from './routes'; // 👈 tu archivo se llama routes.jsx
 
-function App() {
-  return (
-    <Router>
-      <MainLayout>
-        <AppRoutes />
-      </MainLayout>
-    </Router>
-  );
+export default function App() {
+  return <Routes />;
 }
-
-export default App;
