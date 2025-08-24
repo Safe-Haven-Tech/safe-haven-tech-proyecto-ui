@@ -1,30 +1,19 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
-export async function registrarUsuario({
-  correo,
-  contraseña,
-  nombreCompleto,
-  fechaNacimiento,
-}) {
+export const registrarUsuario = async (data) => {
   const response = await fetch(`${API_URL}/api/usuarios/registro`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      correo,
-      contraseña,
-      nombreCompleto,
-      fechaNacimiento,
-    }),
+    body: JSON.stringify(data),
   });
 
-  const data = await response.json();
   if (!response.ok) {
-    const error = new Error(data.error);
-    console.log(error);
-    throw data;
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Error al registrar usuario');
   }
-  return data;
-}
+
+  return await response.json();
+};
 
 export async function iniciarSesion({ correo, contraseña }) {
   const response = await fetch(`${API_URL}/api/auth/login`, {
@@ -35,14 +24,15 @@ export async function iniciarSesion({ correo, contraseña }) {
 
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.error || 'Error al iniciar sesión');
+    const errorData = await response.json();
+    throw new Error(
+      errorData.detalles || errorData.error || 'Error al registrar usuario'
+    );
   }
 
   // Guardar tokens en localStorage
   localStorage.setItem('token', data.accessToken);
   localStorage.setItem('refreshToken', data.refreshToken);
-
-  // 🔹 Eliminamos jwt-decode: ya NO se guarda userId aquí
 
   return data;
 }

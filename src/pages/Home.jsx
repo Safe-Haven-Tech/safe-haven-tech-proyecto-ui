@@ -18,7 +18,7 @@ const colors = {
 const styles = {
   welcomeSection: {
     minHeight: '60vh',
-    backgroundImage : background,
+    backgroundImage: background,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

@@ -6,16 +6,19 @@ import EmergencyButton from '../components/Emergency';
 
 export default function MainLayout() {
   const location = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false); // 🔹 estado global del menú usuario
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  // Rutas donde NO queremos mostrar el navbar
   const hideNavbarRoutes = ['/login', '/register'];
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
 
   return (
     <div
-      className="flex flex-col min-h-screen"
-      style={{ backgroundColor: '#ffffff' }}
+      className="flex flex-col"
+      style={{
+        background: '#f0f2f5',
+        minHeight: '100vh',
+        position: 'relative',
+      }}
     >
       {!shouldHideNavbar && <Navbar onMenuToggle={setMenuOpen} />}
       <EmergencyButton menuOpen={menuOpen} />
@@ -25,12 +28,17 @@ export default function MainLayout() {
         style={{
           textAlign: 'left',
           color: '#000000',
+          display: 'flex',
+          flexDirection: 'column',
+          // Cambiar de minHeight a flex: 1 para que ocupe todo el espacio restante
+          flex: 1,
+          // Si necesitas un mínimo, usa esto en lugar del calc:
+          minHeight: shouldHideNavbar ? '100vh' : 'calc(100vh - 80px)',
+          position: 'relative',
         }}
       >
-        <Outlet /> {/* 🔹 Aquí se renderizan las rutas hijas */}
+        <Outlet />
       </main>
-
-      <Footer />
     </div>
   );
 }

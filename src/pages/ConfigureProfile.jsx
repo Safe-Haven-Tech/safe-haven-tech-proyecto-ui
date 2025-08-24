@@ -14,6 +14,8 @@ export default function ConfigurarPerfil() {
   const [showModal, setShowModal] = useState(false);
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [deleteError, setDeleteError] = useState('');
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const navigate = useNavigate();
 
@@ -101,31 +103,64 @@ export default function ConfigurarPerfil() {
     return <div className="text-center mt-5 pt-5">Cargando usuario...</div>;
 
   const handleDeleteAccount = async () => {
-    setCargando(true);
+    if (!passwordConfirm) {
+      setDeleteError('Por favor, ingresa tu contraseña para confirmar');
+      return;
+    }
+
+    if (deleteConfirmation.toLowerCase() !== 'eliminar') {
+      setDeleteError('Por favor, escribe "ELIMINAR" para confirmar');
+      return;
+    }
+
+    setIsDeleting(true);
     setDeleteError('');
+
     try {
       const token = localStorage.getItem('token');
+      const decoded = JSON.parse(atob(token.split('.')[1]));
+
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/usuarios/delete`,
+        `${import.meta.env.VITE_API_URL}/api/usuarios/${decoded.id}`,
         {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ password: passwordConfirm }),
+          // Cambiar "password" por "contraseña" (con eñe)
+          body: JSON.stringify({
+            contraseña: passwordConfirm,
+          }),
         }
       );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al eliminar la cuenta');
 
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(
+          data.detalles?.join?.(', ') ||
+            data.error ||
+            `Error ${res.status}: ${res.statusText}`
+        );
+      }
+
+      // Éxito - cerrar sesión y redirigir
       localStorage.removeItem('token');
-      navigate('/');
+      localStorage.removeItem('refreshToken');
+      setMensaje('Cuenta eliminada correctamente. Redirigiendo...');
+
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 2000);
     } catch (err) {
-      setDeleteError(err.message);
+      console.error('Error al eliminar cuenta:', err);
+      setDeleteError(
+        err.message ||
+          'Error al eliminar la cuenta. Por favor, intenta nuevamente.'
+      );
     } finally {
-      setCargando(false);
-      setPasswordConfirm('');
+      setIsDeleting(false);
     }
   };
 
@@ -170,32 +205,29 @@ export default function ConfigurarPerfil() {
           background: '#fff',
         }}
       >
-<div style={{ marginBottom: '10px', alignSelf: 'flex-start' }}>
-  <span
-    onClick={() => navigate(`/perfil/${usuario?.nombreUsuario}`)}
-    style={{
-      cursor: 'pointer',
-      color: '#555',
-      fontSize: '0.9rem',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '6px',
-      transition: 'color 0.2s',
-    }}
-    onMouseEnter={(e) => (e.currentTarget.style.color = '#22c55e')} // verde sutil
-    onMouseLeave={(e) => (e.currentTarget.style.color = '#555')}
-  >
-    ← Volver a mi perfil
-  </span>
-</div>
-        
+        <div style={{ marginBottom: '10px', alignSelf: 'flex-start' }}>
+          <span
+            onClick={() => navigate(`/perfil/${usuario?.nombreUsuario}`)}
+            style={{
+              cursor: 'pointer',
+              color: '#555',
+              fontSize: '0.9rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'color 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#22c55e')} // verde sutil
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#555')}
+          >
+            ← Volver a mi perfil
+          </span>
+        </div>
+
         <h3 className="text-center mb-4">Configurar perfil</h3>
-
-
 
         {error && <div className="alert alert-danger">{error}</div>}
         {mensaje && <div className="alert alert-success">{mensaje}</div>}
-
 
         {/* Contraseña */}
         <div
@@ -371,39 +403,62 @@ export default function ConfigurarPerfil() {
         >
           Eliminar cuenta
         </button>
-
         <Modal show={showModal} onHide={handleCloseModal} centered>
           <Modal.Header closeButton>
-            <Modal.Title>Eliminar cuenta</Modal.Title>
+            <Modal.Title>Eliminar cuenta permanentemente</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <p style={{ color: '#dc3545', fontWeight: '600' }}>
-              ⚠️ Esta acción es <strong>permanente</strong>.
+              ⚠️ Esta acción es <strong>irreversible</strong>.
             </p>
             <p>
-              Entendemos que esta decisión puede ser difícil. Al eliminar tu
-              cuenta, toda tu información, publicaciones y conexiones se
-              borrarán de manera irreversible. Si quieres tomarte un tiempo para
-              pensarlo, puedes cancelar y volver más tarde.
+              Todos tus datos, publicaciones y configuraciones se perderán
+              permanentemente. ¿Estás absolutamente seguro de que deseas
+              continuar?
             </p>
-            <label>Ingresa tu contraseña para confirmar:</label>
-            <input
-              type="password"
-              className="form-control"
-              value={passwordConfirm}
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-              style={{ borderRadius: '14px', marginTop: '0.5rem' }}
-            />
+
+            <div className="mb-3">
+              <label>Para confirmar, ingresa tu contraseña:</label>
+              <input
+                type="password"
+                className="form-control"
+                value={passwordConfirm}
+                onChange={(e) => setPasswordConfirm(e.target.value)}
+                style={{ borderRadius: '14px', marginTop: '0.5rem' }}
+                placeholder="Contraseña actual"
+              />
+            </div>
+
+            <div className="mb-3">
+              <label>Escribe "ELIMINAR" para confirmar:</label>
+              <input
+                type="text"
+                className="form-control"
+                value={deleteConfirmation}
+                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                style={{ borderRadius: '14px', marginTop: '0.5rem' }}
+                placeholder="Escribe ELIMINAR aquí"
+              />
+            </div>
+
             {deleteError && (
-              <div className="text-danger mt-2">{deleteError}</div>
+              <div className="alert alert-danger mt-3">{deleteError}</div>
             )}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleCloseModal}>
               Cancelar
             </Button>
-            <Button variant="danger" onClick={handleDeleteAccount}>
-              Confirmar eliminación
+            <Button
+              variant="danger"
+              onClick={handleDeleteAccount}
+              disabled={
+                isDeleting ||
+                !passwordConfirm ||
+                deleteConfirmation.toLowerCase() !== 'eliminar'
+              }
+            >
+              {isDeleting ? 'Eliminando...' : 'Eliminar cuenta permanentemente'}
             </Button>
           </Modal.Footer>
         </Modal>
