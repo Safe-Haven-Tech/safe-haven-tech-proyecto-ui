@@ -1,79 +1,29 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/Logo.png';
+import { useAuth } from '../context/useAuth';
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState(null);
-  const [tokenVersion, setTokenVersion] = useState(0);
+  const { usuario } = useAuth();
+  const [_version, setVersion] = useState(0);
   const navigate = useNavigate();
 
-  // ✅ Usar useCallback para memoizar la función
-  const checkAuthStatus = useCallback(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        // Decodificar el token JWT para obtener información del usuario
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        setUserData(payload);
-        setIsLoggedIn(true);
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        logout();
-      }
-    } else {
-      setIsLoggedIn(false);
-      setUserData(null);
-    }
+  useEffect(() => {
+    const handleTokenChange = () => setVersion((v) => v + 1);
+    window.addEventListener('tokenChanged', handleTokenChange);
+    return () => window.removeEventListener('tokenChanged', handleTokenChange);
   }, []);
 
-  // Verificar si el usuario está autenticado al cargar el componente
-  useEffect(() => {
-    checkAuthStatus();
-  }, [checkAuthStatus, tokenVersion]); // ✅ Añadir tokenVersion como dependencia
-
-  // ✅ Escuchar cambios en el localStorage para actualizar el token
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'token') {
-        // Forzar actualización incrementando la versión
-        setTokenVersion((prev) => prev + 1);
-        checkAuthStatus();
-      }
-    };
-
-    // Escuchar eventos de storage (entre pestañas)
-    window.addEventListener('storage', handleStorageChange);
-
-    // Escuchar eventos personalizados (misma pestaña)
-    window.addEventListener('tokenChanged', checkAuthStatus);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('tokenChanged', checkAuthStatus);
-    };
-  }, [checkAuthStatus]);
+  const handleProfileClick = () => {
+    if (usuario && usuario.nombreUsuario) {
+      navigate(`/perfil/${usuario.nombreUsuario}`);
+    } else {
+      navigate('/perfil');
+    }
+  };
 
   const handleSearchClick = () => {
     // lógica para búsqueda
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    setIsLoggedIn(false);
-    setUserData(null);
-
-    navigate('/');
-  };
-
-  const handleProfileClick = () => {
-    if (userData && userData.nombreUsuario) {
-      // ✅ Redirigir al perfil del usuario con su nickname
-      navigate(`/perfil/${userData.nombreUsuario}`);
-    } else {
-      // Fallback por si no hay nombre de usuario en el token
-      navigate('/perfil');
-    }
   };
 
   return (
@@ -137,10 +87,7 @@ export default function Navbar() {
       <div
         className="collapse navbar-collapse justify-content-end"
         id="navbarSupportedContent"
-        style={{
-          position: 'relative',
-          zIndex: 2110,
-        }}
+        style={{ position: 'relative', zIndex: 2110 }}
       >
         <ul className="navbar-nav mb-2 mb-lg-0" style={{ marginLeft: 'auto' }}>
           {[
@@ -214,11 +161,9 @@ export default function Navbar() {
           </button>
 
           {/* Botón notificaciones (solo para usuarios logueados) */}
-          {isLoggedIn && (
+          {usuario && (
             <button
-              onClick={() => {
-                // TODO: Implementar lógica para abrir panel de notificaciones
-              }}
+              onClick={() => {}}
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -243,10 +188,9 @@ export default function Navbar() {
           )}
 
           {/* Botones de autenticación o menú de usuario */}
-          {isLoggedIn ? (
-            // Usuario logueado - Mostrar botón de Mi Perfil y menú desplegable
+          {usuario ? (
+            // Usuario logueado
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              {/* Botón Mi Perfil */}
               <button
                 onClick={handleProfileClick}
                 style={{
@@ -271,7 +215,7 @@ export default function Navbar() {
               </button>
             </div>
           ) : (
-            // Usuario no logueado - Mostrar botones de Login y Registro
+            // Usuario no logueado
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <button
                 onClick={() => navigate('/login')}

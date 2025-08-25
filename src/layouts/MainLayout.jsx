@@ -1,40 +1,37 @@
 import React, { useState } from 'react';
-import { useLocation, Outlet } from 'react-router-dom';
-import Navbar from '../components/navbar';
-import Footer from '../components/Footer';
-import EmergencyButton from '../components/Emergency';
+import { Outlet } from 'react-router-dom';
+
+import { useAuth } from '../context/useAuth';
+import { useHideNavbar } from '../hooks/useHideNavbar';
+
+import Navbar from '../components/Navbar';
+import EmergencyButton from '../components/EmergencyButton';
 
 export default function MainLayout() {
-  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { usuario } = useAuth();
 
-  const hideNavbarRoutes = ['/login', '/register'];
-  const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
+  const shouldHideNavbar = useHideNavbar();
 
   return (
     <div
-      className="flex flex-col"
+      className="d-flex flex-column"
       style={{
-        background: '#f0f2f5',
         minHeight: '100vh',
         position: 'relative',
+        background: '#f0f2f5',
       }}
     >
-      {!shouldHideNavbar && <Navbar onMenuToggle={setMenuOpen} />}
+      {!shouldHideNavbar && (
+        <Navbar onMenuToggle={setMenuOpen} usuario={usuario} />
+      )}
       <EmergencyButton menuOpen={menuOpen} />
-
       <main
-        className="flex-grow w-100"
+        className="flex-grow-1 w-100 d-flex flex-column"
         style={{
-          textAlign: 'left',
-          color: '#000000',
-          display: 'flex',
-          flexDirection: 'column',
-          // Cambiar de minHeight a flex: 1 para que ocupe todo el espacio restante
-          flex: 1,
-          // Si necesitas un mínimo, usa esto en lugar del calc:
           minHeight: shouldHideNavbar ? '100vh' : 'calc(100vh - 80px)',
           position: 'relative',
+          color: '#000',
         }}
       >
         <Outlet />

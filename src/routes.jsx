@@ -3,12 +3,15 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import MainLayout from './layouts/MainLayout';
-import Home from './pages/Home';
-import Login from './pages/Sing_In';
-import Register from './pages/Register';
-import Profile from './pages/Profile';
-import EditarPerfil from './pages/EditProfile';
-import ConfigurarPerfil from './pages/ConfigureProfile';
+
+import Home from './pages/Home/HomePage';
+
+import Login from './pages/auth/SignIn';
+import Register from './pages/auth/RegisterPage';
+
+import Profile from './pages/Profile/ProfilePage';
+import EditarPerfil from './pages/Profile/EditProfilePage';
+import ConfigurarPerfil from './pages/Profile/ConfigureProfilePage';
 
 export default function AppRoutes() {
   return (

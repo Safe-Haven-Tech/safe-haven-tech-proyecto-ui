@@ -1,7 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import background from '../assets/FondoLogin.png';
+import background from '../../assets/FondoLogin.png';
 
 // Sistema de colores consistente con Login
 const colors = {

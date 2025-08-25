@@ -1,0 +1,14 @@
+App.css
+App.jsx
+assets
+components
+context
+hooks
+index.css
+layouts
+lista.txt
+main.jsx
+pages
+routes.jsx
+services
+utils
