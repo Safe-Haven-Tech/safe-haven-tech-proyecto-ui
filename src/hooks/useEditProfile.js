@@ -99,7 +99,7 @@ function perfilReducer(state, action) {
       return {
         ...state,
         imagenSeleccionada: action.imagen,
-        previsualizacion: action.previsualizacion,
+        previsualizacionImagen: action.previsualizacion,
       };
     case 'SET_MOSTRAR_CONFIRMACION':
       return { ...state, mostrarConfirmacion: action.mostrar };
@@ -246,15 +246,54 @@ export const useEditarPerfil = () => {
     const archivo = event.target.files[0];
     if (!archivo) return;
 
+    // Validar tipo
+    const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!tiposPermitidos.includes(archivo.type)) {
+      dispatch({
+        type: 'SET_ERROR',
+        error: 'Solo se permiten imágenes JPG o PNG',
+      });
+      return;
+    }
+
+    // Validar tamaño (2MB máximo)
+    const maxSize = 2 * 1024 * 1024;
+    if (archivo.size > maxSize) {
+      dispatch({ type: 'SET_ERROR', error: 'La imagen no puede superar 2MB' });
+      return;
+    }
+
     dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      dispatch({
-        type: 'SET_IMAGEN_SELECCIONADA',
-        imagen: archivo,
-        previsualizacion: e.target.result,
-      });
+      const img = new Image();
+      img.src = e.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 300; // ancho/alto máximo para preview
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height && width > maxDim) {
+          height *= maxDim / width;
+          width = maxDim;
+        } else if (height >= width && height > maxDim) {
+          width *= maxDim / height;
+          height = maxDim;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        dispatch({
+          type: 'SET_IMAGEN_SELECCIONADA',
+          imagen: archivo,
+          previsualizacionImagen: canvas.toDataURL('image/png'),
+        });
+      };
     };
     reader.readAsDataURL(archivo);
   }, []);
@@ -319,7 +358,6 @@ export const useEditarPerfil = () => {
         mensaje: 'Perfil actualizado correctamente',
       });
 
-      // Actualizar estado local
       dispatch({
         type: 'SET_USUARIO',
         usuario: {
@@ -334,7 +372,18 @@ export const useEditarPerfil = () => {
       dispatch({ type: 'LIMPIAR_IMAGEN' });
       dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
     } catch (error) {
-      dispatch({ type: 'SET_ERROR', error: error.message });
+      // Manejo de errores específicos
+      if (error.response?.status === 413) {
+        // Payload demasiado grande
+        dispatch({
+          type: 'SET_ERROR',
+          error: 'La imagen es demasiado grande, máximo 2MB',
+        });
+      } else if (error.response?.data?.message) {
+        dispatch({ type: 'SET_ERROR', error: error.response.data.message });
+      } else {
+        dispatch({ type: 'SET_ERROR', error: 'Error al actualizar la imagen' });
+      }
     } finally {
       dispatch({ type: 'SET_CARGANDO', cargando: false });
     }

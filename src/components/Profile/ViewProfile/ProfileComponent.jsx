@@ -356,9 +356,7 @@ const ProfileContent = React.memo(({ usuario, isOwnProfile }) => {
               marginBottom: '1rem',
               opacity: 0.5,
             }}
-          >
-            📷
-          </div>
+          ></div>
           <h5 className="text-muted mb-2">
             {isOwnProfile
               ? 'Aún no tienes publicaciones'

@@ -21,6 +21,7 @@ const RegisterForm = React.memo(
     error,
     success,
     loading,
+    handleFieldBlur,
   }) => {
     const [focusedField, setFocusedField] = useState(null);
     const [hoveredField, setHoveredField] = useState(null);
@@ -40,10 +41,61 @@ const RegisterForm = React.memo(
       return Object.values(fieldValidation).every((v) => v === 'valid');
     }, [fieldValidation]);
 
+    const nicknameFeedback = useMemo(() => {
+      if (validationErrors.nickname) {
+        return (
+          <div className="invalid-feedback d-block mt-2">
+            {validationErrors.nickname}
+          </div>
+        );
+      }
+      if (!formData.nickname) return null;
+      if (!validateNickname(formData.nickname)) {
+        return (
+          <div className="invalid-feedback d-block mt-2">
+            Nickname inválido (solo letras, números y guiones bajos)
+          </div>
+        );
+      }
+      if (validatingNickname)
+        return (
+          <div className="form-text text-info mt-2">
+            Verificando disponibilidad...
+          </div>
+        );
+      if (!validatingNickname && nicknameAvailable)
+        return (
+          <div className="text-success small mt-2">Nickname disponible ✅</div>
+        );
+      if (!validatingNickname && !nicknameAvailable)
+        return (
+          <div className="invalid-feedback d-block mt-2">
+            Nickname ya en uso
+          </div>
+        );
+      return null;
+    }, [
+      formData.nickname,
+      validationErrors.nickname,
+      validatingNickname,
+      nicknameAvailable,
+    ]);
+
     const getInputStyle = (fieldName) => {
-      const baseStyle = { ...styles.input };
-      if (focusedField === fieldName || hoveredField === fieldName)
-        return { ...baseStyle, ...styles.inputFocus };
+      let baseStyle = { ...styles.input };
+
+      // Aplicar focus/hover
+      if (focusedField === fieldName || hoveredField === fieldName) {
+        baseStyle = { ...baseStyle, ...styles.inputFocus };
+      }
+
+      // Aplicar estado de validación
+      if (fieldValidation[fieldName] === 'valid') {
+        baseStyle = { ...baseStyle, ...styles.inputSuccess };
+      } else if (fieldValidation[fieldName] === 'invalid') {
+        baseStyle = { ...baseStyle, ...styles.inputError };
+      }
+
       return baseStyle;
     };
 
@@ -55,35 +107,7 @@ const RegisterForm = React.memo(
           icon: 'at',
           type: 'text',
           placeholder: 'Tu nickname único',
-          feedback: () => {
-            if (!formData.nickname) return null;
-            if (!validateNickname(formData.nickname)) {
-              return (
-                <div className="invalid-feedback d-block mt-2">
-                  Nickname inválido
-                </div>
-              );
-            }
-            if (validatingNickname)
-              return (
-                <div className="form-text text-info mt-2">
-                  Verificando disponibilidad...
-                </div>
-              );
-            if (!validatingNickname && nicknameAvailable)
-              return (
-                <div className="text-success small mt-2">
-                  Nickname disponible ✅
-                </div>
-              );
-            if (!validatingNickname && !nicknameAvailable)
-              return (
-                <div className="invalid-feedback d-block mt-2">
-                  Nickname ya en uso
-                </div>
-              );
-            return null;
-          },
+          feedback: () => nicknameFeedback,
         },
         {
           name: 'email',
@@ -92,17 +116,18 @@ const RegisterForm = React.memo(
           type: 'email',
           placeholder: 'tu@correo.com',
           feedback: () => {
+            if (validationErrors.email) {
+              return (
+                <div className="invalid-feedback d-block mt-2">
+                  {validationErrors.email}
+                </div>
+              );
+            }
             if (!formData.email) return null;
             if (!validateEmail(formData.email))
               return (
                 <div className="invalid-feedback d-block mt-2">
                   Email inválido
-                </div>
-              );
-            if (validationErrors.email)
-              return (
-                <div className="invalid-feedback d-block mt-2">
-                  {validationErrors.email}
                 </div>
               );
             return (
@@ -117,8 +142,15 @@ const RegisterForm = React.memo(
           type: showPassword ? 'text' : 'password',
           placeholder: 'Contraseña',
           toggleShow: () => setShowPassword((prev) => !prev),
-          inputStyle: { paddingRight: '4rem' }, // espacio para tick + ojo
+          inputStyle: { paddingRight: '4rem' },
           feedback: () => {
+            if (validationErrors.password) {
+              return (
+                <div className="invalid-feedback d-block mt-2">
+                  {validationErrors.password}
+                </div>
+              );
+            }
             if (!formData.password) return null;
             return fieldValidation.password === 'valid' ? (
               <div className="text-success small mt-2">
@@ -126,12 +158,11 @@ const RegisterForm = React.memo(
               </div>
             ) : (
               <div className="invalid-feedback d-block mt-2">
-                La contraseña debe tener 8-20 caracteres, incluir mayúscula,
-                minúscula y un número
+                La contraseña debe tener al menos 8 caracteres
               </div>
             );
           },
-          showTick: true, // para renderizar tick junto al input
+          showTick: true,
         },
         {
           name: 'confirmPassword',
@@ -142,6 +173,13 @@ const RegisterForm = React.memo(
           toggleShow: () => setShowConfirmPassword((prev) => !prev),
           inputStyle: { paddingRight: '4rem' },
           feedback: () => {
+            if (validationErrors.confirmPassword) {
+              return (
+                <div className="invalid-feedback d-block mt-2">
+                  {validationErrors.confirmPassword}
+                </div>
+              );
+            }
             if (!formData.confirmPassword) return null;
             return fieldValidation.confirmPassword === 'valid' ? (
               <div className="text-success small mt-2">
@@ -173,17 +211,16 @@ const RegisterForm = React.memo(
         formData,
         fieldValidation,
         validationErrors,
-        validatingNickname,
-        nicknameAvailable,
         showPassword,
         showConfirmPassword,
+        nicknameFeedback,
       ]
     );
 
     return (
       <div
         className="d-flex justify-content-center align-items-center vh-100"
-        style={{ backgroundColor: colors.lightGray }}
+        style={{}}
       >
         <div style={styles.formContainer}>
           <div className="text-center mb-4">
@@ -201,7 +238,18 @@ const RegisterForm = React.memo(
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="mb-3">
+          <form onSubmit={handleSubmit} className="mb-3" autoComplete="off">
+            <input
+              type="text"
+              name="fake-username"
+              style={{ display: 'none' }}
+            />
+            <input
+              type="password"
+              name="fake-password"
+              style={{ display: 'none' }}
+            />
+
             {inputs.map((input) => (
               <div className="mb-3" key={input.name}>
                 <label className="form-label fw-semibold text-dark mb-2 d-flex align-items-center">
@@ -221,6 +269,7 @@ const RegisterForm = React.memo(
                         fechaNacimiento: date,
                       }))
                     }
+                    onBlur={() => handleFieldBlur('fechaNacimiento')}
                     disabled={loading}
                     placeholder={input.placeholder}
                     showAge
@@ -235,16 +284,16 @@ const RegisterForm = React.memo(
                       value={formData[input.name] || ''}
                       onChange={handleInputChange}
                       onFocus={() => setFocusedField(input.name)}
-                      onBlur={() => setFocusedField(null)}
+                      onBlur={() => {
+                        setFocusedField(null);
+                        handleFieldBlur(input.name);
+                      }}
                       onMouseEnter={() => setHoveredField(input.name)}
                       onMouseLeave={() => setHoveredField(null)}
-                      className={`form-control form-control-lg border-0 ${
-                        fieldValidation[input.name] === 'valid'
-                          ? 'is-valid'
-                          : fieldValidation[input.name] === 'invalid'
-                            ? 'is-invalid'
-                            : ''
-                      }${input.toggleShow ? ' pe-5' : ''}`}
+                      autoComplete={
+                        input.name.includes('password') ? 'new-password' : 'off'
+                      }
+                      className={`form-control form-control-lg ${input.toggleShow ? 'pe-5' : ''}`}
                       style={{
                         ...getInputStyle(input.name),
                         ...input.inputStyle,

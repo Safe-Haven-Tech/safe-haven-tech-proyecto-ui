@@ -59,11 +59,6 @@ const LoginForm = React.memo(
       [password]
     );
 
-    const handleRegisterClick = useCallback((e) => {
-      e.preventDefault();
-      alert('Funcionalidad de registro en desarrollo');
-    }, []);
-
     return (
       <div className="h-100 d-flex flex-column justify-content-center px-3 py-2">
         {/* Header */}
@@ -225,10 +220,9 @@ const LoginForm = React.memo(
             <p className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>
               ¿No tienes una cuenta?{' '}
               <a
-                href="#"
-                className="fw-semibold text-decoration-none"
+                href="/Register"
+                className="fw-semibold"
                 style={{ color: colors.primary }}
-                onClick={handleRegisterClick}
               >
                 Regístrate aquí
               </a>

@@ -1,4 +1,3 @@
-// src/utils/stylesRegister.js
 export const colors = {
   primary: '#22c55e',
   primaryHover: '#16a34a',
@@ -15,7 +14,9 @@ export const styles = {
   title: { fontSize: '2.5rem', fontWeight: 800, color: colors.primary },
   input: {
     borderRadius: '12px',
-    border: `2px solid ${colors.primary}`,
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderColor: colors.primary,
     padding: '16px 20px',
     fontSize: '1rem',
     backgroundColor: colors.white,
@@ -35,7 +36,9 @@ export const styles = {
   },
   button: {
     backgroundColor: colors.primary,
-    border: 'none',
+    borderWidth: '0px',
+    borderStyle: 'solid',
+    borderColor: 'transparent',
     boxShadow: '0 4px 12px rgba(34,197,94,0.3)',
     fontSize: '1.1rem',
     borderRadius: '12px',
@@ -48,19 +51,25 @@ export const styles = {
   alertError: {
     backgroundColor: '#fef2f2',
     color: colors.error,
-    border: `1px solid #fecaca`,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: '#fecaca',
   },
   alertSuccess: {
     backgroundColor: '#f0fdf4',
     color: colors.success,
-    border: `1px solid #bbf7d0`,
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: '#bbf7d0',
   },
   formContainer: {
     backgroundColor: 'rgba(248,250,252,0.95)',
     boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
     borderRadius: '20px',
     padding: '40px',
-    border: '1px solid rgba(255,255,255,0.2)',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'rgba(255,255,255,0.2)',
     maxWidth: '500px',
     width: '100%',
   },

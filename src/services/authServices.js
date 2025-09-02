@@ -23,10 +23,10 @@ export async function iniciarSesion({ correo, contraseña }) {
   });
 
   const data = await response.json();
+
   if (!response.ok) {
-    const errorData = await response.json();
     throw new Error(
-      errorData.detalles || errorData.error || 'Error al registrar usuario'
+      data.detalles || data.error || data.message || 'Error al iniciar sesión'
     );
   }
 

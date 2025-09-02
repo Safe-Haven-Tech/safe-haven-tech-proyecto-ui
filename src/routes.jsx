@@ -13,6 +13,10 @@ import Profile from './pages/Profile/ProfilePage';
 import EditarPerfil from './pages/Profile/EditProfilePage';
 import ConfigurarPerfil from './pages/Profile/ConfigureProfilePage';
 
+import SelfAssessment from './pages/AutoEvaluacion/assessmentsHome';
+import ViewSurvey from './pages/AutoEvaluacion/ViewSurvey';
+import MyEvaluations from './pages/AutoEvaluacion/MyEvaluations';
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -26,6 +30,9 @@ export default function AppRoutes() {
         <Route path="/perfil/:nickname" element={<Profile />} />
         <Route path="/editar-perfil" element={<EditarPerfil />} />
         <Route path="/configurar-perfil" element={<ConfigurarPerfil />} />
+        <Route path="/autoevaluacion" element={<SelfAssessment />} />
+        <Route path="/encuesta/:id" element={<ViewSurvey />} />
+        <Route path="/mis-evaluaciones" element={<MyEvaluations />} />
       </Route>
 
       {/* Ruta 404 */}

@@ -24,6 +24,13 @@ export const useEditarPerfilValidation = (initialData = {}) => {
   const debounceTimers = useRef({});
   const originalNickname = useRef(initialData.nombreUsuario);
 
+  const originalData = useRef({
+    nombreCompleto: initialData.nombreCompleto || '',
+    nombreUsuario: initialData.nombreUsuario || '',
+    pronombres: initialData.pronombres || '',
+    biografia: initialData.biografia || '',
+  });
+
   // Funciones de validación con mensajes específicos
   const validateNombreCompleto = (nombre) => {
     if (!nombre || !nombre.trim()) {
@@ -245,15 +252,11 @@ export const useEditarPerfilValidation = (initialData = {}) => {
     return `${length}/${LIMITES.BIOGRAFIA.MAX} caracteres`;
   }, [formData.biografia]);
 
-  // Verificar si hay cambios respecto a los datos originales
   const hasChanges = useCallback(() => {
-    return (
-      formData.nombreCompleto !== (initialData.nombreCompleto || '') ||
-      formData.nombreUsuario !== (initialData.nombreUsuario || '') ||
-      formData.pronombres !== (initialData.pronombres || '') ||
-      formData.biografia !== (initialData.biografia || '')
+    return Object.keys(formData).some(
+      (key) => formData[key] !== originalData.current[key]
     );
-  }, [formData, initialData]);
+  }, [formData]);
 
   // Efecto para validar el formulario cuando cambien los errores
   useEffect(() => {

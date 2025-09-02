@@ -4,6 +4,7 @@ import RegisterForm from '../../components/Register/RegisterForm';
 import background from '../../assets/FondoRegister.png';
 import { sanitizeInput } from '../../utils/validators';
 import { registrarUsuario } from '../../services/authServices';
+
 import { useFormValidation } from '../../hooks/useFormValidator';
 
 export default function Register() {
@@ -30,6 +31,7 @@ export default function Register() {
     validatingNickname,
     nicknameAvailable,
     validateForm,
+    handleFieldBlur,
   } = useFormValidation(initialFormData);
 
   const [error, setError] = useState(null);
@@ -95,6 +97,7 @@ export default function Register() {
         fieldValidation={fieldValidation}
         validatingNickname={validatingNickname}
         nicknameAvailable={nicknameAvailable}
+        handleFieldBlur={handleFieldBlur}
       />
     ),
     [
@@ -108,21 +111,29 @@ export default function Register() {
       fieldValidation,
       validatingNickname,
       nicknameAvailable,
+      handleFieldBlur,
     ]
   );
 
   return (
     <div
-      className="min-vh-100 d-flex align-items-center justify-content-center w-100 p-3"
+      className="w-100 p-3"
       style={{
+        minHeight: '100vh', // permite crecer si el contenido lo necesita
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start', // evita cortar cuando hay scroll
         backgroundImage: `url(${background})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         backgroundColor: '#f0f0f0',
         position: 'relative',
+        paddingTop: '5vh', // espacio superior para que no quede pegado
+        paddingBottom: '5vh', // espacio inferior
       }}
     >
+      {/* Overlay */}
       <div
         style={{
           position: 'absolute',
