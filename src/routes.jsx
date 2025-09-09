@@ -17,6 +17,9 @@ import SelfAssessment from './pages/AutoEvaluacion/assessmentsHome';
 import ViewSurvey from './pages/AutoEvaluacion/ViewSurvey';
 import MyEvaluations from './pages/AutoEvaluacion/MyEvaluations';
 
+import InformationalResourcesHome from './pages/InformationalResources/ResourcesHome';
+import ResourceDetail from './pages/InformationalResources/ResourceDetail';
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -33,6 +36,8 @@ export default function AppRoutes() {
         <Route path="/autoevaluacion" element={<SelfAssessment />} />
         <Route path="/encuesta/:id" element={<ViewSurvey />} />
         <Route path="/mis-evaluaciones" element={<MyEvaluations />} />
+        <Route path="/recursosinformativos" element={<InformationalResourcesHome />} />
+        <Route path="/recurso/:id" element={<ResourceDetail />} />
       </Route>
 
       {/* Ruta 404 */}

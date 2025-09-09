@@ -3,6 +3,7 @@ import { useReducer, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LIMITES } from '../utils/validators';
 import { parseJwt } from '../utils/token';
+import { useAuth } from '../context/useAuth';
 import {
   fetchUsuarioCompleto,
   actualizarPerfil,
@@ -130,6 +131,7 @@ function perfilReducer(state, action) {
 export const useEditarPerfil = () => {
   const [state, dispatch] = useReducer(perfilReducer, initialState);
   const navigate = useNavigate();
+  const { actualizarUsuario } = useAuth();
 
   // Manejar invalidación de token
   const handleTokenInvalidation = useCallback(async () => {
@@ -192,7 +194,6 @@ export const useEditarPerfil = () => {
     }
   }, [navigate, handleTokenInvalidation]);
 
-  // COMENTADO: Validación anterior de nickname - ahora la maneja useEditarPerfilValidation
   /*
   // Validar nickname en tiempo real
   useEffect(() => {
@@ -308,7 +309,12 @@ export const useEditarPerfil = () => {
     dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: true });
   }, []);
 
-  // FUNCIÓN ACTUALIZADA: Guardar cambios usando datos del hook de validación
+  // Cancelar eliminación de foto
+  const cancelarEliminacionFoto = useCallback(() => {
+    dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
+  }, []);
+
+  // Guardar cambios - ACTUALIZADO
   const handleGuardar = useCallback(async () => {
     dispatch({ type: 'SET_CARGANDO', cargando: true });
     dispatch({ type: 'LIMPIAR_ALERTAS' });
@@ -348,8 +354,20 @@ export const useEditarPerfil = () => {
         esFormData
       );
 
+      // Guardar nickname anterior para comparación
+      const nicknameAnterior = state.usuario?.nombreUsuario;
+
       if (resultado.nuevoToken) {
         localStorage.setItem('token', resultado.nuevoToken);
+        
+        // NUEVO: Actualizar contexto inmediatamente con los nuevos datos del token
+        try {
+          const nuevoDecoded = parseJwt(resultado.nuevoToken);
+          actualizarUsuario(nuevoDecoded);
+        } catch (err) {
+          console.error('Error al decodificar nuevo token:', err);
+        }
+        
         window.dispatchEvent(new Event('tokenChanged'));
       }
 
@@ -358,20 +376,33 @@ export const useEditarPerfil = () => {
         mensaje: 'Perfil actualizado correctamente',
       });
 
+      const usuarioActualizado = {
+        ...state.usuario,
+        ...resultado.usuario,
+        fotoPerfil: state.fotoEliminada
+          ? null
+          : resultado.usuario?.fotoPerfil,
+      };
+
       dispatch({
         type: 'SET_USUARIO',
-        usuario: {
-          ...state.usuario,
-          ...resultado.usuario,
-          fotoPerfil: state.fotoEliminada
-            ? null
-            : resultado.usuario?.fotoPerfil,
-        },
+        usuario: usuarioActualizado,
       });
 
       dispatch({ type: 'LIMPIAR_IMAGEN' });
       dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
+
+      // NUEVO: Si cambió el nickname, navegar al nuevo perfil después de un breve delay
+      if (resultado.usuario?.nombreUsuario && 
+          resultado.usuario.nombreUsuario !== nicknameAnterior) {
+        setTimeout(() => {
+          navigate(`/perfil/${resultado.usuario.nombreUsuario}`, { replace: true });
+        }, 1500); // Delay para mostrar mensaje de éxito
+      }
+
     } catch (error) {
+      console.error('Error actualizando perfil:', error);
+      
       // Manejo de errores específicos
       if (error.response?.status === 413) {
         // Payload demasiado grande
@@ -381,20 +412,22 @@ export const useEditarPerfil = () => {
         });
       } else if (error.response?.data?.message) {
         dispatch({ type: 'SET_ERROR', error: error.response.data.message });
+      } else if (error.message.includes('nickname')) {
+        dispatch({ type: 'SET_ERROR', error: 'El nickname no está disponible' });
       } else {
-        dispatch({ type: 'SET_ERROR', error: 'Error al actualizar la imagen' });
+        dispatch({ type: 'SET_ERROR', error: 'Error al actualizar el perfil' });
       }
     } finally {
       dispatch({ type: 'SET_CARGANDO', cargando: false });
     }
-  }, [state]);
+  }, [state, actualizarUsuario, navigate]);
 
   // Limpiar alertas automáticamente
   useEffect(() => {
     if (state.mensaje || state.error) {
       const timer = setTimeout(() => {
         dispatch({ type: 'LIMPIAR_ALERTAS' });
-      }, 3000);
+      }, 4000); // Aumentado a 4 segundos para dar tiempo a leer
       return () => clearTimeout(timer);
     }
   }, [state.mensaje, state.error]);
@@ -405,6 +438,7 @@ export const useEditarPerfil = () => {
     handleImagenSeleccionada,
     eliminarImagenSeleccionada,
     eliminarFotoActual,
+    cancelarEliminacionFoto,
     handleGuardar,
     fetchUsuario,
   };

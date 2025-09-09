@@ -1,11 +1,23 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import evaluationWelcome from '../../../assets/EvaluationWelcome.png';
+import evaluationWelcome from '../../../assets/ResourcesHome.png';
 
 // Importamos los SVGs como imágenes normales
-import LightningIcon from '../../../assets/icons/Lightning.svg';
 import BookIcon from '../../../assets/icons/Book.svg';
 import LockIcon from '../../../assets/icons/Lock.svg';
+
+// Puedes usar iconos de Bootstrap o crear/importar nuevos SVGs para estos
+const SearchIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="#5A4E7C"/>
+  </svg>
+);
+
+const DownloadIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="#5A4E7C"/>
+  </svg>
+);
 
 export default function WelcomeCard({
   title,
@@ -50,20 +62,16 @@ export default function WelcomeCard({
 
   const miniBoxes = [
     {
-      icon: LightningIcon,
-      title: 'Feedback inmediato',
-      description: 'Sabrás tu estado emocional al instante.',
+      icon: <SearchIcon />,
+      title: 'Fácil búsqueda',
+      description: 'Encuentra el contenido que necesitas por tópico.',
     },
     {
-      icon: BookIcon,
-      title: 'Recursos confiables',
-      description: 'Accede a guías y apoyo confiable.',
+      icon: <img src={BookIcon} alt="Book" style={{ width: '24px', height: '24px' }} />,
+      title: 'Contenido variado',
+      description: 'Artículos, guías, videos e infografías.',
     },
-    {
-      icon: LockIcon,
-      title: 'Seguro y privado',
-      description: 'Tus respuestas son completamente confidenciales.',
-    },
+
   ];
 
   return (
@@ -165,11 +173,7 @@ export default function WelcomeCard({
                 }}
               >
                 <div style={{ width: '24px', height: '24px' }}>
-                  <img
-                    src={box.icon}
-                    alt={box.title}
-                    style={{ width: '100%', height: '100%' }}
-                  />
+                  {box.icon}
                 </div>
                 <div>
                   <strong>{box.title}</strong>
@@ -188,7 +192,7 @@ export default function WelcomeCard({
           style={{
             position: 'absolute',
             left: '72.5rem',
-            bottom: '-11rem',
+            bottom: '-13.5rem',
             width: '800px',
             height: '800px',
             zIndex: 2,

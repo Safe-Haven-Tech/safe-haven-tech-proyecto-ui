@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [refreshToken, setRefreshToken] = useState(
     localStorage.getItem('refreshToken')
   );
-  const [isCheckingToken, setIsCheckingToken] = useState(true); // ← Nuevo estado
+  const [isCheckingToken, setIsCheckingToken] = useState(true);
 
   // Función para verificar si el token está expirado
   const isTokenExpired = (token) => {
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ← SOLUCIÓN PRINCIPAL: Verificar token al cargar la app
+  // Verificar token al cargar la aplicación
   useEffect(() => {
     const verificarTokenInicial = async () => {
       const storedToken = localStorage.getItem('token');
@@ -100,6 +100,28 @@ export const AuthProvider = ({ children }) => {
       setUsuario(null);
     }
   }, [token]);
+
+ 
+  useEffect(() => {
+    const handleTokenChange = () => {
+      const newToken = localStorage.getItem('token');
+      const newRefreshToken = localStorage.getItem('refreshToken');
+      
+      if (newToken !== token) {
+        setToken(newToken);
+      }
+      if (newRefreshToken !== refreshToken) {
+        setRefreshToken(newRefreshToken);
+      }
+    };
+
+    // Escuchar el evento customizado
+    window.addEventListener('tokenChanged', handleTokenChange);
+    
+    return () => {
+      window.removeEventListener('tokenChanged', handleTokenChange);
+    };
+  }, [token, refreshToken]);
 
   // Función para cerrar sesión sin navegar (durante inicialización)
   const cerrarSesionSilenciosa = () => {
