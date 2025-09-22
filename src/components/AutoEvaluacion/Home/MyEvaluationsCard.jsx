@@ -1,29 +1,42 @@
-// src/components/AutoEvaluacion/MyEvaluationsCard.jsx
 import React from 'react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import styles from './MyEvaluationsCard.module.css';
 
 const MyEvaluationsCard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
   if (!user) return null;
+
   return (
     <div
-      className="card text-center shadow-sm p-3 mb-4"
-      style={{
-        cursor: 'pointer',
-        borderRadius: '10px',
-        backgroundColor: '#E8F5E9',
-      }}
+      className={`card ${styles.evaluationsCard}`}
       onClick={() => navigate('/mis-evaluaciones')}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          navigate('/mis-evaluaciones');
+        }
+      }}
     >
-      <div className="card-body">
-        <h5 className="card-title">Mis Evaluaciones</h5>
-        <p className="card-text">
+      <div className={styles.cardBody}>
+        <h5 className={styles.cardTitle}>
+          Mis Evaluaciones
+        </h5>
+        <p className={styles.cardText}>
           Ver todas tus encuestas completadas, resultados y descargar PDF.
         </p>
-        <button className="btn btn-success">Ir a Mis Evaluaciones</button>
+        <button 
+          className={`btn ${styles.primaryButton}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate('/mis-evaluaciones');
+          }}
+        >
+          <span>Ir a Mis Evaluaciones</span>
+        </button>
       </div>
     </div>
   );

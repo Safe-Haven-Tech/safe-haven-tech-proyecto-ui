@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import styles from './ResourceDetail.module.css';
 import { fetchRecursoById, incrementarCompartidos, incrementarVisitas, calificarRecurso } from '../../services/informationalResourcesService';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -16,16 +17,16 @@ const getResourceIcon = (tipo) => {
   return iconMap[tipo] || 'bi-file-earmark';
 };
 
-// Función para obtener el color según el tipo de recurso
-const getResourceColor = (tipo) => {
-  const colorMap = {
-    'articulo': '#3498db',
-    'guia': '#2ecc71',
-    'manual': '#9b59b6',
-    'video': '#e74c3c',
-    'infografia': '#f39c12',
+// Función para obtener la clase de color según el tipo de recurso
+const getResourceColorClass = (tipo) => {
+  const colorClassMap = {
+    'articulo': styles.colorArticulo,
+    'guia': styles.colorGuia,
+    'manual': styles.colorManual,
+    'video': styles.colorVideo,
+    'infografia': styles.colorInfografia,
   };
-  return colorMap[tipo] || '#5A4E7C';
+  return colorClassMap[tipo] || styles.colorDefault;
 };
 
 export default function ResourceDetail() {
@@ -210,23 +211,17 @@ export default function ResourceDetail() {
 
   if (loading) {
     return (
-      <div className="container py-5" style={{ marginTop: '80px' }}>
+      <div className={`container py-5 ${styles.resourceDetail}`}>
         <div className="row justify-content-center">
           <div className="col-lg-8">
-            <div className="text-center py-5">
+            <div className={`text-center py-5 ${styles.loadingContainer}`}>
               <div
-                className="spinner-border mb-3"
-                style={{ color: '#A17CCA', width: '3rem', height: '3rem' }}
+                className={`spinner-border mb-3 ${styles.loadingSpinner}`}
                 role="status"
               >
                 <span className="visually-hidden">Cargando recurso...</span>
               </div>
-              <h4
-                style={{
-                  color: '#5A4E7C',
-                  fontFamily: "'Poppins', sans-serif",
-                }}
-              >
+              <h4 className={styles.loadingTitle}>
                 Cargando recurso...
               </h4>
             </div>
@@ -238,52 +233,21 @@ export default function ResourceDetail() {
 
   if (error || !resource) {
     return (
-      <div className="container py-5" style={{ marginTop: '80px' }}>
+      <div className={`container py-5 ${styles.resourceDetail}`}>
         <div className="row justify-content-center">
-          <div className="col-lg-8 text-center">
-            <div
-              className="mx-auto mb-4"
-              style={{
-                width: '80px',
-                height: '80px',
-                background: 'linear-gradient(135deg, #E8DAEF, #D5DBDB)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <i
-                className="bi bi-exclamation-triangle"
-                style={{
-                  fontSize: '2rem',
-                  color: '#8E7AA6',
-                }}
-              ></i>
+          <div className={`col-lg-8 text-center ${styles.errorContainer}`}>
+            <div className={styles.errorIcon}>
+              <i className="bi bi-exclamation-triangle"></i>
             </div>
-            <h4
-              className="fw-bold mb-3"
-              style={{
-                color: '#5A4E7C',
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            >
+            <h4 className={styles.errorTitle}>
               Recurso no encontrado
             </h4>
-            <p style={{ color: '#666', fontSize: '1.1rem', marginBottom: '2rem' }}>
+            <p className={styles.errorText}>
               {error || 'El recurso que buscas no existe o ha sido eliminado.'}
             </p>
             <button
               onClick={() => navigate('/recursosInformativos')}
-              className="btn btn-lg fw-semibold px-4 py-3"
-              style={{
-                background: 'linear-gradient(90deg, #5A4E7C, #A17CCA)',
-                border: 'none',
-                borderRadius: '25px',
-                color: 'white',
-                fontSize: '1rem',
-                fontFamily: "'Poppins', sans-serif",
-              }}
+              className={`btn btn-lg fw-semibold px-4 py-3 ${styles.backButton}`}
             >
               <i className="bi bi-arrow-left me-2"></i>
               Volver a recursos
@@ -294,173 +258,102 @@ export default function ResourceDetail() {
     );
   }
 
-  const resourceColor = getResourceColor(resource.tipo);
+  const resourceColorClass = getResourceColorClass(resource.tipo);
   const resourceIcon = getResourceIcon(resource.tipo);
 
   return (
     <>
-      <div className="container py-5" style={{ marginTop: '80px' }}>
+      <div className={`container py-5 ${styles.resourceDetail}`}>
         <div className="row">
-          <div className="col-lg-8 mx-auto">
+          <div className={`col-lg-8 mx-auto ${styles.resourceContainer}`}>
             {/* Botón de regreso */}
             <button
               onClick={() => navigate('/recursosInformativos')}
-              className="btn btn-outline-secondary mb-4 d-flex align-items-center"
-              style={{
-                borderColor: '#A17CCA',
-                color: '#A17CCA',
-                borderRadius: '25px',
-                padding: '8px 20px',
-              }}
+              className={`btn btn-outline-secondary mb-4 d-flex align-items-center ${styles.navBackButton}`}
             >
               <i className="bi bi-arrow-left me-2"></i>
               Volver a recursos
             </button>
 
             {/* Header del recurso */}
-            <div
-              className="card mb-4"
-              style={{
-                borderRadius: '1rem',
-                border: 'none',
-                boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
-                overflow: 'hidden',
-              }}
-            >
+            <div className={`card mb-4 ${styles.resourceCard} ${resourceColorClass}`}>
               {/* Imagen principal */}
               {resource.imagenPrincipal && (
                 <div
-                  className="position-relative"
+                  className={styles.heroImage}
                   style={{
-                    height: '300px',
-                    background: `url(${resource.imagenPrincipal}) center/cover`,
-                    cursor: 'pointer',
+                    backgroundImage: `url(${resource.imagenPrincipal})`
                   }}
                   onClick={() => handleImageClick(resource.imagenPrincipal, resource.titulo)}
                 >
-                  <div
-                    className="position-absolute top-0 start-0 w-100 h-100"
-                    style={{
-                      background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6))',
-                    }}
-                  ></div>
+                  <div className={styles.heroImageOverlay}></div>
                   
                   {/* Badge de tipo sobre la imagen */}
-                  <div
-                    className="position-absolute top-0 start-0 m-3 px-3 py-2"
-                    style={{
-                      background: resourceColor,
-                      color: 'white',
-                      borderRadius: '20px',
-                      fontSize: '0.9rem',
-                      fontWeight: '600',
-                      textTransform: 'capitalize',
-                    }}
+                  <div 
+                    className={styles.typeBadge}
+                    style={{ background: `var(--resource-color)` }}
                   >
-                    <i className={`${resourceIcon} me-2`}></i>
+                    <i className={resourceIcon}></i>
                     {resource.tipo}
                   </div>
 
                   {/* Badge destacado */}
                   {resource.destacado && (
-                    <div
-                      className="position-absolute top-0 end-0 m-3"
-                      style={{
-                        background: '#FFD700',
-                        color: '#333',
-                        borderRadius: '50%',
-                        width: '40px',
-                        height: '40px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
+                    <div className={styles.featuredBadge}>
                       <i className="bi bi-star-fill"></i>
                     </div>
                   )}
 
                   {/* Indicador de que se puede ampliar */}
-                  <div
-                    className="position-absolute bottom-0 end-0 m-3"
-                    style={{
-                      background: 'rgba(255,255,255,0.8)',
-                      borderRadius: '50%',
-                      width: '35px',
-                      height: '35px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <i className="bi bi-zoom-in" style={{ color: '#333' }}></i>
+                  <div className={styles.zoomIndicator}>
+                    <i className="bi bi-zoom-in"></i>
                   </div>
                 </div>
               )}
 
               <div className="card-body p-4">
                 {/* Título y metadatos */}
-                <h1
-                  className="fw-bold mb-3"
-                  style={{
-                    color: '#2c3e50',
-                    fontFamily: "'Poppins', sans-serif",
-                    fontSize: '2rem',
-                    lineHeight: '1.2',
-                  }}
-                >
+                <h1 className={styles.resourceTitle}>
                   {resource.titulo}
                 </h1>
 
                 {/* Tópicos */}
                 {resource.topicos && resource.topicos.length > 0 && (
-                  <div className="mb-3">
-                    <div className="d-flex flex-wrap gap-2">
-                      {resource.topicos.map((topico, idx) => (
-                        <span
-                          key={idx}
-                          className="badge"
-                          style={{
-                            background: `${resourceColor}20`,
-                            color: resourceColor,
-                            fontSize: '0.8rem',
-                            fontWeight: '500',
-                            padding: '6px 12px',
-                            borderRadius: '12px',
-                          }}
-                        >
-                          {topico}
-                        </span>
-                      ))}
-                    </div>
+                  <div className={styles.topicsContainer}>
+                    {resource.topicos.map((topico, idx) => (
+                      <span
+                        key={idx}
+                        className={styles.topicBadge}
+                        style={{
+                          background: `var(--resource-color)20`,
+                          color: `var(--resource-color)`
+                        }}
+                      >
+                        {topico}
+                      </span>
+                    ))}
                   </div>
                 )}
 
                 {/* Estadísticas y metadatos */}
-                <div className="row g-3 mb-4">
+                <div className={`row ${styles.statsRow}`}>
                   <div className="col-md-3">
-                    <div className="d-flex align-items-center">
-                      <i className="bi bi-eye me-2" style={{ color: '#666' }}></i>
-                      <span style={{ color: '#666', fontSize: '0.9rem' }}>
-                        {resource.visitas || 0} visualizaciones
-                      </span>
+                    <div className={styles.statItem}>
+                      <i className="bi bi-eye"></i>
+                      {resource.visitas || 0} visualizaciones
                     </div>
                   </div>
                   <div className="col-md-3">
-                    <div className="d-flex align-items-center">
-                      <i className="bi bi-share me-2" style={{ color: '#666' }}></i>
-                      <span style={{ color: '#666', fontSize: '0.9rem' }}>
-                        {resource.compartidos || 0} compartidos
-                      </span>
+                    <div className={styles.statItem}>
+                      <i className="bi bi-share"></i>
+                      {resource.compartidos || 0} compartidos
                     </div>
                   </div>
                   {resource.calificacion && resource.calificacion.promedio > 0 && (
                     <div className="col-md-3">
-                      <div className="d-flex align-items-center">
-                        <i className="bi bi-star-fill me-2" style={{ color: '#FFD700' }}></i>
-                        <span style={{ color: '#666', fontSize: '0.9rem' }}>
-                          {resource.calificacion.promedio.toFixed(1)} ({resource.calificacion.totalVotos} votos)
-                        </span>
+                      <div className={styles.ratingItem}>
+                        <i className="bi bi-star-fill"></i>
+                        {resource.calificacion.promedio.toFixed(1)} ({resource.calificacion.totalVotos} votos)
                       </div>
                     </div>
                   )}
@@ -468,114 +361,54 @@ export default function ResourceDetail() {
 
                 {/* Resumen */}
                 {resource.resumen && (
-                  <div
-                    className="p-3 mb-4"
-                    style={{
-                      background: 'rgba(161,124,202,0.05)',
-                      borderLeft: `4px solid ${resourceColor}`,
-                      borderRadius: '0 8px 8px 0',
-                    }}
-                  >
-                    <h5
-                      className="fw-bold mb-2"
-                      style={{
-                        color: '#5A4E7C',
-                        fontFamily: "'Poppins', sans-serif",
-                      }}
-                    >
+                  <div className={styles.summarySection}>
+                    <h5 className={styles.summaryTitle}>
                       Resumen
                     </h5>
-                    <p
-                      style={{
-                        color: '#555',
-                        fontSize: '1rem',
-                        lineHeight: '1.6',
-                        margin: 0,
-                      }}
-                    >
+                    <p className={styles.summaryText}>
                       {resource.resumen}
                     </p>
                   </div>
                 )}
 
                 {/* Descripción completa */}
-                <div className="mb-4">
-                  <h5
-                    className="fw-bold mb-3"
-                    style={{
-                      color: '#5A4E7C',
-                      fontFamily: "'Poppins', sans-serif",
-                    }}
-                  >
+                <div className={styles.descriptionSection}>
+                  <h5 className={styles.sectionTitle}>
                     Descripción
                   </h5>
                   <div
-                    style={{
-                      color: '#555',
-                      fontSize: '1rem',
-                      lineHeight: '1.7',
-                      whiteSpace: 'pre-wrap',
-                    }}
+                    className={styles.descriptionText}
                     dangerouslySetInnerHTML={{ __html: resource.descripcion }}
                   />
                 </div>
 
                 {/* Archivos adjuntos */}
                 {resource.archivosAdjuntos && resource.archivosAdjuntos.length > 0 && (
-                  <div className="mb-4">
-                    <h5
-                      className="fw-bold mb-3"
-                      style={{
-                        color: '#5A4E7C',
-                        fontFamily: "'Poppins', sans-serif",
-                      }}
-                    >
+                  <div className={styles.filesSection}>
+                    <h5 className={styles.sectionTitle}>
                       Archivos para descargar
                     </h5>
                     <div className="row g-3">
                       {resource.archivosAdjuntos.map((archivo, idx) => (
                         <div key={idx} className="col-md-6">
-                          <div
-                            className="d-flex align-items-center p-3"
-                            style={{
-                              background: 'rgba(255,255,255,0.8)',
-                              border: '1px solid #e0e0e0',
-                              borderRadius: '8px',
-                              cursor: 'pointer',
-                              transition: 'all 0.3s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.background = 'rgba(161,124,202,0.1)';
-                              e.currentTarget.style.borderColor = '#A17CCA';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.background = 'rgba(255,255,255,0.8)';
-                              e.currentTarget.style.borderColor = '#e0e0e0';
-                            }}
-                          >
+                          <div className={styles.fileItem}>
                             <i
-                              className="bi bi-file-earmark-arrow-down me-3"
-                              style={{
-                                fontSize: '1.5rem',
-                                color: resourceColor,
-                              }}
+                              className={`bi bi-file-earmark-arrow-down ${styles.fileIcon}`}
+                              style={{ color: `var(--resource-color)` }}
                             ></i>
-                            <div className="flex-grow-1">
-                              <div
-                                className="fw-semibold"
-                                style={{ color: '#333', fontSize: '0.9rem' }}
-                              >
+                            <div className={styles.fileContent}>
+                              <div className={styles.fileName}>
                                 {archivo.nombre}
                               </div>
                               {archivo.tamaño && (
-                                <small style={{ color: '#666' }}>
+                                <small className={styles.fileSize}>
                                   {archivo.tamaño}
                                 </small>
                               )}
                             </div>
                             <i
-                              className="bi bi-download"
-                              style={{ color: resourceColor }}
+                              className={`bi bi-download ${styles.downloadIcon}`}
+                              style={{ color: `var(--resource-color)` }}
                             ></i>
                           </div>
                         </div>
@@ -586,55 +419,23 @@ export default function ResourceDetail() {
 
                 {/* Galería de imágenes */}
                 {resource.galeria && resource.galeria.length > 0 && (
-                  <div className="mb-4">
-                    <h5
-                      className="fw-bold mb-3"
-                      style={{
-                        color: '#5A4E7C',
-                        fontFamily: "'Poppins', sans-serif",
-                      }}
-                    >
+                  <div className={styles.gallerySection}>
+                    <h5 className={styles.sectionTitle}>
                       Galería
                     </h5>
-                    <div className="row g-3">
+                    <div className={`row ${styles.galleryGrid}`}>
                       {resource.galeria.map((imagen, idx) => (
                         <div key={idx} className="col-md-4">
-                          <div className="position-relative">
+                          <div className={styles.galleryImageContainer}>
                             <img
                               src={imagen}
                               alt={`Galería ${idx + 1}`}
-                              className="img-fluid"
-                              style={{
-                                borderRadius: '8px',
-                                cursor: 'pointer',
-                                transition: 'transform 0.3s ease',
-                                width: '100%',
-                                height: '200px',
-                                objectFit: 'cover',
-                              }}
+                              className={styles.galleryImage}
                               onClick={() => handleImageClick(imagen, `Galería ${idx + 1}`)}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'scale(1.05)';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'scale(1)';
-                              }}
                             />
                             {/* Overlay de zoom */}
-                            <div
-                              className="position-absolute top-0 end-0 m-2"
-                              style={{
-                                background: 'rgba(0,0,0,0.6)',
-                                borderRadius: '50%',
-                                width: '30px',
-                                height: '30px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                pointerEvents: 'none',
-                              }}
-                            >
-                              <i className="bi bi-zoom-in" style={{ color: 'white', fontSize: '0.8rem' }}></i>
+                            <div className={styles.galleryZoomOverlay}>
+                              <i className="bi bi-zoom-in"></i>
                             </div>
                           </div>
                         </div>
@@ -644,21 +445,25 @@ export default function ResourceDetail() {
                 )}
 
                 {/* Información adicional */}
-                <div className="border-top pt-4">
-                  <div className="row g-3">
+                <div className={styles.additionalInfo}>
+                  <div className={`row ${styles.infoGrid}`}>
                     {resource.fuente && (
                       <div className="col-md-6">
-                        <strong style={{ color: '#5A4E7C' }}>Fuente:</strong>
-                        <span className="ms-2" style={{ color: '#666' }}>
-                          {resource.fuente}
-                        </span>
+                        <div className={styles.infoItem}>
+                          <span className={styles.infoLabel}>Fuente:</span>
+                          <span className={styles.infoValue}>
+                            {resource.fuente}
+                          </span>
+                        </div>
                       </div>
                     )}
                     <div className="col-md-6">
-                      <strong style={{ color: '#5A4E7C' }}>Fecha de publicación:</strong>
-                      <span className="ms-2" style={{ color: '#666' }}>
-                        {formatDate(resource.fechaCreacion)}
-                      </span>
+                      <div className={styles.infoItem}>
+                        <span className={styles.infoLabel}>Fecha de publicación:</span>
+                        <span className={styles.infoValue}>
+                          {formatDate(resource.fechaCreacion)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -666,36 +471,17 @@ export default function ResourceDetail() {
             </div>
 
             {/* Acciones */}
-            <div
-              className="card mb-4"
-              style={{
-                borderRadius: '1rem',
-                border: 'none',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
-              }}
-            >
+            <div className={`card mb-4 ${styles.actionsCard}`}>
               <div className="card-body p-4">
-                <h5
-                  className="fw-bold mb-3"
-                  style={{
-                    color: '#5A4E7C',
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
-                >
+                <h5 className={styles.sectionTitle}>
                   Acciones
                 </h5>
                 
-                <div className="d-flex gap-3 flex-wrap">
+                <div className={styles.actionsContainer}>
                   {/* Botón compartir */}
                   <button
                     onClick={handleShare}
-                    className="btn btn-outline-primary d-flex align-items-center"
-                    style={{
-                      borderColor: '#3498db',
-                      color: '#3498db',
-                      borderRadius: '25px',
-                      padding: '10px 20px',
-                    }}
+                    className={`btn btn-outline-primary d-flex align-items-center ${styles.shareButton}`}
                   >
                     <i className="bi bi-share me-2"></i>
                     Compartir
@@ -703,24 +489,19 @@ export default function ResourceDetail() {
 
                   {/* Calificación (solo para usuarios autenticados) */}
                   {usuario && (
-                    <div className="d-flex align-items-center">
-                      <span className="me-2" style={{ color: '#5A4E7C', fontWeight: '600' }}>
+                    <div className={styles.ratingContainer}>
+                      <span className={styles.ratingLabel}>
                         Calificar:
                       </span>
-                      <div className="d-flex gap-1">
+                      <div className={styles.starsContainer}>
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             key={star}
                             onClick={() => handleRating(star)}
                             disabled={submittingRating}
-                            className="btn p-0"
-                            style={{
-                              border: 'none',
-                              background: 'none',
-                              fontSize: '1.2rem',
-                              color: star <= userRating ? '#FFD700' : '#ddd',
-                              cursor: submittingRating ? 'not-allowed' : 'pointer',
-                            }}
+                            className={`${styles.starButton} ${
+                              star <= userRating ? styles.starActive : styles.starInactive
+                            }`}
                           >
                             <i className="bi bi-star-fill"></i>
                           </button>
@@ -738,52 +519,29 @@ export default function ResourceDetail() {
       {/* Modal para mostrar imagen ampliada */}
       {showImageModal && (
         <div
-          className="modal fade show d-block"
-          style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            zIndex: 1050,
-          }}
+          className={`modal fade show d-block ${styles.imageModal}`}
           onClick={() => setShowImageModal(false)}
         >
           <div
             className="modal-dialog modal-lg modal-dialog-centered"
             onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="modal-content"
-              style={{
-                backgroundColor: 'transparent',
-                border: 'none',
-              }}
-            >
-              <div className="modal-header border-0 pb-0">
-                <h5
-                  className="modal-title text-white"
-                  style={{
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
-                >
+            <div className={`modal-content ${styles.imageModalContent}`}>
+              <div className={`modal-header ${styles.imageModalHeader}`}>
+                <h5 className={`modal-title ${styles.imageModalTitle}`}>
                   {imageTitle}
                 </h5>
                 <button
                   type="button"
-                  className="btn-close btn-close-white"
+                  className={`btn-close btn-close-white ${styles.imageModalClose}`}
                   onClick={() => setShowImageModal(false)}
-                  style={{
-                    filter: 'invert(1)',
-                  }}
                 ></button>
               </div>
-              <div className="modal-body p-0">
+              <div className={`modal-body ${styles.imageModalBody}`}>
                 <img
                   src={selectedImage}
                   alt={imageTitle}
-                  className="img-fluid w-100"
-                  style={{
-                    borderRadius: '8px',
-                    maxHeight: '80vh',
-                    objectFit: 'contain',
-                  }}
+                  className={`img-fluid w-100 ${styles.imageModalImg}`}
                 />
               </div>
             </div>

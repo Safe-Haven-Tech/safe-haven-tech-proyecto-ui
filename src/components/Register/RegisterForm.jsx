@@ -1,8 +1,7 @@
-// src/components/RegisterForm.jsx
 import React, { useState, useCallback, useMemo } from 'react';
+import styles from './RegisterForm.module.css';
 import Logo from '../../assets/Logo.png';
 import EnhancedDatePicker from './datePicker.jsx';
-import { colors, styles } from '../../utils/stylesRegister.js';
 import {
   sanitizeInput,
   validateNickname,
@@ -27,7 +26,6 @@ const RegisterForm = React.memo(
     const [hoveredField, setHoveredField] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [isButtonHovered, setIsButtonHovered] = useState(false);
 
     const handleInputChange = useCallback(
       (e) => {
@@ -41,10 +39,22 @@ const RegisterForm = React.memo(
       return Object.values(fieldValidation).every((v) => v === 'valid');
     }, [fieldValidation]);
 
+    const getInputClasses = (fieldName) => {
+      let classes = styles.formInput;
+      
+      if (fieldValidation[fieldName] === 'valid') {
+        classes += ` ${styles.inputValid}`;
+      } else if (fieldValidation[fieldName] === 'invalid') {
+        classes += ` ${styles.inputInvalid}`;
+      }
+      
+      return classes;
+    };
+
     const nicknameFeedback = useMemo(() => {
       if (validationErrors.nickname) {
         return (
-          <div className="invalid-feedback d-block mt-2">
+          <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
             {validationErrors.nickname}
           </div>
         );
@@ -52,24 +62,26 @@ const RegisterForm = React.memo(
       if (!formData.nickname) return null;
       if (!validateNickname(formData.nickname)) {
         return (
-          <div className="invalid-feedback d-block mt-2">
+          <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
             Nickname inválido (solo letras, números y guiones bajos)
           </div>
         );
       }
       if (validatingNickname)
         return (
-          <div className="form-text text-info mt-2">
+          <div className={`${styles.feedbackMessage} ${styles.feedbackInfo}`}>
             Verificando disponibilidad...
           </div>
         );
       if (!validatingNickname && nicknameAvailable)
         return (
-          <div className="text-success small mt-2">Nickname disponible ✅</div>
+          <div className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}>
+            Nickname disponible ✅
+          </div>
         );
       if (!validatingNickname && !nicknameAvailable)
         return (
-          <div className="invalid-feedback d-block mt-2">
+          <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
             Nickname ya en uso
           </div>
         );
@@ -80,24 +92,6 @@ const RegisterForm = React.memo(
       validatingNickname,
       nicknameAvailable,
     ]);
-
-    const getInputStyle = (fieldName) => {
-      let baseStyle = { ...styles.input };
-
-      // Aplicar focus/hover
-      if (focusedField === fieldName || hoveredField === fieldName) {
-        baseStyle = { ...baseStyle, ...styles.inputFocus };
-      }
-
-      // Aplicar estado de validación
-      if (fieldValidation[fieldName] === 'valid') {
-        baseStyle = { ...baseStyle, ...styles.inputSuccess };
-      } else if (fieldValidation[fieldName] === 'invalid') {
-        baseStyle = { ...baseStyle, ...styles.inputError };
-      }
-
-      return baseStyle;
-    };
 
     const inputs = useMemo(
       () => [
@@ -118,7 +112,7 @@ const RegisterForm = React.memo(
           feedback: () => {
             if (validationErrors.email) {
               return (
-                <div className="invalid-feedback d-block mt-2">
+                <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
                   {validationErrors.email}
                 </div>
               );
@@ -126,12 +120,14 @@ const RegisterForm = React.memo(
             if (!formData.email) return null;
             if (!validateEmail(formData.email))
               return (
-                <div className="invalid-feedback d-block mt-2">
+                <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
                   Email inválido
                 </div>
               );
             return (
-              <div className="text-success small mt-2">Correo válido ✅</div>
+              <div className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}>
+                Correo válido ✅
+              </div>
             );
           },
         },
@@ -140,25 +136,25 @@ const RegisterForm = React.memo(
           label: 'Contraseña',
           icon: 'lock',
           type: showPassword ? 'text' : 'password',
-          placeholder: 'Contraseña',
+          placeholder: 'Contraseña segura',
           toggleShow: () => setShowPassword((prev) => !prev),
-          inputStyle: { paddingRight: '4rem' },
+          hasToggle: true,
           feedback: () => {
             if (validationErrors.password) {
               return (
-                <div className="invalid-feedback d-block mt-2">
+                <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
                   {validationErrors.password}
                 </div>
               );
             }
             if (!formData.password) return null;
             return fieldValidation.password === 'valid' ? (
-              <div className="text-success small mt-2">
+              <div className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}>
                 Contraseña válida ✅
               </div>
             ) : (
-              <div className="invalid-feedback d-block mt-2">
-                La contraseña debe tener al menos 8 caracteres
+              <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+                La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número
               </div>
             );
           },
@@ -171,22 +167,22 @@ const RegisterForm = React.memo(
           type: showConfirmPassword ? 'text' : 'password',
           placeholder: 'Confirma tu contraseña',
           toggleShow: () => setShowConfirmPassword((prev) => !prev),
-          inputStyle: { paddingRight: '4rem' },
+          hasToggle: true,
           feedback: () => {
             if (validationErrors.confirmPassword) {
               return (
-                <div className="invalid-feedback d-block mt-2">
+                <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
                   {validationErrors.confirmPassword}
                 </div>
               );
             }
             if (!formData.confirmPassword) return null;
             return fieldValidation.confirmPassword === 'valid' ? (
-              <div className="text-success small mt-2">
+              <div className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}>
                 Las contraseñas coinciden ✅
               </div>
             ) : (
-              <div className="invalid-feedback d-block mt-2">
+              <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
                 Las contraseñas no coinciden
               </div>
             );
@@ -201,7 +197,7 @@ const RegisterForm = React.memo(
           placeholder: 'Selecciona tu fecha de nacimiento',
           feedback: () =>
             validationErrors.fechaNacimiento && (
-              <div className="invalid-feedback d-block mt-2">
+              <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
                 {validationErrors.fechaNacimiento}
               </div>
             ),
@@ -218,180 +214,173 @@ const RegisterForm = React.memo(
     );
 
     return (
-      <div
-        className="d-flex justify-content-center align-items-center vh-100"
-        style={{}}
-      >
-        <div style={styles.formContainer}>
-          <div className="text-center mb-4">
-            <img
-              src={Logo}
-              alt="SafeHaven Logo"
-              style={styles.logo}
-              className="mb-3"
-            />
-            <h2 className="fw-bold mb-2" style={styles.title}>
-              Crear Cuenta
-            </h2>
-            <p className="text-muted mb-0" style={{ fontSize: '1rem' }}>
-              Únete a nuestra comunidad de apoyo
-            </p>
-          </div>
+      <div className={styles.registerFormContainer}>
+        {/* Header */}
+        <div className={styles.formHeader}>
+          <img
+            src={Logo}
+            alt="SafeHaven Logo"
+            className={styles.logo}
+          />
+          <h2 className={styles.formTitle}>
+            Crear Cuenta
+          </h2>
+          <p className={styles.formSubtitle}>
+            Únete a nuestra comunidad de apoyo
+          </p>
+        </div>
 
-          <form onSubmit={handleSubmit} className="mb-3" autoComplete="off">
-            <input
-              type="text"
-              name="fake-username"
-              style={{ display: 'none' }}
-            />
-            <input
-              type="password"
-              name="fake-password"
-              style={{ display: 'none' }}
-            />
+        {/* Formulario */}
+        <form
+          onSubmit={handleSubmit}
+          className={styles.registerForm}
+          autoComplete="off"
+        >
+          {/* Campos ocultos para prevenir autocompletado */}
+          <input
+            type="text"
+            name="fake-username"
+            className={styles.hiddenField}
+            tabIndex="-1"
+          />
+          <input
+            type="password"
+            name="fake-password"
+            className={styles.hiddenField}
+            tabIndex="-1"
+          />
 
-            {inputs.map((input) => (
-              <div className="mb-3" key={input.name}>
-                <label className="form-label fw-semibold text-dark mb-2 d-flex align-items-center">
-                  <i
-                    className={`fas fa-${input.icon} me-2`}
-                    style={{ color: colors.primary }}
-                  ></i>
-                  {input.label}
-                </label>
+          {inputs.map((input) => (
+            <div className={styles.inputGroup} key={input.name}>
+              <label
+                htmlFor={input.name}
+                className={styles.inputLabel}
+              >
+                <i className={`fas fa-${input.icon} ${styles.inputIcon}`}></i>
+                {input.label}
+              </label>
 
-                {input.type === 'datePicker' ? (
-                  <EnhancedDatePicker
-                    value={formData.fechaNacimiento}
-                    onChange={(date) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        fechaNacimiento: date,
-                      }))
+              {input.type === 'datePicker' ? (
+                <EnhancedDatePicker
+                  value={formData.fechaNacimiento}
+                  onChange={(date) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      fechaNacimiento: date,
+                    }))
+                  }
+                  onBlur={() => handleFieldBlur('fechaNacimiento')}
+                  disabled={loading}
+                  placeholder={input.placeholder}
+                  showAge
+                  minAge={13}
+                  maxAge={100}
+                />
+              ) : (
+                <div className={styles.inputContainer}>
+                  <input
+                    type={input.type}
+                    id={input.name}
+                    name={input.name}
+                    value={formData[input.name] || ''}
+                    onChange={handleInputChange}
+                    onFocus={() => setFocusedField(input.name)}
+                    onBlur={() => {
+                      setFocusedField(null);
+                      handleFieldBlur(input.name);
+                    }}
+                    onMouseEnter={() => setHoveredField(input.name)}
+                    onMouseLeave={() => setHoveredField(null)}
+                    autoComplete={
+                      input.name.includes('password') ? 'new-password' : 'off'
                     }
-                    onBlur={() => handleFieldBlur('fechaNacimiento')}
+                    className={`${getInputClasses(input.name)} ${input.hasToggle ? styles.inputWithButton : ''}`}
                     disabled={loading}
+                    required
                     placeholder={input.placeholder}
-                    showAge
-                    minAge={13}
-                    maxAge={100}
+                    maxLength={input.name === 'email' ? 254 : input.name.includes('password') ? 128 : 50}
+                    aria-describedby={`${input.name}-feedback`}
                   />
-                ) : (
-                  <div className="position-relative">
-                    <input
-                      type={input.type}
-                      name={input.name}
-                      value={formData[input.name] || ''}
-                      onChange={handleInputChange}
-                      onFocus={() => setFocusedField(input.name)}
-                      onBlur={() => {
-                        setFocusedField(null);
-                        handleFieldBlur(input.name);
-                      }}
-                      onMouseEnter={() => setHoveredField(input.name)}
-                      onMouseLeave={() => setHoveredField(null)}
-                      autoComplete={
-                        input.name.includes('password') ? 'new-password' : 'off'
-                      }
-                      className={`form-control form-control-lg ${input.toggleShow ? 'pe-5' : ''}`}
-                      style={{
-                        ...getInputStyle(input.name),
-                        ...input.inputStyle,
-                      }}
-                      disabled={loading}
-                      required
-                      placeholder={input.placeholder}
-                    />
 
-                    {/* Tick de validación */}
-                    {input.showTick &&
-                      fieldValidation[input.name] === 'valid' && (
-                        <i
-                          className="fas fa-check text-success position-absolute top-50"
-                          style={{
-                            right: '2.75rem',
-                            transform: 'translateY(-50%)',
-                            zIndex: 1,
-                          }}
-                        ></i>
-                      )}
-
-                    {/* Botón toggle */}
-                    {input.toggleShow && (
-                      <button
-                        type="button"
-                        className="btn btn-link position-absolute top-50 end-0"
-                        onClick={input.toggleShow}
-                        style={{
-                          color: colors.secondary,
-                          transform: 'translateY(-50%)',
-                          zIndex: 2,
-                          padding: '0 0.5rem',
-                        }}
-                      >
-                        <i
-                          className={`fas fa-${input.type === 'text' ? 'eye-slash' : 'eye'}`}
-                        ></i>
-                      </button>
+                  {/* Tick de validación */}
+                  {input.showTick &&
+                    fieldValidation[input.name] === 'valid' && (
+                      <i className={`fas fa-check ${styles.validationTick}`}></i>
                     )}
 
-                    {input.feedback()}
-                  </div>
-                )}
-              </div>
-            ))}
+                  {/* Botón toggle */}
+                  {input.hasToggle && (
+                    <button
+                      type="button"
+                      className={styles.passwordToggle}
+                      onClick={input.toggleShow}
+                      aria-label={input.type === 'text' ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                    >
+                      <i
+                        className={`fas fa-${input.type === 'text' ? 'eye-slash' : 'eye'}`}
+                      ></i>
+                    </button>
+                  )}
+                </div>
+              )}
 
-            {error && (
-              <div
-                style={{ ...styles.alert, ...styles.alertError }}
-                className="mb-3"
-              >
-                {error}
+              {/* Feedback */}
+              <div id={`${input.name}-feedback`} role="region" aria-live="polite">
+                {input.feedback()}
               </div>
-            )}
-            {success && (
-              <div
-                style={{ ...styles.alert, ...styles.alertSuccess }}
-                className="mb-3"
-              >
-                {success}
-              </div>
-            )}
+            </div>
+          ))}
 
-            <button
-              type="submit"
-              className="btn btn-lg w-100 fw-semibold py-3 mb-3"
-              disabled={loading || !isFormValid}
-              style={
-                loading || !isFormValid
-                  ? { ...styles.buttonDisabled, cursor: 'not-allowed' }
-                  : isButtonHovered
-                    ? { ...styles.button, ...styles.buttonHover }
-                    : styles.button
-              }
-              onMouseEnter={() => setIsButtonHovered(true)}
-              onMouseLeave={() => setIsButtonHovered(false)}
+          {/* Mensajes de estado */}
+          {error && (
+            <div
+              className={`${styles.alert} ${styles.alertError}`}
+              role="alert"
+              aria-live="assertive"
             >
-              {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
-            </button>
-          </form>
+              {error}
+            </div>
+          )}
+          {success && (
+            <div
+              className={`${styles.alert} ${styles.alertSuccess}`}
+              role="alert"
+              aria-live="polite"
+            >
+              {success}
+            </div>
+          )}
 
-          <div className="text-center">
-            <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
-              ¿Ya tienes una cuenta?{' '}
-              <a
-                href="/Login"
-                className="fw-semibold"
-                style={{ color: colors.primary }}
-              >
-                Inicia sesión aquí
-              </a>
-            </p>
-          </div>
+          {/* Botón de envío */}
+          <button
+            type="submit"
+            className={styles.submitButton}
+            disabled={loading || !isFormValid}
+            aria-describedby="submit-status"
+          >
+            <span>
+              {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
+            </span>
+          </button>
+        </form>
+
+        {/* Footer */}
+        <div className={styles.formFooter}>
+          <p className={styles.footerText}>
+            ¿Ya tienes una cuenta?{' '}
+            <a
+              href="/Login"
+              className={styles.footerLink}
+            >
+              Inicia sesión aquí
+            </a>
+          </p>
         </div>
       </div>
     );
   }
 );
+
+RegisterForm.displayName = 'RegisterForm';
 
 export default RegisterForm;

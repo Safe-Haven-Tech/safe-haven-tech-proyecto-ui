@@ -20,6 +20,8 @@ import MyEvaluations from './pages/AutoEvaluacion/MyEvaluations';
 import InformationalResourcesHome from './pages/InformationalResources/ResourcesHome';
 import ResourceDetail from './pages/InformationalResources/ResourceDetail';
 
+import AdminPanel from './pages/admin/AdminPanel';
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -38,6 +40,7 @@ export default function AppRoutes() {
         <Route path="/mis-evaluaciones" element={<MyEvaluations />} />
         <Route path="/recursosinformativos" element={<InformationalResourcesHome />} />
         <Route path="/recurso/:id" element={<ResourceDetail />} />
+        <Route path="/admin/panel" element={<AdminPanel />} />
       </Route>
 
       {/* Ruta 404 */}

@@ -1,12 +1,11 @@
-// src/pages/AutoEvaluacion/ViewSurvey.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   fetchEncuestaById,
   completarEncuesta,
 } from '../../services/surveysServices';
-
 import { useAuth } from '../../hooks/useAuth';
+import styles from './ViewSurvey.module.css';
 import SurveyHeader from '../../components/AutoEvaluacion/ViewSurvey/SurveyHeader';
 import QuestionCard from '../../components/AutoEvaluacion/ViewSurvey/QuestionCard';
 
@@ -69,6 +68,7 @@ export default function ViewSurvey() {
     if (currentQuestionIndex < survey.preguntas.length - 1)
       setCurrentQuestionIndex((prev) => prev + 1);
   };
+
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) setCurrentQuestionIndex((prev) => prev - 1);
   };
@@ -113,21 +113,22 @@ export default function ViewSurvey() {
 
   if (loading)
     return (
-      <div className="container py-5 text-center">
-        <div className="spinner-border text-primary" role="status">
+      <div className={`container py-5 ${styles.loadingContainer}`}>
+        <div className={styles.spinner} role="status">
           <span className="visually-hidden">Cargando...</span>
         </div>
+        <p className={styles.loadingText}>Cargando encuesta...</p>
       </div>
     );
 
   if (error)
     return (
-      <div className="container py-5 text-center">
-        <div className="alert alert-danger">
-          <h4>Error al cargar la encuesta</h4>
-          <p>{error}</p>
+      <div className={`container py-5 ${styles.container}`}>
+        <div className={styles.errorContainer}>
+          <h4 className={styles.errorTitle}>Error al cargar la encuesta</h4>
+          <p className={styles.errorMessage}>{error}</p>
           <button
-            className="btn btn-primary"
+            className={styles.backButton}
             onClick={() => navigate('/autoevaluacion')}
           >
             Volver a encuestas
@@ -138,11 +139,11 @@ export default function ViewSurvey() {
 
   if (!survey)
     return (
-      <div className="container py-5 text-center">
-        <div className="alert alert-warning">
-          <h4>Encuesta no encontrada</h4>
+      <div className={`container py-5 ${styles.container}`}>
+        <div className={styles.notFoundContainer}>
+          <h4 className={styles.errorTitle}>Encuesta no encontrada</h4>
           <button
-            className="btn btn-primary"
+            className={styles.backButton}
             onClick={() => navigate('/autoevaluacion')}
           >
             Volver a encuestas
@@ -159,44 +160,42 @@ export default function ViewSurvey() {
   );
 
   return (
-    <div
-      className="container py-5"
-      style={{ maxWidth: '800px', marginTop: '80px' }}
-    >
+    <div className={`container py-5 ${styles.container}`}>
+      {/* Toast Notification */}
       {notification && (
-        <div className="toast-container position-fixed top-0 end-0 p-3">
+        <div className={styles.toastContainer}>
           <div
-            className={`toast show align-items-center text-bg-${notification.type}`}
+            className={`${styles.toast} ${
+              notification.type === 'success' 
+                ? styles.toastSuccess 
+                : styles.toastDanger
+            }`}
             role="alert"
           >
             <div className="d-flex">
-              <div className="toast-body">{notification.message}</div>
+              <div className={styles.toastBody}>{notification.message}</div>
               <button
                 type="button"
-                className="btn-close me-2 m-auto"
+                className={styles.toastClose}
                 onClick={() => setNotification(null)}
-              ></button>
+                aria-label="Cerrar notificación"
+              >
+                ×
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Botones Salir / Reiniciar */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      {/* Header de navegación */}
+      <div className={styles.navigationHeader}>
         <button
           onClick={handleExitSurvey}
-          style={{
-            padding: '0.5rem 1rem',
-            borderRadius: '0.5rem',
-            fontWeight: 'bold',
-            border: '1px solid #6c757d',
-            backgroundColor: 'white',
-            color: '#6c757d',
-            cursor: isCompleting ? 'not-allowed' : 'pointer',
-          }}
+          className={styles.exitButton}
           disabled={isCompleting}
         >
-          ← Salir
+          <span>←</span>
+          <span>Salir</span>
         </button>
       </div>
 
@@ -216,79 +215,38 @@ export default function ViewSurvey() {
       />
 
       {/* Botones de navegación */}
-      <div className="d-flex justify-content-between mt-4">
+      <div className={styles.navigationButtons}>
         <button
           onClick={handlePrevious}
           disabled={currentQuestionIndex === 0 || isCompleting}
-          style={{
-            padding: '0.6rem 1.2rem',
-            borderRadius: '12px',
-            fontWeight: 'bold',
-            color: 'white',
-            background: 'linear-gradient(135deg, #5A4E7C, #A17CCA)',
-            border: 'none',
-            cursor:
-              currentQuestionIndex === 0 || isCompleting
-                ? 'not-allowed'
-                : 'pointer',
-            opacity: currentQuestionIndex === 0 || isCompleting ? 0.5 : 1,
-            transition: 'all 0.3s ease',
-          }}
+          className={styles.navButton}
         >
-          ← Anterior
+          <span>← Anterior</span>
         </button>
 
         {!isLastQuestion ? (
           <button
             onClick={handleNext}
             disabled={!currentAnswer || isCompleting}
-            style={{
-              padding: '0.6rem 1.2rem',
-              borderRadius: '12px',
-              fontWeight: 'bold',
-              color: 'white',
-              background: 'linear-gradient(135deg, #5A4E7C, #A17CCA)',
-              border: 'none',
-              cursor:
-                !currentAnswer || isCompleting ? 'not-allowed' : 'pointer',
-              opacity: !currentAnswer || isCompleting ? 0.5 : 1,
-              transition: 'all 0.3s ease',
-            }}
+            className={styles.navButton}
           >
-            Siguiente →
+            <span>Siguiente →</span>
           </button>
         ) : (
           <button
             onClick={handleCompleteSurvey}
             disabled={!allQuestionsAnswered || isCompleting}
-            style={{
-              padding: '0.6rem 1.2rem',
-              borderRadius: '12px',
-              fontWeight: 'bold',
-              color: 'white',
-              background: 'linear-gradient(135deg, #5A4E7C, #A17CCA)',
-              border: 'none',
-              cursor:
-                !allQuestionsAnswered || isCompleting
-                  ? 'not-allowed'
-                  : 'pointer',
-              opacity: !allQuestionsAnswered || isCompleting ? 0.5 : 1,
-              transition: 'all 0.3s ease',
-            }}
+            className={styles.navButton}
           >
-            {isCompleting ? ' Procesando...' : ' Finalizar Encuesta'}
+            <span>
+              {isCompleting ? 'Procesando...' : 'Finalizar Encuesta'}
+            </span>
           </button>
         )}
       </div>
 
-      <div
-        style={{
-          textAlign: 'center',
-          marginTop: '1rem',
-          fontSize: '0.85rem',
-          color: '#6c757d',
-        }}
-      >
+      {/* Contador de progreso */}
+      <div className={styles.progressCounter}>
         {Object.values(answers).filter((answer) => answer !== null).length} de{' '}
         {survey.preguntas.length} preguntas respondidas
       </div>

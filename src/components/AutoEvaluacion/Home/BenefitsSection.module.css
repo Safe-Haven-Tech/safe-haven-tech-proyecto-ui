@@ -1,0 +1,317 @@
+/* Sección principal */
+.benefitsSection {
+  border-radius: 1.5rem;
+  background: #FAF8FF;
+  box-shadow: 0 6px 18px rgba(90, 78, 124, 0.08);
+  padding: 1.5rem;
+  margin: 2rem 0 1rem 0; /* 🎯 CAMBIO: Reducido margen inferior de 2rem a 1rem */
+}
+
+@media (min-width: 576px) {
+  .benefitsSection {
+    padding: 2rem;
+    margin: 2rem 0 1.2rem 0; 
+  }
+}
+
+@media (min-width: 768px) {
+  .benefitsSection {
+    padding: 2.5rem;
+    margin: 3rem 0 1.5rem 0; 
+  }
+}
+
+@media (min-width: 992px) {
+  .benefitsSection {
+    padding: 3rem;
+    margin: 3rem 0 2rem 0; 
+  }
+}
+
+/* Título principal */
+.sectionTitle {
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: clamp(1.3rem, 3.5vw, 2rem);
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .sectionTitle {
+    margin-bottom: 1.2rem;
+  }
+}
+
+/* Subtítulo */
+.sectionSubtitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  color: #6c757d;
+  margin-bottom: 2rem;
+  text-align: center;
+  line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+  .sectionSubtitle {
+    margin-bottom: 3rem;
+  }
+}
+
+/* Grid de beneficios */
+.benefitsGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 576px) {
+  .benefitsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .benefitsGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Cards individuales - MEJORADAS */
+.benefitCard {
+  border-radius: 2rem; /* 🎯 CAMBIO: Más redondeadas (1rem → 2rem) */
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 15px rgba(90, 78, 124, 0.08); /* 🎯 MEJORA: Sombra más suave */
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* 🎯 CAMBIO: Transición más suave */
+  border: none;
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* 🎯 NUEVO: Efectos adicionales */
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 576px) {
+  .benefitCard {
+    padding: 2rem;
+    border-radius: 2.2rem; /* 🎯 NUEVO: Aún más redondeadas en pantallas más grandes */
+  }
+}
+
+@media (min-width: 768px) {
+  .benefitCard {
+    border-radius: 2.5rem; /* 🎯 NUEVO: Máxima redondez en desktop */
+  }
+}
+
+/* 🎯 NUEVO: Efecto de brillo sutil al fondo */
+.benefitCard::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.benefitCard:hover::before {
+  transform: translateX(100%); /* 🎯 NUEVO: Efecto de brillo al hacer hover */
+}
+
+/* Hover effect mejorado */
+.benefitCard:hover {
+  transform: translateY(-8px) scale(1.02); /* 🎯 CAMBIO: Movimiento más suave y ligero escalado */
+  box-shadow: 0 12px 30px rgba(90, 78, 124, 0.15); /* 🎯 CAMBIO: Sombra más suave y amplia */
+  background: rgba(255, 255, 255, 0.95); /* 🎯 NUEVO: Fondo ligeramente más opaco en hover */
+  border-color: rgba(161, 124, 202, 0.2); /* 🎯 NUEVO: Borde sutil en hover */
+}
+
+/* Contenedor del icono - MEJORADO */
+.iconWrapper {
+  margin-bottom: 1rem;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* 🎯 CAMBIO: Transición más suave */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1; /* 🎯 NUEVO: Asegurar que esté por encima del brillo */
+  /* 🎯 NUEVO: Fondo sutil para el icono */
+  background: rgba(161, 124, 202, 0.08);
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+}
+
+@media (min-width: 576px) {
+  .iconWrapper {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+@media (min-width: 768px) {
+  .iconWrapper {
+    margin-bottom: 1.2rem;
+    width: 90px;
+    height: 90px;
+  }
+}
+
+.benefitCard:hover .iconWrapper {
+  transform: scale(1.15) rotate(5deg); /* 🎯 CAMBIO: Escalado más suave + rotación sutil */
+  background: rgba(161, 124, 202, 0.15); /* 🎯 NUEVO: Fondo más intenso en hover */
+  box-shadow: 0 4px 15px rgba(161, 124, 202, 0.2); /* 🎯 NUEVO: Sombra en el icono */
+}
+
+/* Título del beneficio - MEJORADO */
+.benefitTitle {
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+  margin-bottom: 0.8rem;
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  color: #333;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease; /* 🎯 NUEVO: Transición suave */
+}
+
+@media (min-width: 768px) {
+  .benefitTitle {
+    margin-bottom: 1rem;
+  }
+}
+
+.benefitCard:hover .benefitTitle {
+  color: #5A4E7C; /* 🎯 NUEVO: Color más vibrante en hover */
+  transform: translateY(-2px); /* 🎯 NUEVO: Movimiento sutil hacia arriba */
+}
+
+/* Descripción del beneficio - MEJORADA */
+.benefitDescription {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+  color: #6c757d;
+  line-height: 1.6; /* 🎯 CAMBIO: Mejor espaciado de línea */
+  margin: 0;
+  flex-grow: 1;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease; /* 🎯 NUEVO: Transición suave */
+}
+
+.benefitCard:hover .benefitDescription {
+  color: #555; /* 🎯 NUEVO: Color más oscuro en hover para mejor legibilidad */
+  transform: translateY(-1px); /* 🎯 NUEVO: Movimiento sutil hacia arriba */
+}
+
+/* Responsividad para iconos - MEJORADA */
+.iconWrapper svg {
+  width: 35px; /* 🎯 CAMBIO: Ligeramente más pequeños para mejor proporción */
+  height: 35px;
+  color: #8E7AA6;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* 🎯 NUEVO: Transición suave */
+  filter: drop-shadow(0 2px 4px rgba(142, 122, 166, 0.2)); /* 🎯 NUEVO: Sombra sutil */
+}
+
+@media (min-width: 576px) {
+  .iconWrapper svg {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (min-width: 768px) {
+  .iconWrapper svg {
+    width: 45px;
+    height: 45px;
+  }
+}
+
+.benefitCard:hover .iconWrapper svg {
+  color: #A17CCA; /* 🎯 NUEVO: Color más vibrante en hover */
+  filter: drop-shadow(0 4px 8px rgba(161, 124, 202, 0.3)); /* 🎯 NUEVO: Sombra más intensa en hover */
+}
+
+/* 🎯 NUEVO: Animación de entrada suave */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.benefitCard {
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.benefitCard:nth-child(1) { animation-delay: 0.1s; }
+.benefitCard:nth-child(2) { animation-delay: 0.2s; }
+.benefitCard:nth-child(3) { animation-delay: 0.3s; }
+.benefitCard:nth-child(4) { animation-delay: 0.4s; }
+
+/* 🎯 NUEVO: Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .benefitCard,
+  .iconWrapper,
+  .benefitTitle,
+  .benefitDescription,
+  .iconWrapper svg {
+    animation: none;
+    transition: none;
+  }
+  
+  .benefitCard:hover {
+    transform: translateY(-2px);
+  }
+  
+  .benefitCard:hover .iconWrapper {
+    transform: scale(1.05);
+  }
+}
+
+/* 🎯 NUEVO: Modo alto contraste */
+@media (prefers-contrast: high) {
+  .benefitCard {
+    background: rgba(255, 255, 255, 0.98);
+    border: 2px solid #333;
+  }
+  
+  .benefitCard:hover {
+    border-color: #A17CCA;
+  }
+  
+  .iconWrapper {
+    background: rgba(51, 51, 51, 0.1);
+  }
+  
+  .benefitCard:hover .iconWrapper {
+    background: rgba(161, 124, 202, 0.2);
+  }
+}

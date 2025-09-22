@@ -1,24 +1,11 @@
+/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\components\Profile\ViewProfile\ProfileComponent.jsx */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import styles from './ProfileComponent.module.css';
 
 // Asegúrate de que esta ruta sea correcta según tu estructura de carpetas
 import perfilPlaceholder from '../../../assets/perfil_placeholder.png';
 
-const colors = {
-  primary: '#22c55e',
-  secondary: '#64748b',
-  error: '#ef4444',
-  white: '#ffffff',
-  lightGray: '#f8fafc',
-  darkGray: '#334155',
-};
-
-const spinnerStyle = `
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-`;
 
 const ProfileComponent = React.memo(
   ({
@@ -37,31 +24,9 @@ const ProfileComponent = React.memo(
     /** Estados de carga o error */
     if (isLoading)
       return (
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{ minHeight: '100vh' }}
-        >
-          <style>{spinnerStyle}</style>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              fontSize: '1.2rem',
-              color: colors.primary,
-            }}
-          >
-            <div
-              style={{
-                width: '3rem',
-                height: '3rem',
-                border: '0.4rem solid #f3f3f3',
-                borderTop: `0.4rem solid ${colors.primary}`,
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite',
-                marginBottom: '1rem',
-              }}
-            />
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingContent}>
+            <div className={styles.loadingSpinner} />
             Cargando perfil...
           </div>
         </div>
@@ -69,27 +34,26 @@ const ProfileComponent = React.memo(
 
     if (error)
       return (
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{ minHeight: '100vh' }}
-        >
-          <div
-            className="card p-4"
-            style={{ maxWidth: '400px', textAlign: 'center' }}
-          >
-            <div className="alert alert-danger mb-3">{error}</div>
-            <div className="d-flex gap-2 justify-content-center">
-              <button className="btn btn-primary" onClick={() => navigate('/')}>
+        <div className={styles.errorContainer}>
+          <div className={`card p-4 ${styles.errorCard}`}>
+            <div className={`alert alert-danger mb-3 ${styles.errorText}`}>
+              {error}
+            </div>
+            <div className={styles.errorButtons}>
+              <button 
+                className={`btn btn-primary ${styles.errorButton}`}
+                onClick={() => navigate('/')}
+              >
                 Volver al inicio
               </button>
               <button
-                className="btn btn-outline-secondary"
+                className={`btn btn-outline-secondary ${styles.errorButton}`}
                 onClick={() => window.location.reload()}
               >
                 Reintentar
               </button>
             </div>
-            <small className="text-muted mt-3">
+            <small className={`text-muted mt-3 ${styles.errorFooter}`}>
               Buscando: @{nicknameParam}
             </small>
           </div>
@@ -99,11 +63,8 @@ const ProfileComponent = React.memo(
     // Validar que el usuario existe antes de renderizar
     if (!usuario) {
       return (
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{ minHeight: '100vh' }}
-        >
-          <div className="alert alert-warning">
+        <div className={styles.errorContainer}>
+          <div className={`alert alert-warning ${styles.errorText}`}>
             No se pudo cargar la información del usuario
           </div>
         </div>
@@ -115,94 +76,59 @@ const ProfileComponent = React.memo(
     const currentUser = getCurrentUser();
 
     return (
-      <div
-        style={{
-          minHeight: '100vh',
-          width: '100%',
-          background: '#fafafa',
-          display: 'flex',
-          flexDirection: 'column',
-          paddingTop: '90px',
-          paddingBottom: '6rem',
-        }}
-      >
-        <style>{spinnerStyle}</style>
-
+      <div className={styles.profileContainer}>
         {/* Header moderno tipo Instagram */}
-        <div className="bg-white border-bottom">
-          <div className="container-fluid px-4">
-            <div className="d-flex py-4">
+        <div className={styles.profileHeader}>
+          <div className={`container-fluid ${styles.headerContainer}`}>
+            <div className={styles.profileInfo}>
               {/* Avatar */}
-              <div className="me-4">
-                <div
-                  style={{
-                    width: '150px',
-                    height: '150px',
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    border: '3px solid #ffffff',
-                    padding: '3px',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      borderRadius: '50%',
-                      overflow: 'hidden',
-                    }}
-                  >
+              <div className={styles.avatarContainer}>
+                <div className={styles.avatarWrapper}>
+                  <div className={styles.avatarImage}>
                     <img
                       src={usuario.avatar || perfilPlaceholder}
                       onError={(e) => {
                         e.target.src = perfilPlaceholder;
                       }}
                       alt="perfil"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                      }}
+                      className={styles.avatar}
                     />
                   </div>
                 </div>
               </div>
 
               {/* Información del perfil */}
-              <div className="flex-grow-1">
+              <div className={styles.userInfo}>
                 {/* Fila 1: Nickname y botones */}
-                <div className="d-flex align-items-center mb-3">
-                  <h1 className="h4 me-4 mb-0" style={{ fontWeight: '300' }}>
+                <div className={styles.nicknameRow}>
+                  <h1 className={styles.nickname}>
                     {usuario.nickname || usuario.nombreUsuario}
                   </h1>
 
                   {/* Botones de acción */}
                   {isOwnProfile ? (
-                    <div className="d-flex gap-2">
+                    <div className={styles.actionButtons}>
                       <button
-                        className="btn btn-outline-dark btn-sm px-3"
-                        style={{ fontWeight: '600', fontSize: '14px' }}
+                        className={`btn btn-outline-dark btn-sm ${styles.actionButton}`}
                         onClick={onEditProfile}
                       >
                         Editar perfil
                       </button>
                       <button
-                        className="btn btn-outline-dark btn-sm px-2"
-                        style={{ fontWeight: '600', fontSize: '14px' }}
+                        className={`btn btn-outline-dark btn-sm ${styles.actionButton} ${styles.iconButton}`}
                         onClick={onConfigureProfile}
                       >
                         <i className="bi bi-gear"></i>
                       </button>
                     </div>
                   ) : (
-                    <div className="d-flex gap-2">
+                    <div className={styles.actionButtons}>
                       <button
-                        className={`btn btn-sm px-4 ${
+                        className={`btn btn-sm ${
                           usuario.seguidores?.includes(currentUser?.id)
                             ? 'btn-outline-dark'
                             : 'btn-primary'
-                        }`}
-                        style={{ fontWeight: '600', fontSize: '14px' }}
+                        } ${styles.actionButton}`}
                         onClick={onFollowToggle}
                       >
                         {usuario.seguidores?.includes(currentUser?.id)
@@ -210,12 +136,13 @@ const ProfileComponent = React.memo(
                           : 'Seguir'}
                       </button>
                       <button
-                        className="btn btn-outline-dark btn-sm px-3"
-                        style={{ fontWeight: '600', fontSize: '14px' }}
+                        className={`btn btn-outline-dark btn-sm ${styles.actionButton}`}
                       >
                         Mensaje
                       </button>
-                      <button className="btn btn-outline-dark btn-sm p-2">
+                      <button 
+                        className={`btn btn-outline-dark btn-sm ${styles.actionButton} ${styles.iconButton}`}
+                      >
                         <i className="bi bi-person-plus"></i>
                       </button>
                     </div>
@@ -223,42 +150,37 @@ const ProfileComponent = React.memo(
                 </div>
 
                 {/* Fila 2: Estadísticas */}
-                <div className="d-flex gap-4 mb-3">
-                  <span>
-                    <strong>{usuario.posts?.length || 0}</strong> publicaciones
+                <div className={styles.statsRow}>
+                  <span className={styles.statItem}>
+                    <strong>{usuario.posts?.length || 0}</strong>{' '}
+                    <span className="d-none d-sm-inline">publicaciones</span>
+                    <span className="d-inline d-sm-none">posts</span>
                   </span>
-                  <span style={{ cursor: 'pointer' }}>
+                  <span className={styles.statItem}>
                     <strong>{usuario.seguidores?.length || 0}</strong>{' '}
                     seguidores
                   </span>
-                  <span style={{ cursor: 'pointer' }}>
-                    <strong>{usuario.seguidos?.length || 0}</strong> seguidos
+                  <span className={styles.statItem}>
+                    <strong>{usuario.seguidos?.length || 0}</strong>{' '}
+                    seguidos
                   </span>
                 </div>
 
                 {/* Fila 3: Bio y detalles */}
-                <div>
-                  <h2 className="h6 mb-1" style={{ fontWeight: '600' }}>
+                <div className={styles.bioSection}>
+                  <h2 className={styles.fullName}>
                     {usuario.nombreCompleto}
                   </h2>
 
                   {usuario.pronombres && (
                     <span
-                      className="badge bg-light text-dark me-2 mb-2"
-                      style={{ fontSize: '11px' }}
+                      className={`badge bg-light text-dark me-2 mb-2 ${styles.pronounsBadge}`}
                     >
                       {usuario.pronombres}
                     </span>
                   )}
 
-                  <p
-                    className="mb-2"
-                    style={{
-                      whiteSpace: 'pre-line',
-                      fontSize: '14px',
-                      lineHeight: '1.4',
-                    }}
-                  >
+                  <p className={styles.bio}>
                     {usuario.bio ||
                       usuario.biografia ||
                       (isOwnProfile
@@ -267,22 +189,25 @@ const ProfileComponent = React.memo(
                   </p>
 
                   {/* Indicadores de perfil */}
-                  <div
-                    className="d-flex align-items-center gap-2 text-muted"
-                    style={{ fontSize: '12px' }}
-                  >
+                  <div className={styles.badges}>
                     <span
-                      className={`badge ${usuario.visibilidadPerfil === 'publico' ? 'bg-success' : 'bg-warning'}`}
+                      className={`badge ${
+                        usuario.visibilidadPerfil === 'publico' 
+                          ? 'bg-success' 
+                          : 'bg-warning'
+                      } ${styles.badge}`}
                     >
                       {usuario.visibilidadPerfil === 'publico'
                         ? '🌐 Público'
                         : '🔒 Privado'}
                     </span>
-                    <span>•</span>
-                    <span className="text-capitalize">{usuario.rol}</span>
+                    <span style={{ color: '#6c757d' }}>•</span>
+                    <span className="text-capitalize" style={{ color: '#6c757d' }}>
+                      {usuario.rol}
+                    </span>
                     {isOwnProfile && (
                       <>
-                        <span>•</span>
+                        <span style={{ color: '#6c757d' }}>•</span>
                         <span className="text-primary">Tu perfil</span>
                       </>
                     )}
@@ -294,16 +219,13 @@ const ProfileComponent = React.memo(
         </div>
 
         {/* Contenido del perfil */}
-        <div className="container py-3">
+        <div className={`container ${styles.profileContent}`}>
           {isPrivateProfile && !isOwnProfile ? (
             // PERFIL PRIVADO - No es el mío
-            <div
-              className="text-center p-5"
-              style={{ color: colors.secondary }}
-            >
-              <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🔒</div>
-              <h4>Este perfil es privado</h4>
-              <p className="text-muted mb-4">
+            <div className={styles.privateProfile}>
+              <div className={styles.privateIcon}>🔒</div>
+              <h4 className={styles.privateTitle}>Este perfil es privado</h4>
+              <p className={`text-muted mb-4 ${styles.privateText}`}>
                 {currentUser
                   ? `Sigue a @${usuario.nickname || usuario.nombreUsuario} para ver sus fotos y videos.`
                   : `Inicia sesión y sigue a @${usuario.nickname || usuario.nombreUsuario} para ver su contenido.`}
@@ -311,21 +233,24 @@ const ProfileComponent = React.memo(
 
               {/* Botones según estado del usuario */}
               {currentUser ? (
-                <button className="btn btn-primary" onClick={onFollowToggle}>
+                <button 
+                  className={`btn btn-primary ${styles.privateButton}`}
+                  onClick={onFollowToggle}
+                >
                   {usuario.seguidores?.includes(currentUser?.id)
                     ? 'Dejar de seguir'
                     : 'Seguir'}
                 </button>
               ) : (
-                <div className="d-flex gap-2 justify-content-center">
+                <div className={styles.privateButtons}>
                   <button
-                    className="btn btn-primary"
+                    className={`btn btn-primary ${styles.privateButton}`}
                     onClick={() => navigate('/login')}
                   >
                     Iniciar sesión
                   </button>
                   <button
-                    className="btn btn-outline-primary"
+                    className={`btn btn-outline-primary ${styles.privateButton}`}
                     onClick={() => navigate('/register')}
                   >
                     Registrarse
@@ -349,21 +274,15 @@ const ProfileContent = React.memo(({ usuario, isOwnProfile }) => {
     <>
       {/* Mensaje si no hay posts */}
       {(!usuario.posts || usuario.posts.length === 0) && (
-        <div className="text-center p-4">
-          <div
-            style={{
-              fontSize: '3rem',
-              marginBottom: '1rem',
-              opacity: 0.5,
-            }}
-          ></div>
-          <h5 className="text-muted mb-2">
+        <div className={styles.noPostsContainer}>
+          <div className={styles.noPostsIcon}>📷</div>
+          <h5 className={`text-muted mb-2 ${styles.noPostsTitle}`}>
             {isOwnProfile
               ? 'Aún no tienes publicaciones'
               : 'Este usuario no tiene publicaciones'}
           </h5>
           {isOwnProfile && (
-            <p className="text-muted small">
+            <p className={`text-muted small ${styles.noPostsText}`}>
               Comparte tus primeros momentos con tus seguidores
             </p>
           )}
@@ -372,7 +291,7 @@ const ProfileContent = React.memo(({ usuario, isOwnProfile }) => {
 
       {/* Grid de Posts */}
       {usuario.posts && usuario.posts.length > 0 && (
-        <div className="row g-2">
+        <div className={`row ${styles.postsGrid}`}>
           {usuario.posts.map((post, index) => (
             <PostGridItem key={index} post={post} usuario={usuario} />
           ))}
@@ -384,58 +303,25 @@ const ProfileContent = React.memo(({ usuario, isOwnProfile }) => {
 
 // Componente para cada item del grid de posts
 const PostGridItem = React.memo(({ post, usuario }) => {
-  const [isHovered, setIsHovered] = React.useState(false);
-
   return (
     <div className="col-4">
-      <div
-        className="position-relative"
-        style={{
-          aspectRatio: '1/1',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '8px',
-          overflow: 'hidden',
-          cursor: 'pointer',
-          transition: 'transform 0.2s ease',
-          transform: isHovered ? 'scale(1.02)' : 'scale(1)',
-        }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+      <div className={styles.postItem}>
         <img
           src={post.imagen || usuario.avatar || perfilPlaceholder}
           onError={(e) => {
             e.target.src = perfilPlaceholder;
           }}
           alt="publicación"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
+          className={styles.postImage}
         />
 
         {/* Overlay con estadísticas */}
-        <div
-          className="position-absolute d-flex align-items-center justify-content-center gap-3"
-          style={{
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            opacity: isHovered ? 1 : 0,
-            transition: 'opacity 0.3s ease',
-            color: 'white',
-            fontSize: '0.9rem',
-            fontWeight: '600',
-          }}
-        >
-          <div className="d-flex align-items-center gap-1">
+        <div className={styles.postOverlay}>
+          <div className={styles.postStat}>
             <i className="bi bi-heart-fill"></i>
             <span>{post.likes || 0}</span>
           </div>
-          <div className="d-flex align-items-center gap-1">
+          <div className={styles.postStat}>
             <i className="bi bi-chat-fill"></i>
             <span>{post.comentarios || 0}</span>
           </div>

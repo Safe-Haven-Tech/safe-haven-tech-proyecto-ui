@@ -1,0 +1,245 @@
+/* Contenedor principal - FONDO CLARO */
+.configureContainer {
+  padding-top: 70px;
+  padding-bottom: 30px;
+  min-height: 100vh;
+  background: #f0f2f5 !important; /* CAMBIADO: de #f0f2f5 a gris muy claro */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* Tablet pequeño - 576px y más */
+@media (min-width: 576px) {
+  .configureContainer {
+    padding-top: 80px;
+    padding-bottom: 35px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+/* Tablet - 768px y más */
+@media (min-width: 768px) {
+  .configureContainer {
+    padding-top: 90px;
+    padding-bottom: 40px;
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+}
+
+/* Desktop - 992px y más */
+@media (min-width: 992px) {
+  .configureContainer {
+    padding-top: 100px;
+    padding-bottom: 50px;
+    min-height: 100vh;
+    background: #f8f9fa; /* CAMBIADO: fondo más claro */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+/* Desktop grande - 1200px y más */
+@media (min-width: 1200px) {
+  .configureContainer {
+    padding-top: 105px;
+    padding-bottom: 55px;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+/* Pantallas muy grandes - 1400px y más */
+@media (min-width: 1400px) {
+  .configureContainer {
+    padding-top: 110px;
+    padding-bottom: 60px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* Loading container */
+.loadingContainer {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+@media (min-width: 576px) {
+  .loadingContainer {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+@media (min-width: 768px) {
+  .loadingContainer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* Optimizaciones específicas para móvil */
+@media (max-width: 575.98px) {
+  .configureContainer {
+    overflow-x: hidden;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  @media (max-width: 375px) {
+    .configureContainer {
+      padding-top: 60px;
+      padding-bottom: 25px;
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+    
+    .loadingContainer {
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+  }
+  
+  @media (max-width: 320px) {
+    .configureContainer {
+      padding-top: 50px;
+      padding-bottom: 20px;
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+  }
+}
+
+/* Optimización para tablets en orientación landscape */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .configureContainer {
+    padding-top: 70px;
+    padding-bottom: 30px;
+  }
+}
+
+/* Optimización para pantallas táctiles */
+@media (hover: none) and (pointer: coarse) {
+  .configureContainer {
+    padding-top: 75px;
+  }
+  
+  @media (min-width: 992px) {
+    .configureContainer {
+      padding-top: 100px;
+    }
+  }
+}
+
+/* Fix para navegadores iOS */
+@supports (-webkit-touch-callout: none) {
+  .configureContainer {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Asegurar que el contenido no sea demasiado ancho */
+.configureContainer > * {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 576px) {
+  .configureContainer > * {
+    max-width: 500px;
+  }
+}
+
+@media (min-width: 768px) {
+  .configureContainer > * {
+    max-width: 600px;
+  }
+}
+
+@media (min-width: 992px) {
+  .configureContainer > * {
+    max-width: 700px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .configureContainer > * {
+    max-width: 800px;
+  }
+}
+
+/* Soporte para pantallas con notch */
+@supports (padding: max(0px)) {
+  .configureContainer {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+  
+  @media (min-width: 992px) {
+    .configureContainer {
+      padding-left: max(15px, env(safe-area-inset-left));
+      padding-right: max(15px, env(safe-area-inset-right));
+    }
+  }
+}
+
+/* Mejoras para pantallas con poca altura */
+@media screen and (max-height: 600px) {
+  .configureContainer {
+    padding-top: 50px;
+    padding-bottom: 20px;
+  }
+  
+  @media (min-width: 992px) {
+    .configureContainer {
+      padding-top: 80px;
+      padding-bottom: 40px;
+    }
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .configureContainer {
+    background: #fff; /* Blanco puro en alto contraste */
+    border: 2px solid #000;
+  }
+}
+
+/* Print styles */
+@media print {
+  .configureContainer {
+    background: white; /* Blanco para impresión */
+    padding: 20px;
+    min-height: auto;
+  }
+  
+  .loadingContainer {
+    padding: 10px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .configureContainer {
+    background: #1a1a1a;
+    color: #ffffff;
+  }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .configureContainer {
+    transition: none;
+  }
+}

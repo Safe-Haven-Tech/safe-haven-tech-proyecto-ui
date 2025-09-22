@@ -1,0 +1,213 @@
+/* Contenedor principal */
+.container {
+  margin-top: 80px;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  padding: 0 1rem;
+}
+
+@media (min-width: 576px) {
+  .container {
+    margin-top: 90px;
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    margin-top: 100px;
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    padding: 0;
+  }
+}
+
+/* Contenedor de evaluaciones */
+.evaluationsContainer {
+  background-color: #F9F9F9;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+@media (min-width: 576px) {
+  .evaluationsContainer {
+    padding: 2rem;
+    border-radius: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .evaluationsContainer {
+    padding: 2.5rem;
+  }
+}
+
+/* Estados de carga y error */
+.loadingContainer {
+  text-align: center;
+  margin-top: 3rem;
+  padding: 2rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .loadingContainer {
+    margin-top: 5rem;
+    padding: 3rem;
+  }
+}
+
+.loadingText {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #6c757d;
+}
+
+.errorContainer {
+  text-align: center;
+  margin-top: 3rem;
+  padding: 2rem 1rem;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .errorContainer {
+    margin-top: 5rem;
+    padding: 3rem;
+    border-radius: 1rem;
+  }
+}
+
+.errorText {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #856404;
+  margin: 0;
+}
+
+/* Mensaje de no evaluaciones */
+.noEvaluationsContainer {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .noEvaluationsContainer {
+    padding: 3rem;
+  }
+}
+
+.noEvaluationsText {
+  font-family: 'Poppins', sans-serif;
+  color: #6c757d;
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  margin: 0;
+}
+
+/* Grid de evaluaciones */
+.evaluationsGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .evaluationsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .evaluationsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Call to action */
+.ctaContainer {
+  text-align: center;
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .ctaContainer {
+    margin-top: 3rem;
+    padding: 1.5rem;
+  }
+}
+
+.ctaText {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.9rem, 1.8vw, 1rem);
+  margin: 0;
+}
+
+.ctaLink {
+  color: #5A4E7C;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.ctaLink:hover {
+  color: #A17CCA;
+  text-decoration: none;
+}
+
+.ctaLink::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  transition: width 0.3s ease;
+}
+
+.ctaLink:hover::after {
+  width: 100%;
+}
+
+/* Animaciones */
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fadeSlideUp {
+  animation: fadeSlideUp 0.6s ease-out forwards;
+}
+
+/* Responsividad específica para pantallas muy pequeñas */
+@media (max-width: 320px) {
+  .container {
+    margin-top: 70px;
+    padding: 0 0.5rem;
+  }
+  
+  .evaluationsContainer {
+    padding: 1rem;
+    border-radius: 0.75rem;
+  }
+  
+  .ctaContainer {
+    margin-top: 1.5rem;
+    padding: 0.75rem;
+  }
+}

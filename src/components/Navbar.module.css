@@ -1,0 +1,264 @@
+/* ==================== NAVBAR RESPONSIVE CON ESTILO ORIGINAL ==================== */
+
+/* Navbar principal */
+.navbar {
+  /* Los estilos inline del componente original se mantienen */
+}
+
+/* ==================== MOBILE CONTROLS ==================== */
+
+.mobileControls {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Ajustado para coincidir con gap original de 24 */
+  margin-left: auto;
+}
+
+/* ==================== HAMBURGER MENU ==================== */
+
+.hamburgerButton {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 6px; /* ORIGINAL: border radius como los botones */
+  transition: background-color 0.3s ease; /* ORIGINAL: solo fondo cambia */
+}
+
+.hamburgerButton:hover {
+  background-color: #2d5016; /* ORIGINAL: mismo hover que otros botones */
+}
+
+.hamburgerLine {
+  width: 24px;
+  height: 3px;
+  background: #2d5016;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.hamburgerButton:hover .hamburgerLine {
+  background: #ffffff; /* ORIGINAL: líneas blancas en hover */
+}
+
+.hamburgerButton.active .hamburgerLine:nth-child(1) {
+  transform: rotate(45deg) translateY(7px);
+}
+
+.hamburgerButton.active .hamburgerLine:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburgerButton.active .hamburgerLine:nth-child(3) {
+  transform: rotate(-45deg) translateY(-7px);
+}
+
+/* ==================== MOBILE MENU OVERLAY ==================== */
+
+.mobileMenuOverlay {
+  position: fixed;
+  top: 80px; /* ORIGINAL: altura del navbar */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobileMenuOverlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobileMenuContent {
+  background: #A9C5A0; /* ORIGINAL: mismo color que navbar */
+  margin: 15px;
+  border-radius: 8px; /* ORIGINAL: mismo border radius que logo */
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* ORIGINAL: misma sombra que navbar */
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+  font-family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"; /* ORIGINAL */
+}
+
+.mobileMenuOverlay.open .mobileMenuContent {
+  transform: translateY(0);
+}
+
+.mobileMenuItems {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.mobileMenuItem {
+  background: transparent; /* ORIGINAL */
+  color: #000; /* ORIGINAL */
+  border: none;
+  padding: 10px 18px; /* ORIGINAL: mismo padding que NavButton */
+  font-size: 16px; /* ORIGINAL */
+  font-weight: 600; /* ORIGINAL */
+  text-align: left;
+  border-radius: 6px; /* ORIGINAL */
+  transition: background-color 0.3s ease; /* ORIGINAL: solo fondo cambia */
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+}
+
+.mobileMenuItem:hover {
+  color: #fff; /* ORIGINAL */
+  background-color: #2d5016; /* ORIGINAL */
+}
+
+.mobileAuthSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(45, 80, 22, 0.2);
+}
+
+.mobileProfileButton,
+.mobileLoginButton,
+.mobileRegisterButton {
+  padding: 10px 18px; /* ORIGINAL */
+  border-radius: 6px; /* ORIGINAL */
+  font-size: 16px; /* ORIGINAL */
+  font-weight: 600; /* ORIGINAL */
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease; /* ORIGINAL */
+  cursor: pointer;
+  border: none;
+  display: block;
+}
+
+.mobileProfileButton {
+  background-color: #2d5016; /* ORIGINAL */
+  color: #ffffff; /* ORIGINAL */
+}
+
+.mobileProfileButton:hover {
+  background-color: #1f3a0f; /* ORIGINAL */
+  color: #ffffff; /* ORIGINAL */
+}
+
+.mobileLoginButton {
+  background-color: transparent; /* ORIGINAL */
+  color: #2d5016; /* ORIGINAL */
+  border: 2px solid #2d5016; /* ORIGINAL */
+}
+
+.mobileLoginButton:hover {
+  background-color: #2d5016; /* ORIGINAL */
+  color: #ffffff; /* ORIGINAL */
+}
+
+.mobileRegisterButton {
+  background-color: #2d5016; /* ORIGINAL */
+  color: #ffffff; /* ORIGINAL */
+}
+
+.mobileRegisterButton:hover {
+  background-color: #1f3a0f; /* ORIGINAL */
+  color: #ffffff; /* ORIGINAL */
+}
+
+/* ==================== RESPONSIVE BREAKPOINTS ==================== */
+
+/* Móvil pequeño */
+@media (max-width: 480px) {
+  .mobileControls {
+    gap: 8px;
+  }
+  
+  .mobileMenuContent {
+    margin: 10px;
+    padding: 15px;
+  }
+}
+
+/* Esconder elementos según pantalla */
+@media (max-width: 768px) {
+  .navbar .collapse {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobileControls {
+    display: none;
+  }
+  
+  .mobileMenuOverlay {
+    display: none;
+  }
+}
+
+/* ==================== ACCESIBILIDAD ==================== */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .hamburgerLine {
+    background: #000;
+  }
+  
+  .mobileMenuContent {
+    border: 2px solid #000;
+  }
+}
+
+/* ==================== BOTÓN ADMIN MÓVIL ==================== */
+
+.mobileAdminButton {
+  background-color: #dc3545; /* Rojo para admin */
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 700; /* Más bold para destacar */
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  border: none;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.mobileAdminButton:hover {
+  background-color: #c82333; /* Rojo más oscuro */
+  color: #ffffff;
+}
+
+/* Asegurar que el botón admin aparezca primero */
+.mobileAuthSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(45, 80, 22, 0.2);
+}
+
+.mobileAuthSection .mobileAdminButton {
+  order: -1; /* Admin aparece primero */
+}

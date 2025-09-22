@@ -1,13 +1,12 @@
-// src/pages/Register/Register.jsx
 import React, { Suspense, useMemo, useCallback, useState } from 'react';
+import styles from './RegisterPage.module.css';
 import RegisterForm from '../../components/Register/RegisterForm';
 import background from '../../assets/FondoRegister.png';
 import { sanitizeInput } from '../../utils/validators';
 import { registrarUsuario } from '../../services/authServices';
-
 import { useFormValidation } from '../../hooks/useFormValidator';
 
-export default function Register() {
+export default function RegisterPage() {
   const initialFormData = {
     email: '',
     password: '',
@@ -44,7 +43,7 @@ export default function Register() {
       e.preventDefault();
 
       if (!validateForm()) {
-        setError('Corrige los errores');
+        setError('Por favor corrige los errores en el formulario');
         return;
       }
 
@@ -67,16 +66,21 @@ export default function Register() {
           rol: formData.rol,
           anonimo: formData.anonimo,
           visibilidadPerfil: formData.visibilidadPerfil,
-          genero: formData.genero,
-          pronombres: formData.pronombres,
-          biografia: formData.biografia,
+          genero: formData.genero || '',
+          pronombres: formData.pronombres || '',
+          biografia: formData.biografia || '',
         };
 
         await registrarUsuario(payload);
-        setSuccess('Cuenta creada, redirigiendo...');
-        setTimeout(() => (window.location.href = '/login'), 2000);
+        setSuccess('¡Cuenta creada exitosamente! Redirigiendo al login...');
+        
+        // Usar navigate en lugar de window.location
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
       } catch (err) {
-        setError(err.message || 'Error al crear la cuenta');
+        console.error('Error en registro:', err);
+        setError(err.message || 'Error al crear la cuenta. Intenta nuevamente.');
       } finally {
         setLoading(false);
       }
@@ -115,47 +119,37 @@ export default function Register() {
     ]
   );
 
+  const LoadingFallback = () => (
+    <div className={styles.loadingFallback}>
+      <div className={styles.loadingSpinner}></div>
+      Cargando formulario de registro...
+    </div>
+  );
+
+  const ErrorFallback = ({ error }) => (
+    <div className={styles.errorState}>
+      <div className={styles.errorTitle}>Error al cargar</div>
+      <div className={styles.errorMessage}>
+        {error?.message || 'Hubo un problema al cargar el formulario'}
+      </div>
+    </div>
+  );
+
   return (
     <div
-      className="w-100 p-3"
-      style={{
-        minHeight: '100vh', // permite crecer si el contenido lo necesita
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'flex-start', // evita cortar cuando hay scroll
-        backgroundImage: `url(${background})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundColor: '#f0f0f0',
-        position: 'relative',
-        paddingTop: '5vh', // espacio superior para que no quede pegado
-        paddingBottom: '5vh', // espacio inferior
-      }}
+      className={styles.registerContainer}
+      style={{ backgroundImage: `url(${background})` }}
     >
-      {/* Overlay */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.3)',
-          zIndex: 1,
-        }}
-      />
-      <div
-        className="position-relative"
-        style={{ zIndex: 2, maxWidth: '500px', width: '100%' }}
-      >
-        <Suspense
-          fallback={
-            <div className="text-center text-white">Cargando formulario...</div>
-          }
-        >
-          {memoizedForm}
-        </Suspense>
+      {/* Overlay mejorado */}
+      <div className={styles.overlay}></div>
+
+      {/* Contenedor principal */}
+      <div className={styles.contentContainer}>
+        <div className={styles.formWrapper}>
+          <Suspense fallback={<LoadingFallback />}>
+            {memoizedForm}
+          </Suspense>
+        </div>
       </div>
     </div>
   );

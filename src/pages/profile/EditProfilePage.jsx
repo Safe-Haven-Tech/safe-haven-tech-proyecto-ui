@@ -1,9 +1,10 @@
-// src/pages/EditarPerfil/EditarPerfil.jsx
+/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\pages\profile\EditProfilePage.jsx */
 import React, { useCallback } from 'react';
 import EditarPerfilForm from '../../components/Profile/EditProfile/EditProfileForm';
 import PreviewCard from '../../components/Profile/EditProfile/PreviewCard';
 import ModalConfirmation from '../../components/Profile/EditProfile/ModalConfirmation';
 import { useEditarPerfil } from '../../hooks/useEditProfile';
+import styles from './EditProfilePage.module.css';
 
 export default function EditarPerfil() {
   const {
@@ -32,13 +33,9 @@ export default function EditarPerfil() {
   // Mostrar skeleton mientras carga
   if (state.mostrarSkeleton) {
     return (
-      <div
-        className="d-flex flex-column justify-content-center align-items-center"
-        style={{ minHeight: '100vh' }}
-      >
+      <div className={`d-flex flex-column justify-content-center align-items-center ${styles.skeletonContainer}`}>
         <div
-          className="spinner-border text-success mb-3"
-          style={{ width: '3rem', height: '3rem' }}
+          className={`spinner-border text-success mb-3 ${styles.skeletonSpinner}`}
           role="status"
         >
           <span className="visually-hidden">Cargando perfil...</span>
@@ -49,37 +46,7 @@ export default function EditarPerfil() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        width: '100%',
-        background: '#f0f2f5',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '30px',
-        justifyContent: 'flex-start',
-        paddingTop: '120px',
-        paddingBottom: '50px',
-        paddingLeft: '20px',
-        paddingRight: '20px',
-        position: 'relative',
-        boxSizing: 'border-box',
-      }}
-    >
-      <style>
-        {`
-          .modal {
-            backdrop-filter: blur(5px);
-          }
-          .modal-content {
-            border-radius: 16px;
-            border: none;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-          }
-        `}
-      </style>
-
+    <div className={styles.editProfileContainer}>
       {/* Formulario de edición */}
       <EditarPerfilForm
         state={state}

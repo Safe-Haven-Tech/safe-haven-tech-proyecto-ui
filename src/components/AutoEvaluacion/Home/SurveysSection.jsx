@@ -1,6 +1,8 @@
+/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\components\AutoEvaluacion\Home\SurveysSection.jsx */
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import styles from './SurveysSection.module.css';
 import { fetchEncuestas } from '../../../services/surveysServices';
 
 const validTopics = [
@@ -76,69 +78,33 @@ export default function SurveysSection({ selectedTopic, batchSize = 3 }) {
   const handleLoadMore = () => setVisibleCount((prev) => prev + batchSize);
   const handleSurveyClick = (surveyId) => navigate(`/encuesta/${surveyId}`);
 
-  if (loading) return <p className="text-center mt-4">Cargando encuestas...</p>;
+  if (loading) return <p className={styles.loadingText}>Cargando encuestas...</p>;
 
   return (
     <section className="my-5">
-      <div
-        className="container p-3 p-md-4"
-        style={{
-          borderRadius: '1.5rem',
-          background:
-            'linear-gradient(135deg, rgba(251,232,245,0.8), rgba(230,240,250,0.8), rgba(208,230,255,0.8))',
-          boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
-        }}
-      >
+      <div className={`container ${styles.surveysContainer}`}>
         {displayedSurveys.length === 0 ? (
-          <p
-            className="text-center fw-bold"
-            style={{
-              fontFamily: "'Poppins', sans-serif",
-              color: '#5A4E7C',
-              fontSize: '1.1rem',
-              padding: '2rem',
-            }}
-          >
+          <p className={styles.noSurveysMessage}>
             No hay encuestas disponibles para este tópico.
           </p>
         ) : (
           <>
-            <div className="row g-4">
+            <div className={styles.surveysGrid}>
               {displayedSurveys.map((survey, idx) => (
                 <div
                   key={idx}
-                  className={`col-12 col-md-6 col-lg-4 survey-card-wrapper ${
-                    animateIndexes.includes(idx) ? 'fade-in' : 'opacity-0'
+                  className={`${styles.surveyCardWrapper} ${
+                    animateIndexes.includes(idx) ? styles.fadeIn : ''
                   }`}
-                  style={{ transitionDelay: `${idx * 100}ms` }}
                 >
                   <div
-                    className="card h-100 shadow-sm border-0 p-3 survey-card"
-                    style={{
-                      borderRadius: '1rem',
-                      background: 'white',
-                      transition: 'transform 0.2s, box-shadow 0.2s',
-                      cursor: 'pointer',
-                    }}
+                    className={`card ${styles.surveyCard}`}
                     onClick={() => handleSurveyClick(survey._id)}
                   >
-                    <h5
-                      className="fw-bold"
-                      style={{
-                        fontFamily: "'Poppins', sans-serif",
-                        color: '#5A4E7C',
-                        marginBottom: '0.5rem',
-                      }}
-                    >
+                    <h5 className={styles.surveyTitle}>
                       {survey.titulo}
                     </h5>
-                    <p
-                      className="text-muted"
-                      style={{
-                        fontFamily: "'Poppins', sans-serif",
-                        fontSize: 'clamp(0.85rem, 1.5vw, 0.95rem)',
-                      }}
-                    >
+                    <p className={styles.surveyDescription}>
                       {survey.descripcion}
                     </p>
                   </div>
@@ -147,11 +113,10 @@ export default function SurveysSection({ selectedTopic, batchSize = 3 }) {
             </div>
 
             {showLoadMore && (
-              <div className="text-center mt-4 load-more-wrapper fade-in">
+              <div className={`${styles.loadMoreWrapper} ${styles.fadeIn}`}>
                 <button
-                  className="btn btn-outline-primary px-4 py-2"
+                  className={`btn ${styles.loadMoreButton}`}
                   onClick={handleLoadMore}
-                  style={{ borderRadius: '2rem' }}
                 >
                   Cargar más encuestas
                 </button>
@@ -160,25 +125,6 @@ export default function SurveysSection({ selectedTopic, batchSize = 3 }) {
           </>
         )}
       </div>
-
-      <style>{`
-        .survey-card {
-          transition: all 0.3s ease;
-        }
-        .survey-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 8px 25px rgba(90, 78, 124, 0.3);
-        }
-        .opacity-0 {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        .fade-in {
-          opacity: 1;
-          transform: translateY(0);
-          transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-        }
-      `}</style>
     </section>
   );
 }

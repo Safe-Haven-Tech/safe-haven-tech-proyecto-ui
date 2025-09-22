@@ -1,6 +1,7 @@
-// src/components/AutoEvaluacion/TopicsFilter.jsx
+/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\components\AutoEvaluacion\Home\TopicsFilter.jsx */
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import styles from './TopicsFilter.module.css';
 
 // Agregamos "Todas" como primera opción
 const topics = [
@@ -24,61 +25,24 @@ export default function TopicsFilter({ onSelect }) {
   };
 
   return (
-    <section
-      className="container my-5 p-4"
-      style={{
-        borderRadius: '1.5rem',
-        background: '#FAF8FF', // Fondo suave
-        boxShadow: '0 6px 18px rgba(90,78,124,0.08)',
-      }}
-    >
-      <h3
-        className="fw-bold mb-4 text-center"
-        style={{
-          fontFamily: "'Poppins', sans-serif",
-          background: 'linear-gradient(90deg, #5A4E7C, #A17CCA)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-        }}
-      >
+    <section className={`container ${styles.topicsSection}`}>
+      <h3 className={styles.sectionTitle}>
         Selecciona un tópico
       </h3>
 
-      <div className="d-flex flex-wrap justify-content-center gap-3">
+      <div className={styles.topicsContainer}>
         {topics.map((topic, idx) => (
           <button
             key={idx}
-            className={`btn topic-btn ${selectedTopic === topic ? 'active' : ''}`}
+            className={`${styles.topicBtn} ${
+              selectedTopic === topic ? styles.topicBtnActive : ''
+            }`}
             onClick={() => handleClick(topic)}
           >
             {topic}
           </button>
         ))}
       </div>
-
-      <style>{`
-        .topic-btn {
-          font-family: 'Poppins', sans-serif;
-          font-weight: 500;
-          padding: 0.5rem 1rem;
-          border-radius: 2rem;
-          border: 1px solid #A17CCA;
-          background: #f7f5fb;
-          color: #5A4E7C;
-          transition: all 0.3s ease;
-          cursor: pointer;
-          font-size: 0.9rem;
-        }
-        .topic-btn:hover {
-          transform: translateY(-3px);
-          background: #e6e0f5;
-        }
-        .topic-btn.active {
-          background: linear-gradient(90deg, #5A4E7C, #A17CCA);
-          color: #fff;
-          box-shadow: 0 4px 12px rgba(90, 78, 124, 0.3);
-        }
-      `}</style>
     </section>
   );
 }

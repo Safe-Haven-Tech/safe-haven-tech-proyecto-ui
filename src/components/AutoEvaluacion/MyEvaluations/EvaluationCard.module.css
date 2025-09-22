@@ -1,0 +1,364 @@
+/* Contenedor wrapper de la card */
+.cardWrapper {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: none;
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.cardWrapper.animated {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Card principal */
+.evaluationCard {
+  /* Layout y visibilidad */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  
+  /* Estilos visuales */
+  padding: 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border: none;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  overflow: hidden;
+  
+  /* Background dinámico desde getBackgroundColor */
+  background: white; /* Fallback */
+}
+
+@media (min-width: 576px) {
+  .evaluationCard {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .evaluationCard {
+    padding: 1.75rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .evaluationCard {
+    padding: 2rem;
+  }
+}
+
+/* Hover effects */
+.evaluationCard:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* 🎯 REMOVIDO: Efecto decorativo superior morado */
+/* .evaluationCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.evaluationCard:hover::before {
+  opacity: 1;
+} */
+
+/* Contenido principal */
+.cardContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Título de la evaluación */
+.cardTitle {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  color: #2d2d2d;
+  margin: 0 0 0.75rem 0;
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+@media (min-width: 768px) {
+  .cardTitle {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Fecha */
+.dateText {
+  font-family: 'Poppins', sans-serif;
+  color: #6c757d;
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+  margin: 0 0 0.75rem 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dateText::before {
+  content: '📅';
+  font-size: 0.9em;
+}
+
+@media (min-width: 768px) {
+  .dateText {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Badge de nivel de riesgo */
+.riskBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  cursor: help;
+  align-self: flex-start;
+  white-space: nowrap;
+  
+  /* Colores desde getBadgeColor utility */
+  background: #f8f9fa; /* Fallback */
+  color: #495057; /* Fallback */
+}
+
+@media (min-width: 576px) {
+  .riskBadge {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+}
+
+.riskBadge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.riskBadge svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+@media (min-width: 576px) {
+  .riskBadge svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* 🎯 CORREGIDO: Texto de tip/recomendación SIN borde morado */
+.tipText {
+  font-family: 'Poppins', sans-serif;
+  font-style: italic;
+  color: #5A4E7C;
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+  line-height: 1.5;
+  margin: 0;
+  flex-grow: 1;
+  padding: 1rem;
+  background: rgba(90, 78, 124, 0.05); /* 🎯 MANTENER: Fondo sutil */
+  border-radius: 12px;
+  /* 🎯 REMOVIDO: border-left: 3px solid #A17CCA; */
+}
+
+/* Botón de descarga */
+.downloadButton {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  padding: 0.875rem 1.25rem;
+  background: linear-gradient(135deg, #5A4E7C, #A17CCA);
+  border: none;
+  border-radius: 15px;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  
+  /* Sombra inicial */
+  box-shadow: 0 4px 15px rgba(90, 78, 124, 0.3);
+}
+
+@media (min-width: 576px) {
+  .downloadButton {
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Efecto de brillo en el botón */
+.downloadButton::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+  z-index: 0;
+}
+
+.downloadButton:hover::before {
+  transform: translateX(100%);
+}
+
+/* Hover del botón */
+.downloadButton:hover {
+  background: linear-gradient(135deg, #4a3d66, #8a6bb8);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(90, 78, 124, 0.4);
+}
+
+.downloadButton:active {
+  transform: translateY(-1px) scale(1.01);
+}
+
+.downloadButton:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
+}
+
+.downloadButton:disabled:hover {
+  background: #6c757d;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
+}
+
+/* Icono y texto del botón */
+.downloadButton svg,
+.downloadButton span {
+  position: relative;
+  z-index: 1;
+}
+
+.downloadButton svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.downloadButton:hover svg {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Animaciones escalonadas */
+.cardWrapper:nth-child(1) { animation-delay: 0.1s; }
+.cardWrapper:nth-child(2) { animation-delay: 0.2s; }
+.cardWrapper:nth-child(3) { animation-delay: 0.3s; }
+.cardWrapper:nth-child(4) { animation-delay: 0.4s; }
+.cardWrapper:nth-child(5) { animation-delay: 0.5s; }
+.cardWrapper:nth-child(6) { animation-delay: 0.6s; }
+.cardWrapper:nth-child(7) { animation-delay: 0.7s; }
+.cardWrapper:nth-child(8) { animation-delay: 0.8s; }
+.cardWrapper:nth-child(9) { animation-delay: 0.9s; }
+
+/* Responsive específico */
+@media (max-width: 480px) {
+  .evaluationCard {
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+  
+  .downloadButton {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    margin-top: 1rem;
+  }
+  
+  .riskBadge {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+  }
+  
+  .tipText {
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Accesibilidad */
+.evaluationCard:focus-within {
+  outline: 3px solid rgba(90, 78, 124, 0.4);
+  outline-offset: 2px;
+}
+
+.downloadButton:focus {
+  outline: 3px solid rgba(90, 78, 124, 0.6);
+  outline-offset: 2px;
+}
+
+/* Reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .cardWrapper,
+  .evaluationCard,
+  .downloadButton,
+  .riskBadge {
+    animation: none;
+    transition: none;
+  }
+  
+  .evaluationCard:hover {
+    transform: translateY(-2px);
+  }
+  
+  .downloadButton::before {
+    display: none;
+  }
+}
+
+/* Alto contraste */
+@media (prefers-contrast: high) {
+  .evaluationCard {
+    border: 2px solid #333;
+  }
+  
+  .evaluationCard:hover {
+    border-color: #5A4E7C;
+  }
+  
+  .downloadButton {
+    border: 2px solid white;
+  }
+}

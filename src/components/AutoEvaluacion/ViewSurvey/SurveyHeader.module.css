@@ -1,0 +1,299 @@
+/* Contenedor principal */
+.surveyHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+@media (min-width: 768px) {
+  .surveyHeader {
+    margin-bottom: 2.5rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .surveyHeader {
+    margin-bottom: 3rem;
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Título principal */
+.surveyTitle {
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.2;
+  animation: slideInLeft 0.8s ease-out 0.2s both;
+}
+
+@media (min-width: 768px) {
+  .surveyTitle {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Descripción */
+.surveyDescription {
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  line-height: 1.5;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: slideInRight 0.8s ease-out 0.4s both;
+}
+
+@media (min-width: 768px) {
+  .surveyDescription {
+    margin-bottom: 2rem;
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Contenedor de badges */
+.badgeContainer {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
+}
+
+@media (min-width: 576px) {
+  .badgeContainer {
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .badgeContainer {
+    gap: 1.5rem;
+  }
+}
+
+/* Badge de categoría */
+.categoryBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #5A4E7C, #A17CCA);
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(90, 78, 124, 0.3);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 576px) {
+  .categoryBadge {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .categoryBadge {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+.categoryBadge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(90, 78, 124, 0.4);
+}
+
+@media (min-width: 768px) {
+  .categoryBadge:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(90, 78, 124, 0.45);
+  }
+}
+
+/* Efecto de brillo en badge de categoría */
+.categoryBadge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.categoryBadge:hover::before {
+  left: 100%;
+}
+
+/* Badge de tiempo */
+.timeBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6c757d, #495057);
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 576px) {
+  .timeBadge {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .timeBadge {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+.timeBadge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(108, 117, 125, 0.4);
+  background: linear-gradient(135deg, #495057, #343a40);
+}
+
+@media (min-width: 768px) {
+  .timeBadge:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(108, 117, 125, 0.45);
+  }
+}
+
+/* Efecto de brillo en badge de tiempo */
+.timeBadge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.timeBadge:hover::before {
+  left: 100%;
+}
+
+/* Responsividad para pantallas muy pequeñas */
+@media (max-width: 320px) {
+  .surveyHeader {
+    margin-bottom: 1.5rem;
+  }
+  
+  .surveyDescription {
+    margin-bottom: 1rem;
+  }
+  
+  .badgeContainer {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .categoryBadge,
+  .timeBadge {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    width: fit-content;
+    min-width: 120px;
+    justify-content: center;
+  }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .surveyHeader,
+  .surveyTitle,
+  .surveyDescription,
+  .badgeContainer {
+    animation: none;
+  }
+  
+  .categoryBadge,
+  .timeBadge {
+    transition: none;
+  }
+  
+  .categoryBadge:hover,
+  .timeBadge:hover {
+    transform: none;
+  }
+  
+  .categoryBadge::before,
+  .timeBadge::before {
+    display: none;
+  }
+}
+
+/* Focus para accesibilidad */
+.categoryBadge:focus,
+.timeBadge:focus {
+  outline: 3px solid rgba(90, 78, 124, 0.5);
+  outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .surveyTitle {
+    background: none;
+    -webkit-text-fill-color: initial;
+    color: #000;
+  }
+  
+  .categoryBadge,
+  .timeBadge {
+    border: 2px solid #000;
+  }
+}

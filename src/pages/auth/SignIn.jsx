@@ -1,12 +1,11 @@
 import React, { useState, useCallback, useMemo, useRef, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import styles from './SignIn.module.css';
 import LoginForm from '../../components/Login/LoginForm';
 import WelcomeSection from '../../components/Login/WelcomeSection';
 import background from '../../assets/FondoLogin.png';
 import { useAuth } from '../../context/useAuth';
 import { sanitizeInput } from '../../utils/validators';
-import { styles } from '../../utils/stylesLogin';
 
 export default function SignInPage() {
   const navigate = useNavigate();
@@ -152,47 +151,33 @@ export default function SignInPage() {
     ]
   );
 
+  const LoadingFallback = () => (
+    <div className={styles.loadingFallback}>
+      <div className={styles.loadingSpinner}></div>
+      Cargando...
+    </div>
+  );
+
   return (
     <div
-      className="d-flex align-items-center justify-content-center"
-      style={{
-        backgroundImage: `url(${background})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-        height: '100vh',
-        width: '100vw',
-        overflow: 'hidden',
-        margin: 0,
-        padding: 0,
-      }}
+      className={`d-flex align-items-center justify-content-center ${styles.signInContainer}`}
+      style={{ backgroundImage: `url(${background})` }}
     >
-      {/* Overlay */}
-      <div
-        className="position-absolute w-100 h-100"
-        style={{
-          top: 0,
-          left: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          zIndex: 1,
-        }}
-      ></div>
+      {/* Overlay mejorado */}
+      <div className={styles.overlay}></div>
 
       {/* Contenedor principal */}
-      <div
-        className="container-fluid position-relative p-0 h-100"
-        style={{ zIndex: 2, maxHeight: '100vh' }}
-      >
-        <div className="row justify-content-between align-items-stretch h-100 g-0">
+      <div className={`container-fluid position-relative p-0 h-100 ${styles.contentContainer}`}>
+        <div className={`row justify-content-between align-items-stretch h-100 g-0 ${styles.mainRow}`}>
           {/* Panel izquierdo */}
-          <div className="col-lg-6 d-none d-lg-flex align-items-center justify-content-center">
+          <div className={`col-lg-6 ${styles.leftPanel}`}>
             <WelcomeSection />
           </div>
 
           {/* Panel derecho */}
-          <div className="col-lg-5 col-xl-4 p-0 h-100">
-            <div className="p-3" style={styles.formContainer}>
-              <Suspense fallback={<div>Cargando...</div>}>
+          <div className={`col-lg-5 col-xl-4 ${styles.rightPanel}`}>
+            <div className={styles.formContainer}>
+              <Suspense fallback={<LoadingFallback />}>
                 {memoizedLoginForm}
               </Suspense>
             </div>

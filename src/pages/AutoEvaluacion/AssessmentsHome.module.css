@@ -1,0 +1,181 @@
+/* Welcome Section */
+.welcomeContainer {
+  width: 100%;
+  margin-top: 60px;
+  padding: 0 1rem;
+}
+
+@media (min-width: 576px) {
+  .welcomeContainer {
+    margin-top: 70px;
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .welcomeContainer {
+    margin-top: 80px;
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .welcomeContainer {
+    padding: 0;
+  }
+}
+
+/* User Evaluations Card */
+.userEvaluationsContainer {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+  padding: 0 1rem;
+}
+
+@media (min-width: 576px) {
+  .userEvaluationsContainer {
+    margin: 1.5rem 0;
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .userEvaluationsContainer {
+    margin: 2rem 0;
+    padding: 0;
+  }
+}
+
+.userEvaluationsCard {
+  background: white;
+  border: 2px solid #A17CCA;
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 100%;
+  width: 100%;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+}
+
+@media (min-width: 576px) {
+  .userEvaluationsCard {
+    padding: 2rem;
+    max-width: 480px;
+  }
+}
+
+@media (min-width: 768px) {
+  .userEvaluationsCard {
+    padding: 2.5rem;
+    max-width: 500px;
+  }
+}
+
+.cardTitle {
+  color: #5A4E7C;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+@media (min-width: 576px) {
+  .cardTitle {
+    font-size: 1.25rem;
+  }
+}
+
+.cardDescription {
+  font-size: 0.85rem;
+  color: #444;
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
+}
+
+@media (min-width: 576px) {
+  .cardDescription {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.primaryButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-weight: 600;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 10px rgba(90, 78, 124, 0.3);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+@media (min-width: 576px) {
+  .primaryButton {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(90, 78, 124, 0.4);
+}
+
+.primaryButton:active {
+  transform: translateY(0);
+}
+
+/* Surveys Section */
+.surveysContainer {
+  margin: 2rem 0;
+}
+
+@media (min-width: 768px) {
+  .surveysContainer {
+    margin: 2.5rem 0;
+  }
+}
+
+.sectionTitle {
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.5rem;
+}
+
+@media (min-width: 576px) {
+  .sectionTitle {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .sectionTitle {
+    font-size: 2rem;
+  }
+}
+
+/* Topics Filter Container */
+.topicsContainer {
+  margin: 2rem 0;
+}
+
+@media (min-width: 768px) {
+  .topicsContainer {
+    margin: 2.5rem 0;
+  }
+}

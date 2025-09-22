@@ -1,0 +1,386 @@
+/* Contenedor principal */
+.container {
+  max-width: 800px;
+  margin-top: 70px;
+  padding: 1rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+@media (min-width: 576px) {
+  .container {
+    margin-top: 80px;
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    margin-top: 90px;
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    margin-top: 80px;
+  }
+}
+
+/* Estados de carga */
+.loadingContainer {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .loadingContainer {
+    padding: 5rem;
+  }
+}
+
+.spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #5A4E7C;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@media (min-width: 576px) {
+  .spinner {
+    width: 3rem;
+    height: 3rem;
+    border-width: 5px;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loadingText {
+  margin-top: 1rem;
+  color: #6c757d;
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+}
+
+/* Estados de error */
+.errorContainer,
+.notFoundContainer {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #fff5f5, #ffeaa7);
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+@media (min-width: 768px) {
+  .errorContainer,
+  .notFoundContainer {
+    padding: 3rem;
+  }
+}
+
+.errorTitle {
+  color: #dc3545;
+  margin-bottom: 1rem;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  font-weight: bold;
+}
+
+.errorMessage {
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.backButton {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #5A4E7C, #A17CCA);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+@media (min-width: 576px) {
+  .backButton {
+    padding: 0.875rem 2rem;
+  }
+}
+
+.backButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(90, 78, 124, 0.3);
+}
+
+/* Toast notification */
+.toastContainer {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1050;
+  max-width: 300px;
+}
+
+@media (min-width: 768px) {
+  .toastContainer {
+    top: 1.5rem;
+    right: 1.5rem;
+    max-width: 350px;
+  }
+}
+
+.toast {
+  background: white;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.toastBody {
+  padding: 0.875rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.toastSuccess {
+  border-left: 4px solid #28a745;
+}
+
+.toastDanger {
+  border-left: 4px solid #dc3545;
+}
+
+.toastClose {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.toastClose:hover {
+  opacity: 1;
+}
+
+/* Header de navegación */
+.navigationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .navigationHeader {
+    margin-bottom: 2rem;
+  }
+}
+
+.exitButton {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 2px solid #6c757d;
+  background: white;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 576px) {
+  .exitButton {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.95rem;
+  }
+}
+
+.exitButton:hover:not(:disabled) {
+  background: #6c757d;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.exitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Botones de navegación */
+.navigationButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .navigationButtons {
+    margin-top: 2rem;
+  }
+}
+
+.navButton {
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #5A4E7C, #A17CCA);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 576px) {
+  .navButton {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .navButton {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+.navButton:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(90, 78, 124, 0.4);
+}
+
+.navButton:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.navButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Efecto ripple en botones */
+.navButton::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.4s ease;
+}
+
+.navButton:hover:not(:disabled)::before {
+  width: 300px;
+  height: 300px;
+}
+
+.navButton span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Contador de progreso */
+.progressCounter {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+  color: #6c757d;
+  font-weight: 500;
+}
+
+@media (min-width: 768px) {
+  .progressCounter {
+    margin-top: 1.5rem;
+  }
+}
+
+/* Responsividad para pantallas muy pequeñas */
+@media (max-width: 320px) {
+  .container {
+    margin-top: 60px;
+    padding: 0.75rem;
+  }
+  
+  .navigationButtons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .navButton {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem;
+  }
+  
+  .toastContainer {
+    top: 0.5rem;
+    right: 0.5rem;
+    left: 0.5rem;
+    max-width: none;
+  }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .spinner,
+  .toast,
+  .navButton,
+  .exitButton {
+    animation: none;
+    transition: none;
+  }
+  
+  .navButton:hover,
+  .exitButton:hover {
+    transform: none;
+  }
+  
+  .navButton::before {
+    display: none;
+  }
+}
+
+/* Focus states */
+.navButton:focus,
+.exitButton:focus,
+.backButton:focus {
+  outline: 3px solid rgba(90, 78, 124, 0.5);
+  outline-offset: 2px;
+}

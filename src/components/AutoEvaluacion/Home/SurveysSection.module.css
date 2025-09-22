@@ -1,0 +1,258 @@
+/* Contenedor principal - EXACTO al CSS inline */
+.surveysContainer {
+  border-radius: 1.5rem; /* 🎯 EXACTO */
+  background: linear-gradient(135deg, rgba(251,232,245,0.8), rgba(230,240,250,0.8), rgba(208,230,255,0.8)); /* 🎯 EXACTO */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* 🎯 EXACTO */
+  padding: 1rem; /* 🎯 p-3 de Bootstrap */
+  margin: 3rem 0; /* 🎯 my-5 de Bootstrap */
+}
+
+@media (min-width: 768px) {
+  .surveysContainer {
+    padding: 1.5rem; /* 🎯 p-md-4 de Bootstrap */
+  }
+}
+
+/* Mensaje de no hay encuestas - EXACTO al inline */
+.noSurveysMessage {
+  text-align: center; /* 🎯 text-center */
+  font-weight: bold; /* 🎯 fw-bold */
+  font-family: 'Poppins', sans-serif; /* 🎯 EXACTO */
+  color: #5A4E7C; /* 🎯 EXACTO */
+  font-size: 1.1rem; /* 🎯 EXACTO */
+  padding: 2rem; /* 🎯 EXACTO */
+  margin: 0;
+}
+
+/* Grid de encuestas - REPLICANDO row g-4 EXACTO */
+.surveysGrid {
+  display: grid;
+  gap: 1.5rem; /* 🎯 g-4 de Bootstrap = 1.5rem */
+  grid-template-columns: 1fr; /* 🎯 col-12 por defecto */
+}
+
+@media (min-width: 768px) {
+  .surveysGrid {
+    grid-template-columns: repeat(2, 1fr); /* 🎯 col-md-6 */
+  }
+}
+
+@media (min-width: 992px) {
+  .surveysGrid {
+    grid-template-columns: repeat(3, 1fr); /* 🎯 col-lg-4 */
+  }
+}
+
+/* 🎯 CORREGIDO: Wrapper de cada tarjeta */
+.surveyCardWrapper {
+  opacity: 0;
+  transform: translateY(10px);
+  /* 🎯 NUEVO: Asegurar que todas tengan la misma altura */
+  display: flex;
+  flex-direction: column;
+}
+
+.surveyCardWrapper.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; /* 🎯 EXACTO */
+}
+
+/* Delays dinámicos */
+.surveyCardWrapper:nth-child(1) { transition-delay: 0ms; }
+.surveyCardWrapper:nth-child(2) { transition-delay: 100ms; }
+.surveyCardWrapper:nth-child(3) { transition-delay: 200ms; }
+.surveyCardWrapper:nth-child(4) { transition-delay: 300ms; }
+.surveyCardWrapper:nth-child(5) { transition-delay: 400ms; }
+.surveyCardWrapper:nth-child(6) { transition-delay: 500ms; }
+.surveyCardWrapper:nth-child(7) { transition-delay: 600ms; }
+.surveyCardWrapper:nth-child(8) { transition-delay: 800ms; }
+.surveyCardWrapper:nth-child(9) { transition-delay: 900ms; }
+.surveyCardWrapper:nth-child(10) { transition-delay: 1000ms; }
+.surveyCardWrapper:nth-child(11) { transition-delay: 1100ms; }
+.surveyCardWrapper:nth-child(12) { transition-delay: 1200ms; }
+
+/* 🎯 CORREGIDO: Tarjetas más redondeadas y mismo tamaño */
+.surveyCard {
+  /* 🎯 PROBLEMA: Bordes más redondeados como en el original */
+  border-radius: 1.5rem !important; /* 🎯 MÁS REDONDEADAS + !important para override Bootstrap */
+  background: white !important; /* 🎯 !important para override Bootstrap */
+  transition: all 0.3s ease !important; /* 🎯 Del <style> inline + !important */
+  cursor: pointer;
+  
+  /* 🎯 CORREGIDO: Altura uniforme */
+  height: 100%; /* h-100 */
+  min-height: 200px; /* 🎯 NUEVO: Altura mínima para uniformidad */
+  
+  /* 🎯 CORREGIDO: Sombra más sutil como Bootstrap shadow-sm */
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important; /* shadow-sm exacto */
+  border: none !important; /* border-0 */
+  padding: 1.5rem !important; /* 🎯 CORREGIDO: p-3 de Bootstrap es 1rem, pero visualmente se ve 1.5rem */
+  
+  /* Layout para altura uniforme */
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+@media (min-width: 768px) {
+  .surveyCard {
+    padding: 1.5rem !important; /* 🎯 Mantiene padding consistente */
+    min-height: 220px; /* 🎯 Altura mínima mayor en desktop */
+  }
+}
+
+/* 🎯 CORREGIDO: Hover effect exacto */
+.surveyCard:hover {
+  transform: translateY(-5px) !important; /* 🎯 EXACTO */
+  box-shadow: 0 8px 25px rgba(90, 78, 124, 0.3) !important; /* 🎯 EXACTO */
+}
+
+.surveyCard:active {
+  transform: translateY(-2px) !important;
+}
+
+/* Títulos de las encuestas - EXACTO al inline */
+.surveyTitle {
+  font-weight: bold !important; /* fw-bold */
+  font-family: 'Poppins', sans-serif !important; /* 🎯 EXACTO */
+  color: #5A4E7C !important; /* 🎯 EXACTO */
+  margin-bottom: 0.5rem !important; /* 🎯 EXACTO */
+  font-size: 1.25rem !important; /* h5 de Bootstrap */
+  line-height: 1.3 !important;
+  /* 🎯 NUEVO: Evitar que el título se estire */
+  flex-shrink: 0;
+}
+
+/* Descripciones de las encuestas - EXACTO al inline */
+.surveyDescription {
+  color: #6c757d !important; /* text-muted de Bootstrap */
+  font-family: 'Poppins', sans-serif !important; /* 🎯 EXACTO */
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem) !important; /* 🎯 EXACTO */
+  margin: 0 !important;
+  line-height: 1.5 !important;
+  /* 🎯 NUEVO: Que la descripción tome el espacio restante */
+  flex-grow: 1;
+  display: flex;
+  align-items: flex-start; /* Texto arriba */
+}
+
+/* 🎯 CORREGIDO: Contenedor del botón cargar más */
+.loadMoreWrapper {
+  text-align: center !important; /* text-center */
+  margin-top: 1.5rem !important; /* mt-4 = 1.5rem */
+}
+
+.loadMoreWrapper.fadeIn {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+/* 🎯 CORREGIDO: Botón cargar más MÁS REDONDEADO y CON FONDO AZUL SUTIL */
+.loadMoreButton {
+  /* 🎯 PROBLEMA SOLUCIONADO: Bootstrap btn-outline-primary pero más redondeado */
+  border: 1px solid #0d6efd !important;
+  background: rgba(13, 110, 253, 0.1) !important; /* 🎯 NUEVO: Fondo azul muy sutil */
+  color: #0d6efd !important;
+  
+  /* 🎯 CORREGIDO: MÁS REDONDEADO */
+  border-radius: 2.5rem !important; /* 🎯 ERA 2rem, ahora MÁS REDONDEADO */
+  
+  /* px-4 py-2 */
+  padding: 0.75rem 1.5rem !important; /* 🎯 CORREGIDO: Era 0.5rem 1rem, ahora más grande */
+  
+  /* Estilos adicionales */
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 600 !important; /* 🎯 CORREGIDO: Más bold */
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+  font-size: 1rem !important;
+  /* 🎯 NUEVO: Eliminar estilos de botón por defecto */
+  outline: none !important;
+  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.15) !important; /* 🎯 NUEVO: Sombra sutil */
+}
+
+@media (min-width: 576px) {
+  .loadMoreButton {
+    padding: 0.8rem 1.8rem !important; /* 🎯 Aún más grande en pantallas más grandes */
+    font-size: 1.05rem !important;
+  }
+}
+
+/* 🎯 CORREGIDO: Hover del botón con fondo más intenso */
+.loadMoreButton:hover {
+  background: #0d6efd !important; /* 🎯 Fondo azul completo */
+  color: white !important;
+  border-color: #0d6efd !important;
+  transform: translateY(-3px) !important; /* 🎯 CORREGIDO: Más movimiento */
+  box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4) !important; /* 🎯 Sombra más intensa */
+}
+
+.loadMoreButton:active {
+  transform: translateY(-1px) !important;
+}
+
+.loadMoreButton:focus {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+  outline: none !important;
+}
+
+/* Texto de carga - EXACTO al inline */
+.loadingText {
+  text-align: center !important; /* text-center */
+  margin-top: 1.5rem !important; /* mt-4 */
+  font-family: 'Poppins', sans-serif !important;
+  color: #6c757d !important;
+  font-size: 1rem !important;
+}
+
+/* Responsive para pantallas muy pequeñas */
+@media (max-width: 576px) {
+  .surveysContainer {
+    padding: 0.75rem;
+    margin: 1.5rem 0;
+  }
+  
+  .surveyCard {
+    padding: 1.25rem !important; /* 🎯 CORREGIDO: Padding consistente en móvil */
+    min-height: 180px !important;
+  }
+  
+  .loadMoreButton {
+    padding: 0.6rem 1.2rem !important;
+    font-size: 0.95rem !important;
+    border-radius: 2rem !important;
+  }
+}
+
+/* Accesibilidad y reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .surveyCardWrapper,
+  .loadMoreWrapper,
+  .surveyCard {
+    transition: none !important;
+  }
+  
+  .surveyCard:hover {
+    transform: translateY(-2px) !important;
+  }
+  
+  .loadMoreButton:hover {
+    transform: none !important;
+  }
+}
+
+/* Alto contraste */
+@media (prefers-contrast: high) {
+  .surveyCard {
+    border: 1px solid #333 !important;
+  }
+  
+  .surveyCard:hover {
+    border-color: #5A4E7C !important;
+  }
+  
+  .loadMoreButton {
+    border-width: 2px !important;
+  }
+}
