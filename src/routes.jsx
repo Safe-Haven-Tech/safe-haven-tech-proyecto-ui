@@ -21,6 +21,8 @@ import InformationalResourcesHome from './pages/InformationalResources/Resources
 import ResourceDetail from './pages/InformationalResources/ResourceDetail';
 
 import AdminPanel from './pages/admin/AdminPanel';
+import ResourcesManagement from './pages/admin/ResourcesManagement';
+import SurveysManagement from './pages/admin/SurveysManagement';
 
 export default function AppRoutes() {
   return (
@@ -41,6 +43,8 @@ export default function AppRoutes() {
         <Route path="/recursosinformativos" element={<InformationalResourcesHome />} />
         <Route path="/recurso/:id" element={<ResourceDetail />} />
         <Route path="/admin/panel" element={<AdminPanel />} />
+        <Route path="/admin/recursos-informativos" element={<ResourcesManagement />} />
+        <Route path="/admin/encuestas" element={<SurveysManagement />} />
       </Route>
 
       {/* Ruta 404 */}

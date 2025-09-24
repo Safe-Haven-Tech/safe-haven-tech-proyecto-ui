@@ -1,5 +1,5 @@
 /* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\pages\admin\AdminPanel.jsx */
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../../context/useAuth';
 import { useNavigate } from 'react-router-dom';
 import styles from './AdminPanel.module.css';
@@ -24,10 +24,10 @@ const AdminPanel = () => {
 
 
 
-  // Funciones de navegación (placeholders)
+  // Funciones de navegación
   const handleNavigation = (section) => {
     console.log(`Navegando a: ${section}`);
-    // navigate(`/admin/${section}`);
+    navigate(`/admin/${section}`);
   };
 
   if (!usuario || usuario.rol !== 'administrador') {
@@ -57,8 +57,23 @@ const AdminPanel = () => {
 
       {/* Funcionalidades Principales */}
       <section className={styles.functionsSection}>
-        <h2 className={styles.sectionTitle}> Funcionalidades</h2>
+        <h2 className={styles.sectionTitle}>Funcionalidades</h2>
+        <div className={styles.functionsGrid}>
+          {/* Gestión de Recursos Informativos */}
+          <div 
+            className={styles.functionCard}
+            onClick={() => handleNavigation('recursos-informativos')}
+          >
 
+            <div className={styles.functionContent}>
+              <h3 className={styles.functionTitle}>Gestión de Recursos Informativos</h3>
+              <p className={styles.functionDescription}>
+                Administra y gestiona todos los recursos informativos de la plataforma. 
+              </p>
+            </div>
+            <div className={styles.functionArrow}>→</div>
+          </div>
+        </div>
       </section>
 
       {/* Acciones Rápidas */}

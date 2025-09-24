@@ -172,3 +172,24 @@ export const generarPDFEncuesta = async (respuesta) => {
     throw error;
   }
 };
+
+export const crearEncuesta = async (encuesta, token) => {
+  try {
+    const res = await fetch(`${API_URL}/api/encuestas`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(encuesta),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.detalles || data.mensaje || 'Error al crear la encuesta');
+    }
+    return data.encuesta;
+  } catch (error) {
+    console.error('Error en crearEncuesta:', error);
+    throw error;
+  }
+};

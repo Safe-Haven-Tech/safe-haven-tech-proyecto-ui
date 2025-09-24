@@ -164,12 +164,35 @@ export const fetchTiposDisponibles = async () => {
 
 export const fetchEstadisticas = async () => {
   try {
-    const res = await fetch(`${API_URL}/api/recursos-informativos/estadisticas`);
-    if (!res.ok) throw new Error('Error al obtener estadísticas');
-    const data = await res.json();
-    return data.data || {};
+    console.log('📊 Solicitando estadísticas al servidor...');
+
+    // Hacer la petición SIN token ya que es público
+    const response = await fetch(`${API_URL}/api/recursos-informativos/estadisticas`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log('📡 Respuesta del servidor:', response.status, response.statusText);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('❌ Error del servidor:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorData
+      });
+      
+      throw new Error(errorData.mensaje || `Error HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ Estadísticas recibidas correctamente');
+    
+    return data.data;
   } catch (error) {
-    console.error('Error en fetchEstadisticas:', error);
+    console.error('❌ Error al obtener estadísticas:', error);
     throw error;
   }
 };

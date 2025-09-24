@@ -13,7 +13,7 @@ const AnonymitySection = ({ anonimo, setAnonimo }) => {
       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e9ecef')}
       onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f8f9fa')}
     >
-      <div style={{ fontSize: '1.8rem', color: '#6c757d' }}>👤</div>
+      <div style={{ fontSize: '1.8rem', color: '#6c757d' }}></div>
       <div className="flex-grow-1">
         <label className="form-label fw-semibold">Anonimato</label>
         <div className="form-check form-switch">
