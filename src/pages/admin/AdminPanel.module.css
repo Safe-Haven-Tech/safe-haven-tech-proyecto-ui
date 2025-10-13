@@ -3,7 +3,7 @@
 .adminContainer {
   min-height: 100vh;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  padding: 100px 20px 40px; /* Top padding para navbar */
+  padding: 100px 20px 40px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -50,27 +50,6 @@
   line-height: 1.5;
 }
 
-.timeWidget {
-  text-align: right;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 20px;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-}
-
-.currentTime {
-  font-size: 2rem;
-  font-weight: 700;
-  font-family: 'Courier New', monospace;
-  margin-bottom: 5px;
-}
-
-.currentDate {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  text-transform: capitalize;
-}
-
 /* ==================== SECTIONS ==================== */
 
 .sectionTitle {
@@ -103,7 +82,9 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .statCard:hover {
@@ -118,7 +99,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #A9C5A0 0%, #8db584 100%);
+  background: linear-gradient(135deg, #a9c5a0 0%, #8db584 100%);
   border-radius: 12px;
   color: white;
 }
@@ -169,7 +150,7 @@
 .functionCard:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
-  border-color: #A9C5A0;
+  border-color: #a9c5a0;
 }
 
 .functionIcon {
@@ -198,14 +179,14 @@
 
 .functionDescription {
   font-size: 0.95rem;
-  color: #6c757d;
+  color: #1469b4;
   margin: 0;
   line-height: 1.4;
 }
 
 .functionArrow {
   font-size: 1.5rem;
-  color: #A9C5A0;
+  color: #a9c5a0;
   font-weight: bold;
   transition: transform 0.3s ease;
 }
@@ -227,7 +208,7 @@
 }
 
 .quickActionBtn {
-  background: linear-gradient(135deg, #A9C5A0 0%, #8db584 100%);
+  background: linear-gradient(135deg, #a9c5a0 0%, #8db584 100%);
   color: white;
   border: none;
   padding: 15px 20px;
@@ -368,7 +349,7 @@
   .functionCard {
     border: 2px solid #000;
   }
-  
+
   .statCard {
     border: 1px solid #000;
   }
@@ -380,15 +361,30 @@
     background: linear-gradient(135deg, #f5f0f0 0%, #fffcfc 100%);
     color: white;
   }
-  
+
   .statCard,
   .functionCard {
     background: #2d2d2d;
     color: white;
   }
-  
+
   .statLabel,
   .functionDescription {
     color: #adb5bd;
   }
+
+  /* Elimina la regla para .functionCardLight aquí para que siempre se vea igual */
+}
+
+/* ==================== TARJETAS CLARAS ==================== */
+
+.functionCardLight {
+  background: linear-gradient(135deg, #f6fff6 0%, #e3fbe3 100%);
+  border: 2px solid #b7d9c2;
+  box-shadow: 0 4px 16px rgba(169, 197, 160, 0.1);
+  color: #2d5016;
+}
+.functionCardLight:hover {
+  border-color: #7fcf9c;
+  box-shadow: 0 12px 32px rgba(127, 207, 156, 0.18);
 }

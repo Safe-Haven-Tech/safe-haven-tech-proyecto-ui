@@ -22,13 +22,11 @@ const MyEvaluationsCard = () => {
       }}
     >
       <div className={styles.cardBody}>
-        <h5 className={styles.cardTitle}>
-          Mis Evaluaciones
-        </h5>
+        <h5 className={styles.cardTitle}>Mis Evaluaciones</h5>
         <p className={styles.cardText}>
           Ver todas tus encuestas completadas, resultados y descargar PDF.
         </p>
-        <button 
+        <button
           className={`btn ${styles.primaryButton}`}
           onClick={(e) => {
             e.stopPropagation();

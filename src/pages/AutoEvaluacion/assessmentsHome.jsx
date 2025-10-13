@@ -28,9 +28,7 @@ export default function SelfAssessment() {
       {usuario && (
         <div className={styles.userEvaluationsContainer}>
           <div className={styles.userEvaluationsCard}>
-            <h5 className={styles.cardTitle}>
-              Tus autoevaluaciones
-            </h5>
+            <h5 className={styles.cardTitle}>Tus autoevaluaciones</h5>
             <p className={styles.cardDescription}>
               Aquí podrás consultar todas las autoevaluaciones que has realizado
               y, si lo deseas, descargarlas para guardarlas o compartirlas.
@@ -57,9 +55,7 @@ export default function SelfAssessment() {
 
         {/* Encuestas */}
         <div className={styles.surveysContainer}>
-          <h3 className={styles.sectionTitle}>
-            Encuestas disponibles
-          </h3>
+          <h3 className={styles.sectionTitle}>Encuestas disponibles</h3>
           <SurveysSection selectedTopic={selectedTopic} />
         </div>
       </div>

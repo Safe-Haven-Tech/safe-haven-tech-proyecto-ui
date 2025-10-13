@@ -166,8 +166,8 @@ export default function ViewSurvey() {
         <div className={styles.toastContainer}>
           <div
             className={`${styles.toast} ${
-              notification.type === 'success' 
-                ? styles.toastSuccess 
+              notification.type === 'success'
+                ? styles.toastSuccess
                 : styles.toastDanger
             }`}
             role="alert"
@@ -238,9 +238,7 @@ export default function ViewSurvey() {
             disabled={!allQuestionsAnswered || isCompleting}
             className={styles.navButton}
           >
-            <span>
-              {isCompleting ? 'Procesando...' : 'Finalizar Encuesta'}
-            </span>
+            <span>{isCompleting ? 'Procesando...' : 'Finalizar Encuesta'}</span>
           </button>
         )}
       </div>

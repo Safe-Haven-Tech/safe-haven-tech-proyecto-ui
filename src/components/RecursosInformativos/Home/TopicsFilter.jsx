@@ -60,19 +60,16 @@ export default function TopicsFilter({ onSelect }) {
   }
 
   return (
-    <section 
+    <section
       className={`container ${styles.topicsSection}`}
       role="region"
       aria-labelledby="topics-title"
     >
-      <h3
-        id="topics-title"
-        className={styles.sectionTitle}
-      >
+      <h3 id="topics-title" className={styles.sectionTitle}>
         Filtra recursos por tipo
       </h3>
 
-      <div 
+      <div
         className={styles.topicsContainer}
         role="group"
         aria-label="Filtros de tópicos disponibles"
@@ -90,7 +87,7 @@ export default function TopicsFilter({ onSelect }) {
           >
             {topic}
             {selectedTopic === topic && (
-              <i 
+              <i
                 className={`bi bi-check-circle-fill ${styles.checkIcon}`}
                 aria-hidden="true"
               />
@@ -102,10 +99,7 @@ export default function TopicsFilter({ onSelect }) {
       {/* Información adicional */}
       <div className={styles.additionalInfo}>
         <p className={styles.infoText}>
-          <i 
-            className={`bi bi-funnel ${styles.infoIcon}`}
-            aria-hidden="true"
-          />
+          <i className={`bi bi-funnel ${styles.infoIcon}`} aria-hidden="true" />
           <span>
             Selecciona un tópico para filtrar los recursos disponibles
           </span>

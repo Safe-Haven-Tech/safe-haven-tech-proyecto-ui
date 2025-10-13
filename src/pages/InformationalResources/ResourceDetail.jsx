@@ -2,17 +2,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './ResourceDetail.module.css';
-import { fetchRecursoById, incrementarCompartidos, incrementarVisitas, calificarRecurso } from '../../services/informationalResourcesService';
+import {
+  fetchRecursoById,
+  incrementarCompartidos,
+  incrementarVisitas,
+  calificarRecurso,
+} from '../../services/informationalResourcesService';
 import { useAuth } from '../../hooks/useAuth';
 
 // Función para obtener el icono según el tipo de recurso
 const getResourceIcon = (tipo) => {
   const iconMap = {
-    'articulo': 'bi-file-text',
-    'guia': 'bi-book',
-    'manual': 'bi-journal-bookmark',
-    'video': 'bi-play-circle',
-    'infografia': 'bi-image',
+    articulo: 'bi-file-text',
+    guia: 'bi-book',
+    manual: 'bi-journal-bookmark',
+    video: 'bi-play-circle',
+    infografia: 'bi-image',
   };
   return iconMap[tipo] || 'bi-file-earmark';
 };
@@ -20,11 +25,11 @@ const getResourceIcon = (tipo) => {
 // Función para obtener la clase de color según el tipo de recurso
 const getResourceColorClass = (tipo) => {
   const colorClassMap = {
-    'articulo': styles.colorArticulo,
-    'guia': styles.colorGuia,
-    'manual': styles.colorManual,
-    'video': styles.colorVideo,
-    'infografia': styles.colorInfografia,
+    articulo: styles.colorArticulo,
+    guia: styles.colorGuia,
+    manual: styles.colorManual,
+    video: styles.colorVideo,
+    infografia: styles.colorInfografia,
   };
   return colorClassMap[tipo] || styles.colorDefault;
 };
@@ -33,13 +38,13 @@ export default function ResourceDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { usuario, token } = useAuth();
-  
+
   const [resource, setResource] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userRating, setUserRating] = useState(0);
   const [submittingRating, setSubmittingRating] = useState(false);
-  
+
   // Estados para el modal de imagen
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
@@ -67,7 +72,7 @@ export default function ResourceDetail() {
         setError(null);
 
         const response = await fetchRecursoById(id);
-        
+
         if (response.status !== 200 || !response.data) {
           setError(response.mensaje || 'Recurso no encontrado');
           setLoading(false);
@@ -77,9 +82,13 @@ export default function ResourceDetail() {
         setResource(response.data);
 
         // Si el usuario está autenticado, obtener su calificación actual
-        if (usuario && response.data.calificacion && response.data.calificacion.votos) {
+        if (
+          usuario &&
+          response.data.calificacion &&
+          response.data.calificacion.votos
+        ) {
           const miCalificacion = response.data.calificacion.votos.find(
-            voto => voto.usuario && voto.usuario._id === usuario.id
+            (voto) => voto.usuario && voto.usuario._id === usuario.id
           );
           if (miCalificacion) {
             setUserRating(miCalificacion.calificacion);
@@ -89,26 +98,24 @@ export default function ResourceDetail() {
         // Incrementar visitas solo una vez usando ref
         const visitaKey = `visita_${id}`;
         const yaVisitado = sessionStorage.getItem(visitaKey);
-        
+
         if (!yaVisitado && !visitaIncrementada.current) {
           visitaIncrementada.current = true;
-          
+
           try {
             await incrementarVisitas(id);
             sessionStorage.setItem(visitaKey, 'true');
-            
+
             // Actualizar contador local
-            setResource(prev => ({
+            setResource((prev) => ({
               ...prev,
-              visitas: (prev.visitas || 0) + 1
+              visitas: (prev.visitas || 0) + 1,
             }));
-            
           } catch (visitasError) {
             console.error('Error al incrementar visitas:', visitasError);
             visitaIncrementada.current = false; // Resetear en caso de error
           }
         }
-
       } catch (error) {
         console.error('Error cargando recurso:', error);
         setError('Error al cargar el recurso');
@@ -128,7 +135,7 @@ export default function ResourceDetail() {
   const handleShare = async () => {
     try {
       const url = window.location.href;
-      
+
       if (navigator.share) {
         await navigator.share({
           title: resource.titulo,
@@ -139,22 +146,21 @@ export default function ResourceDetail() {
         await navigator.clipboard.writeText(url);
         alert('Enlace copiado al portapapeles');
       }
-      
+
       // Incrementar contador de compartidos (no bloquear si falla)
       incrementarCompartidos(id)
         .then(() => {
           // Actualizar el recurso para mostrar el nuevo contador
-          setResource(prev => ({
+          setResource((prev) => ({
             ...prev,
-            compartidos: (prev.compartidos || 0) + 1
+            compartidos: (prev.compartidos || 0) + 1,
           }));
         })
         .catch(() => {
           // Silenciar errores de compartidos
         });
-      
     } catch (error) {
-      if (error.name !== 'AbortError') { 
+      if (error.name !== 'AbortError') {
         alert('Error al compartir. El enlace se ha copiado al portapapeles.');
         try {
           await navigator.clipboard.writeText(window.location.href);
@@ -167,12 +173,12 @@ export default function ResourceDetail() {
 
   const handleRating = async (rating) => {
     if (!usuario || !token) return;
-    
+
     try {
       setSubmittingRating(true);
       await calificarRecurso(id, rating, token);
       setUserRating(rating);
-      
+
       // Recargar el recurso para obtener la nueva calificación promedio
       const response = await fetchRecursoById(id);
       if (response.status === 200 && response.data) {
@@ -180,7 +186,7 @@ export default function ResourceDetail() {
         // Mantener la calificación del usuario actualizada
         if (response.data.calificacion && response.data.calificacion.votos) {
           const miCalificacion = response.data.calificacion.votos.find(
-            voto => voto.usuario && voto.usuario._id === usuario.id
+            (voto) => voto.usuario && voto.usuario._id === usuario.id
           );
           if (miCalificacion) {
             setUserRating(miCalificacion.calificacion);
@@ -205,7 +211,7 @@ export default function ResourceDetail() {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -221,9 +227,7 @@ export default function ResourceDetail() {
               >
                 <span className="visually-hidden">Cargando recurso...</span>
               </div>
-              <h4 className={styles.loadingTitle}>
-                Cargando recurso...
-              </h4>
+              <h4 className={styles.loadingTitle}>Cargando recurso...</h4>
             </div>
           </div>
         </div>
@@ -239,9 +243,7 @@ export default function ResourceDetail() {
             <div className={styles.errorIcon}>
               <i className="bi bi-exclamation-triangle"></i>
             </div>
-            <h4 className={styles.errorTitle}>
-              Recurso no encontrado
-            </h4>
+            <h4 className={styles.errorTitle}>Recurso no encontrado</h4>
             <p className={styles.errorText}>
               {error || 'El recurso que buscas no existe o ha sido eliminado.'}
             </p>
@@ -276,20 +278,24 @@ export default function ResourceDetail() {
             </button>
 
             {/* Header del recurso */}
-            <div className={`card mb-4 ${styles.resourceCard} ${resourceColorClass}`}>
+            <div
+              className={`card mb-4 ${styles.resourceCard} ${resourceColorClass}`}
+            >
               {/* Imagen principal */}
               {resource.imagenPrincipal && (
                 <div
                   className={styles.heroImage}
                   style={{
-                    backgroundImage: `url(${resource.imagenPrincipal})`
+                    backgroundImage: `url(${resource.imagenPrincipal})`,
                   }}
-                  onClick={() => handleImageClick(resource.imagenPrincipal, resource.titulo)}
+                  onClick={() =>
+                    handleImageClick(resource.imagenPrincipal, resource.titulo)
+                  }
                 >
                   <div className={styles.heroImageOverlay}></div>
-                  
+
                   {/* Badge de tipo sobre la imagen */}
-                  <div 
+                  <div
                     className={styles.typeBadge}
                     style={{ background: `var(--resource-color)` }}
                   >
@@ -313,9 +319,7 @@ export default function ResourceDetail() {
 
               <div className="card-body p-4">
                 {/* Título y metadatos */}
-                <h1 className={styles.resourceTitle}>
-                  {resource.titulo}
-                </h1>
+                <h1 className={styles.resourceTitle}>{resource.titulo}</h1>
 
                 {/* Tópicos */}
                 {resource.topicos && resource.topicos.length > 0 && (
@@ -326,7 +330,7 @@ export default function ResourceDetail() {
                         className={styles.topicBadge}
                         style={{
                           background: `var(--resource-color)20`,
-                          color: `var(--resource-color)`
+                          color: `var(--resource-color)`,
                         }}
                       >
                         {topico}
@@ -349,33 +353,29 @@ export default function ResourceDetail() {
                       {resource.compartidos || 0} compartidos
                     </div>
                   </div>
-                  {resource.calificacion && resource.calificacion.promedio > 0 && (
-                    <div className="col-md-3">
-                      <div className={styles.ratingItem}>
-                        <i className="bi bi-star-fill"></i>
-                        {resource.calificacion.promedio.toFixed(1)} ({resource.calificacion.totalVotos} votos)
+                  {resource.calificacion &&
+                    resource.calificacion.promedio > 0 && (
+                      <div className="col-md-3">
+                        <div className={styles.ratingItem}>
+                          <i className="bi bi-star-fill"></i>
+                          {resource.calificacion.promedio.toFixed(1)} (
+                          {resource.calificacion.totalVotos} votos)
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
 
                 {/* Resumen */}
                 {resource.resumen && (
                   <div className={styles.summarySection}>
-                    <h5 className={styles.summaryTitle}>
-                      Resumen
-                    </h5>
-                    <p className={styles.summaryText}>
-                      {resource.resumen}
-                    </p>
+                    <h5 className={styles.summaryTitle}>Resumen</h5>
+                    <p className={styles.summaryText}>{resource.resumen}</p>
                   </div>
                 )}
 
                 {/* Descripción completa */}
                 <div className={styles.descriptionSection}>
-                  <h5 className={styles.sectionTitle}>
-                    Descripción
-                  </h5>
+                  <h5 className={styles.sectionTitle}>Descripción</h5>
                   <div
                     className={styles.descriptionText}
                     dangerouslySetInnerHTML={{ __html: resource.descripcion }}
@@ -383,46 +383,45 @@ export default function ResourceDetail() {
                 </div>
 
                 {/* Archivos adjuntos */}
-                {resource.archivosAdjuntos && resource.archivosAdjuntos.length > 0 && (
-                  <div className={styles.filesSection}>
-                    <h5 className={styles.sectionTitle}>
-                      Archivos para descargar
-                    </h5>
-                    <div className="row g-3">
-                      {resource.archivosAdjuntos.map((archivo, idx) => (
-                        <div key={idx} className="col-md-6">
-                          <div className={styles.fileItem}>
-                            <i
-                              className={`bi bi-file-earmark-arrow-down ${styles.fileIcon}`}
-                              style={{ color: `var(--resource-color)` }}
-                            ></i>
-                            <div className={styles.fileContent}>
-                              <div className={styles.fileName}>
-                                {archivo.nombre}
+                {resource.archivosAdjuntos &&
+                  resource.archivosAdjuntos.length > 0 && (
+                    <div className={styles.filesSection}>
+                      <h5 className={styles.sectionTitle}>
+                        Archivos para descargar
+                      </h5>
+                      <div className="row g-3">
+                        {resource.archivosAdjuntos.map((archivo, idx) => (
+                          <div key={idx} className="col-md-6">
+                            <div className={styles.fileItem}>
+                              <i
+                                className={`bi bi-file-earmark-arrow-down ${styles.fileIcon}`}
+                                style={{ color: `var(--resource-color)` }}
+                              ></i>
+                              <div className={styles.fileContent}>
+                                <div className={styles.fileName}>
+                                  {archivo.nombre}
+                                </div>
+                                {archivo.tamaño && (
+                                  <small className={styles.fileSize}>
+                                    {archivo.tamaño}
+                                  </small>
+                                )}
                               </div>
-                              {archivo.tamaño && (
-                                <small className={styles.fileSize}>
-                                  {archivo.tamaño}
-                                </small>
-                              )}
+                              <i
+                                className={`bi bi-download ${styles.downloadIcon}`}
+                                style={{ color: `var(--resource-color)` }}
+                              ></i>
                             </div>
-                            <i
-                              className={`bi bi-download ${styles.downloadIcon}`}
-                              style={{ color: `var(--resource-color)` }}
-                            ></i>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Galería de imágenes */}
                 {resource.galeria && resource.galeria.length > 0 && (
                   <div className={styles.gallerySection}>
-                    <h5 className={styles.sectionTitle}>
-                      Galería
-                    </h5>
+                    <h5 className={styles.sectionTitle}>Galería</h5>
                     <div className={`row ${styles.galleryGrid}`}>
                       {resource.galeria.map((imagen, idx) => (
                         <div key={idx} className="col-md-4">
@@ -431,7 +430,9 @@ export default function ResourceDetail() {
                               src={imagen}
                               alt={`Galería ${idx + 1}`}
                               className={styles.galleryImage}
-                              onClick={() => handleImageClick(imagen, `Galería ${idx + 1}`)}
+                              onClick={() =>
+                                handleImageClick(imagen, `Galería ${idx + 1}`)
+                              }
                             />
                             {/* Overlay de zoom */}
                             <div className={styles.galleryZoomOverlay}>
@@ -459,7 +460,9 @@ export default function ResourceDetail() {
                     )}
                     <div className="col-md-6">
                       <div className={styles.infoItem}>
-                        <span className={styles.infoLabel}>Fecha de publicación:</span>
+                        <span className={styles.infoLabel}>
+                          Fecha de publicación:
+                        </span>
                         <span className={styles.infoValue}>
                           {formatDate(resource.fechaCreacion)}
                         </span>
@@ -473,10 +476,8 @@ export default function ResourceDetail() {
             {/* Acciones */}
             <div className={`card mb-4 ${styles.actionsCard}`}>
               <div className="card-body p-4">
-                <h5 className={styles.sectionTitle}>
-                  Acciones
-                </h5>
-                
+                <h5 className={styles.sectionTitle}>Acciones</h5>
+
                 <div className={styles.actionsContainer}>
                   {/* Botón compartir */}
                   <button
@@ -490,9 +491,7 @@ export default function ResourceDetail() {
                   {/* Calificación (solo para usuarios autenticados) */}
                   {usuario && (
                     <div className={styles.ratingContainer}>
-                      <span className={styles.ratingLabel}>
-                        Calificar:
-                      </span>
+                      <span className={styles.ratingLabel}>Calificar:</span>
                       <div className={styles.starsContainer}>
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
@@ -500,7 +499,9 @@ export default function ResourceDetail() {
                             onClick={() => handleRating(star)}
                             disabled={submittingRating}
                             className={`${styles.starButton} ${
-                              star <= userRating ? styles.starActive : styles.starInactive
+                              star <= userRating
+                                ? styles.starActive
+                                : styles.starInactive
                             }`}
                           >
                             <i className="bi bi-star-fill"></i>

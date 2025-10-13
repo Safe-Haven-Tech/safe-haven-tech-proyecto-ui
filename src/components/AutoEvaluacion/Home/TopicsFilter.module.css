@@ -1,7 +1,7 @@
 /* Sección principal */
 .topicsSection {
   border-radius: 1.5rem;
-  background: #FAF8FF;
+  background: #faf8ff;
   box-shadow: 0 6px 18px rgba(90, 78, 124, 0.08);
   padding: 1.5rem;
   margin: 3rem 0;
@@ -25,7 +25,7 @@
   font-weight: bold;
   margin-bottom: 1.5rem;
   text-align: center;
-  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(90deg, #5a4e7c, #a17cca);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -59,9 +59,9 @@
   font-weight: 500; /* 🎯 IGUAL al original */
   padding: 0.5rem 1rem; /* 🎯 EXACTO al original */
   border-radius: 2rem; /* 🎯 EXACTO al original */
-  border: 1px solid #A17CCA; /* 🎯 EXACTO al original */
+  border: 1px solid #a17cca; /* 🎯 EXACTO al original */
   background: #f7f5fb; /* 🎯 EXACTO al original */
-  color: #5A4E7C; /* 🎯 EXACTO al original */
+  color: #5a4e7c; /* 🎯 EXACTO al original */
   transition: all 0.3s ease; /* 🎯 EXACTO al original */
   cursor: pointer;
   font-size: 0.9rem; /* 🎯 EXACTO al original */
@@ -84,14 +84,18 @@
 .topicBtn:hover {
   transform: translateY(-3px); /* 🎯 EXACTO al original */
   background: #e6e0f5; /* 🎯 EXACTO al original */
-  color: #5A4E7C; /* 🎯 Mantiene el color original */
-  border-color: #A17CCA; /* 🎯 Mantiene el borde original */
+  color: #5a4e7c; /* 🎯 Mantiene el color original */
+  border-color: #a17cca; /* 🎯 Mantiene el borde original */
   text-decoration: none; /* 🎯 Sin subrayado */
 }
 
 /* 🎯 NUEVO: Estado activo exacto al original */
 .topicBtnActive {
-  background: linear-gradient(90deg, #5A4E7C, #A17CCA) !important; /* 🎯 EXACTO al original */
+  background: linear-gradient(
+    90deg,
+    #5a4e7c,
+    #a17cca
+  ) !important; /* 🎯 EXACTO al original */
   color: #fff !important; /* 🎯 EXACTO al original */
   box-shadow: 0 4px 12px rgba(90, 78, 124, 0.3); /* 🎯 EXACTO al original */
   border-color: transparent; /* 🎯 Para que no se vea el borde sobre el gradiente */
@@ -100,7 +104,7 @@
 
 /* 🎯 NUEVO: Hover del botón activo */
 .topicBtnActive:hover {
-  background: linear-gradient(90deg, #5A4E7C, #A17CCA) !important;
+  background: linear-gradient(90deg, #5a4e7c, #a17cca) !important;
   color: #fff !important;
   transform: translateY(-3px); /* 🎯 Mantiene el efecto hover */
   box-shadow: 0 6px 15px rgba(90, 78, 124, 0.4); /* 🎯 Sombra más intensa en hover */
@@ -121,7 +125,7 @@
     font-size: 0.85rem;
     padding: 0.45rem 0.9rem;
   }
-  
+
   .topicsContainer {
     gap: 0.5rem;
     margin: 0 -0.5rem; /* Para compensar el padding en móvil */
@@ -139,9 +143,11 @@
 @media (prefers-reduced-motion: reduce) {
   .topicBtn,
   .topicBtnActive {
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
   }
-  
+
   .topicBtn:hover,
   .topicBtnActive:hover {
     transform: none;
@@ -155,12 +161,12 @@
     background: #fff;
     color: #000;
   }
-  
+
   .topicBtn:hover {
     background: #f0f0f0;
     color: #000;
   }
-  
+
   .topicBtnActive {
     background: #000 !important;
     color: #fff !important;
@@ -191,14 +197,30 @@
   animation: fadeInUp 0.3s ease-out backwards;
 }
 
-.topicBtn:nth-child(1) { animation-delay: 0.05s; }
-.topicBtn:nth-child(2) { animation-delay: 0.1s; }
-.topicBtn:nth-child(3) { animation-delay: 0.15s; }
-.topicBtn:nth-child(4) { animation-delay: 0.2s; }
-.topicBtn:nth-child(5) { animation-delay: 0.25s; }
-.topicBtn:nth-child(6) { animation-delay: 0.3s; }
-.topicBtn:nth-child(7) { animation-delay: 0.35s; }
-.topicBtn:nth-child(8) { animation-delay: 0.4s; }
+.topicBtn:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.topicBtn:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.topicBtn:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.topicBtn:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.topicBtn:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.topicBtn:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.topicBtn:nth-child(7) {
+  animation-delay: 0.35s;
+}
+.topicBtn:nth-child(8) {
+  animation-delay: 0.4s;
+}
 
 /* Desactivar animación si el usuario lo prefiere */
 @media (prefers-reduced-motion: reduce) {

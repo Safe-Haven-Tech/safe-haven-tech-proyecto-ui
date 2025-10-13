@@ -17,6 +17,7 @@ export default function Profile() {
     isOwnProfile,
     isLoading,
     error,
+    perfilPosts,
     getCurrentUser,
     handleFollowToggle,
   } = useProfile(nickname);
@@ -49,6 +50,7 @@ export default function Profile() {
       isOwnProfile={isOwnProfile}
       isLoading={isLoading}
       error={error}
+      perfilPosts={perfilPosts}
       nicknameParam={nickname}
       getCurrentUser={getCurrentUser}
       onFollowToggle={handleFollowToggleWithNavigation}

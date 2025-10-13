@@ -2,7 +2,7 @@
 .welcomeCard {
   position: relative;
   border-radius: 1.5rem;
-  background: linear-gradient(135deg, #FBE8F5, #E6F0FA, #D0E6FF);
+  background: linear-gradient(135deg, #fbe8f5, #e6f0fa, #d0e6ff);
   color: #333;
   min-height: 350px;
   overflow: hidden;
@@ -96,7 +96,7 @@
   left: 8%;
   width: 8%;
   height: 15%;
-  background: rgba(200, 180, 220, 0.10);
+  background: rgba(200, 180, 220, 0.1);
   border-radius: 45% / 55%;
 }
 
@@ -105,7 +105,7 @@
     right: -10%;
     left: auto;
   }
-  
+
   .shape3 {
     right: 5%;
     left: auto;
@@ -167,7 +167,7 @@
   font-family: 'Poppins', sans-serif;
   font-weight: bold;
   font-size: clamp(1.4rem, 4vw, 2.8rem);
-  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(90deg, #5a4e7c, #a17cca);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -185,7 +185,7 @@
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
   font-size: clamp(0.9rem, 2.5vw, 1.4rem);
-  color: #6B5FA5;
+  color: #6b5fa5;
   margin-bottom: 1rem;
   text-align: center;
 }
@@ -228,7 +228,7 @@
 }
 
 .miniBox {
-  background: rgba(255, 255, 255, 0.90);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 1rem;
   padding: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -327,7 +327,7 @@
   .welcomeCard::before {
     animation: none;
   }
-  
+
   .miniBox:hover {
     transform: none;
   }
@@ -338,12 +338,12 @@
   .welcomeCard::before {
     opacity: 0.8;
   }
-  
+
   .miniBox {
     background: rgba(255, 255, 255, 0.98);
     border: 2px solid #333;
   }
-  
+
   @media (min-width: 1200px) {
     .textContainer {
       background: rgba(255, 255, 255, 0.1);

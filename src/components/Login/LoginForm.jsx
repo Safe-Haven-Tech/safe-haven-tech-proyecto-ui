@@ -63,22 +63,14 @@ const LoginForm = React.memo(
           <div className={styles.logoContainer}>
             <img src={Logo} alt="SafeHaven Logo" className={styles.logo} />
           </div>
-          <h2 className={styles.formTitle}>
-            Iniciar Sesión
-          </h2>
+          <h2 className={styles.formTitle}>Iniciar Sesión</h2>
         </div>
 
         {/* Formulario */}
-        <form
-          onSubmit={handleSubmit}
-          className={styles.loginForm}
-        >
+        <form onSubmit={handleSubmit} className={styles.loginForm}>
           {/* Email */}
           <div className={styles.inputGroup}>
-            <label
-              htmlFor="email"
-              className={styles.inputLabel}
-            >
+            <label htmlFor="email" className={styles.inputLabel}>
               Correo Electrónico
             </label>
             <input
@@ -94,7 +86,7 @@ const LoginForm = React.memo(
               required
               maxLength={254}
               autoComplete="email"
-              aria-describedby={emailValidation ? "email-error" : undefined}
+              aria-describedby={emailValidation ? 'email-error' : undefined}
             />
             {emailValidation && (
               <div
@@ -109,10 +101,7 @@ const LoginForm = React.memo(
 
           {/* Contraseña */}
           <div className={styles.inputGroup}>
-            <label
-              htmlFor="password"
-              className={styles.inputLabel}
-            >
+            <label htmlFor="password" className={styles.inputLabel}>
               Contraseña
             </label>
             <div className={styles.passwordContainer}>
@@ -130,13 +119,17 @@ const LoginForm = React.memo(
                 minLength={8}
                 maxLength={128}
                 autoComplete="current-password"
-                aria-describedby={passwordValidation ? "password-error" : undefined}
+                aria-describedby={
+                  passwordValidation ? 'password-error' : undefined
+                }
               />
               <button
                 type="button"
                 className={styles.passwordToggle}
                 onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                aria-label={
+                  showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                }
                 tabIndex={0}
               >
                 <i
@@ -214,10 +207,7 @@ const LoginForm = React.memo(
           <div className={styles.formFooter}>
             <p className={styles.footerText}>
               ¿No tienes una cuenta?{' '}
-              <a
-                href="/Register"
-                className={styles.footerLink}
-              >
+              <a href="/Register" className={styles.footerLink}>
                 Regístrate aquí
               </a>
             </p>

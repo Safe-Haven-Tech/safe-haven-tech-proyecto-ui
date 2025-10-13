@@ -83,11 +83,11 @@
 }
 
 .mobileMenuContent {
-  background: #A9C5A0; /* ORIGINAL: mismo color que navbar */
+  background: #a9c5a0; /* ORIGINAL: mismo color que navbar */
   margin: 15px;
   border-radius: 8px; /* ORIGINAL: mismo border radius que logo */
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* ORIGINAL: misma sombra que navbar */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* ORIGINAL: misma sombra que navbar */
   transform: translateY(-20px);
   transition: transform 0.3s ease;
   font-family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"; /* ORIGINAL */
@@ -185,7 +185,7 @@
   .mobileControls {
     gap: 8px;
   }
-  
+
   .mobileMenuContent {
     margin: 10px;
     padding: 15px;
@@ -203,7 +203,7 @@
   .mobileControls {
     display: none;
   }
-  
+
   .mobileMenuOverlay {
     display: none;
   }
@@ -221,7 +221,7 @@
   .hamburgerLine {
     background: #000;
   }
-  
+
   .mobileMenuContent {
     border: 2px solid #000;
   }

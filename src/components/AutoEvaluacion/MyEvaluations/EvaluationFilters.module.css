@@ -88,8 +88,10 @@
 .filterInput:focus,
 .filterSelect:focus {
   outline: none;
-  border-color: #A17CCA;
-  box-shadow: 0 0 0 3px rgba(161, 124, 202, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: #a17cca;
+  box-shadow:
+    0 0 0 3px rgba(161, 124, 202, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
 
@@ -145,7 +147,7 @@
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .searchInput,
   .riskSelect,
   .dateSelect,
@@ -160,12 +162,12 @@
   .filtersContainer {
     justify-content: space-between;
   }
-  
+
   .searchInput {
     flex: 1 1 100%;
     margin-bottom: 0.5rem;
   }
-  
+
   .riskSelect,
   .dateSelect,
   .scoreInput {
@@ -179,10 +181,18 @@
   animation: slideInUp 0.4s ease-out backwards;
 }
 
-.filtersContainer > *:nth-child(1) { animation-delay: 0.1s; }
-.filtersContainer > *:nth-child(2) { animation-delay: 0.2s; }
-.filtersContainer > *:nth-child(3) { animation-delay: 0.3s; }
-.filtersContainer > *:nth-child(4) { animation-delay: 0.4s; }
+.filtersContainer > *:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.filtersContainer > *:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.filtersContainer > *:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.filtersContainer > *:nth-child(4) {
+  animation-delay: 0.4s;
+}
 
 @keyframes slideInUp {
   0% {
@@ -211,11 +221,11 @@
   .filterSelect {
     transition: none;
   }
-  
+
   .filtersContainer > * {
     animation: none;
   }
-  
+
   .filterInput:hover,
   .filterSelect:hover,
   .filterInput:focus,
@@ -231,7 +241,7 @@
     border-width: 3px;
     border-color: #000;
   }
-  
+
   .filterInput:focus,
   .filterSelect:focus {
     border-color: #0066cc;

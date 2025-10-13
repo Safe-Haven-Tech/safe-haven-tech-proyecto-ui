@@ -151,7 +151,7 @@
   justify-content: center;
   align-items: center;
   height: 200px;
-  color: #5A4E7C;
+  color: #5a4e7c;
   font-size: clamp(0.9rem, 2vw, 1.1rem);
 }
 
@@ -159,15 +159,19 @@
   width: 2rem;
   height: 2rem;
   border: 3px solid #e9ecef;
-  border-top: 3px solid #5A4E7C;
+  border-top: 3px solid #5a4e7c;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-right: 0.75rem;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Efectos de hover en el contenedor */
@@ -191,7 +195,7 @@
     margin: 0.5rem;
     border-radius: 15px;
   }
-  
+
   .signInContainer {
     padding: 0.5rem;
   }
@@ -204,7 +208,7 @@
     min-height: 100vh;
     padding: 1rem 0;
   }
-  
+
   .formContainer {
     max-height: 90vh;
     overflow-y: auto;
@@ -216,14 +220,14 @@
   .formContainer {
     animation: none;
   }
-  
+
   .formContainer:hover {
     transform: none;
   }
-  
+
   .loadingSpinner {
     animation: none;
-    border-top-color: #5A4E7C;
+    border-top-color: #5a4e7c;
   }
 }
 
@@ -234,7 +238,7 @@
     border: 2px solid #000;
     backdrop-filter: none;
   }
-  
+
   .overlay {
     background: rgba(0, 0, 0, 0.7);
   }
@@ -252,11 +256,11 @@
     background: white !important;
     height: auto !important;
   }
-  
+
   .overlay {
     display: none;
   }
-  
+
   .formContainer {
     box-shadow: none;
     border: 1px solid #000;

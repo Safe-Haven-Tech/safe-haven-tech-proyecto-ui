@@ -156,7 +156,7 @@
 .noResourcesIcon {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #E8DAEF, #D5DBDB);
+  background: linear-gradient(135deg, #e8daef, #d5dbdb);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -166,7 +166,11 @@
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
   40% {
@@ -179,11 +183,11 @@
 
 .noResourcesIcon i {
   font-size: 2rem;
-  color: #8E7AA6;
+  color: #8e7aa6;
 }
 
 .noResourcesTitle {
-  color: #5A4E7C;
+  color: #5a4e7c;
   font-family: 'Poppins', sans-serif;
   font-weight: bold;
   margin-bottom: 1rem;
@@ -200,8 +204,8 @@
 }
 
 .reloadButton {
-  border-color: #A17CCA !important;
-  color: #A17CCA !important;
+  border-color: #a17cca !important;
+  color: #a17cca !important;
   border-radius: 25px !important;
   padding: 10px 25px !important;
   font-weight: 600;
@@ -210,7 +214,7 @@
 }
 
 .reloadButton:hover {
-  background: #A17CCA !important;
+  background: #a17cca !important;
   color: white !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(161, 124, 202, 0.3);
@@ -232,15 +236,33 @@
   width: 100%;
 }
 
-.resourceCard:nth-child(1) { animation-delay: 0.1s; }
-.resourceCard:nth-child(2) { animation-delay: 0.2s; }
-.resourceCard:nth-child(3) { animation-delay: 0.3s; }
-.resourceCard:nth-child(4) { animation-delay: 0.4s; }
-.resourceCard:nth-child(5) { animation-delay: 0.5s; }
-.resourceCard:nth-child(6) { animation-delay: 0.6s; }
-.resourceCard:nth-child(7) { animation-delay: 0.7s; }
-.resourceCard:nth-child(8) { animation-delay: 0.8s; }
-.resourceCard:nth-child(9) { animation-delay: 0.9s; }
+.resourceCard:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.resourceCard:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.resourceCard:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.resourceCard:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.resourceCard:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.resourceCard:nth-child(6) {
+  animation-delay: 0.6s;
+}
+.resourceCard:nth-child(7) {
+  animation-delay: 0.7s;
+}
+.resourceCard:nth-child(8) {
+  animation-delay: 0.8s;
+}
+.resourceCard:nth-child(9) {
+  animation-delay: 0.9s;
+}
 
 @keyframes fadeInUp {
   0% {
@@ -271,7 +293,11 @@
 }
 
 .resourceImageGradient {
-  background: linear-gradient(135deg, var(--resource-color-light), var(--resource-color-medium));
+  background: linear-gradient(
+    135deg,
+    var(--resource-color-light),
+    var(--resource-color-medium)
+  );
 }
 
 /* Badge de tipo */
@@ -297,7 +323,7 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: #FFD700;
+  background: #ffd700;
   color: #333;
   border-radius: 50%;
   width: 32px;
@@ -441,7 +467,7 @@
 }
 
 .loadMoreButton {
-  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(90deg, #5a4e7c, #a17cca);
   border: none;
   border-radius: 25px;
   color: white;
@@ -510,9 +536,9 @@
 }
 
 .colorDefault {
-  --resource-color: #5A4E7C;
-  --resource-color-light: #5A4E7C33;
-  --resource-color-medium: #5A4E7C40;
+  --resource-color: #5a4e7c;
+  --resource-color-light: #5a4e7c33;
+  --resource-color-medium: #5a4e7c40;
 }
 
 /* Animación para nuevos elementos */
@@ -526,12 +552,12 @@
     animation: none !important;
     transition: none !important;
   }
-  
+
   .resourceCard:hover,
   .loadMoreButton:hover {
     transform: none;
   }
-  
+
   .loadMoreButton::before {
     display: none;
   }
@@ -542,19 +568,19 @@
   .resourceCard {
     border: 2px solid #000;
   }
-  
+
   .resourceTitle {
     color: #000;
   }
-  
+
   .resourceDescription {
     color: #333;
   }
-  
+
   .noResourcesTitle {
     color: #000;
   }
-  
+
   .loadMoreButton {
     background: #000;
     border: 2px solid #000;

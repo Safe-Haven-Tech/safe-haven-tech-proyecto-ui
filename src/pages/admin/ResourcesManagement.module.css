@@ -2,7 +2,12 @@
 
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #e9ecef 100%) !important;
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #f8f9fa 50%,
+    #e9ecef 100%
+  ) !important;
   padding: 100px 20px 40px; /* Top padding para navbar */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -107,7 +112,9 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   border: 2px solid #e9ecef;
 }
 
@@ -763,7 +770,12 @@
 @media (max-width: 768px) {
   .container {
     padding: 80px 15px 30px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #e9ecef 100%) !important;
+    background: linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f8f9fa 50%,
+      #e9ecef 100%
+    ) !important;
   }
 
   .headerContent {
@@ -849,7 +861,12 @@
 @media (max-width: 480px) {
   .container {
     padding: 70px 10px 20px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #e9ecef 100%) !important;
+    background: linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f8f9fa 50%,
+      #e9ecef 100%
+    ) !important;
   }
 
   .header {

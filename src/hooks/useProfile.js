@@ -3,6 +3,7 @@ import {
   fetchUsuarioPublico,
   toggleSeguirUsuario,
   getUsuarioActual,
+  fetchPostsPerfilByUserId,
 } from '../services/profileServices';
 
 import { mapearUsuario } from '../utils/mappers';
@@ -17,6 +18,7 @@ export const useProfile = (nickname) => {
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [perfilPosts, setPerfilPosts] = useState([]); // Nuevo estado
 
   // Función memoizada para obtener el usuario actual
   const getCurrentUser = useCallback(() => {
@@ -45,6 +47,10 @@ export const useProfile = (nickname) => {
       const currentUser = getCurrentUser();
       const ownProfile = currentUser && currentUser.id === userData._id;
       setIsOwnProfile(ownProfile);
+
+      // Obtener los posts de tipo "perfil"
+      const postsPerfil = await fetchPostsPerfilByUserId(userData._id, token);
+      setPerfilPosts(postsPerfil);
     } catch (err) {
       console.error('❌ Error cargando perfil:', err.message);
       setError(err.message);
@@ -104,13 +110,14 @@ export const useProfile = (nickname) => {
     isOwnProfile,
     isLoading,
     error,
+    perfilPosts, 
 
     // Funciones
     getCurrentUser,
     handleFollowToggle,
     refreshProfile,
 
-    // Funciones de utilidad
-    setError, // Para limpiar errores desde el componente
+   
+    setError, 
   };
 };

@@ -17,7 +17,8 @@ const items = [
   {
     icon: <SearchIcon />,
     title: 'Encuentra lo que necesitas',
-    description: 'Herramientas de búsqueda avanzada para encontrar recursos específicos.',
+    description:
+      'Herramientas de búsqueda avanzada para encontrar recursos específicos.',
   },
   {
     icon: <TrustedIcon />,
@@ -27,7 +28,8 @@ const items = [
   {
     icon: <AlertIcon />,
     title: 'Nota importante',
-    description: 'Nuestros recursos están diseñados para complementar, no reemplazar, la atención profesional de salud mental.',
+    description:
+      'Nuestros recursos están diseñados para complementar, no reemplazar, la atención profesional de salud mental.',
   },
 ];
 
@@ -38,24 +40,19 @@ export default function BenefitsSection() {
       <h2 className={styles.sectionTitle}>
         ¿Por qué elegir nuestros recursos informativos?
       </h2>
-      
+
       <p className={styles.sectionSubtitle}>
-        Accede a información curada y herramientas diseñadas para apoyar tu bienestar mental.
+        Accede a información curada y herramientas diseñadas para apoyar tu
+        bienestar mental.
       </p>
 
       <div className={styles.benefitsGrid}>
         {items.map((item, idx) => (
           // 🎯 REMOVIDO: clase "card" de Bootstrap
           <div key={idx} className={styles.benefitCard}>
-            <div className={styles.iconWrapper}>
-              {item.icon}
-            </div>
-            <h5 className={styles.benefitTitle}>
-              {item.title}
-            </h5>
-            <p className={styles.benefitDescription}>
-              {item.description}
-            </p>
+            <div className={styles.iconWrapper}>{item.icon}</div>
+            <h5 className={styles.benefitTitle}>{item.title}</h5>
+            <p className={styles.benefitDescription}>{item.description}</p>
           </div>
         ))}
       </div>

@@ -22,7 +22,7 @@ const EvaluationCard = ({ r, idx, handleDownloadPDF, pdfLoading }) => {
   }, [idx]);
 
   return (
-    <div 
+    <div
       className={`${styles.cardWrapper} ${isAnimated ? styles.animated : ''}`}
       style={{ animationDelay: `${idx * 0.1}s` }}
     >
@@ -34,7 +34,6 @@ const EvaluationCard = ({ r, idx, handleDownloadPDF, pdfLoading }) => {
           <h5 className={styles.cardTitle}>
             {r.encuestaId?.titulo || 'Encuesta sin título'}
           </h5>
-          
 
           <span
             className={`${styles.riskBadge} ${getBadgeColor(r.nivelRiesgo)}`}
@@ -45,9 +44,7 @@ const EvaluationCard = ({ r, idx, handleDownloadPDF, pdfLoading }) => {
             <span>{r.nivelRiesgo?.toUpperCase() || 'N/A'}</span>
           </span>
 
-          <p className={styles.tipText}>
-            {getTip(r.nivelRiesgo)}
-          </p>
+          <p className={styles.tipText}>{getTip(r.nivelRiesgo)}</p>
         </div>
 
         <button

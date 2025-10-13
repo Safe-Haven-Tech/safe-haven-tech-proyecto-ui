@@ -1,0 +1,344 @@
+.feedContainer {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding-top: 100px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(96,60,126,0.10);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 24px rgba(96,60,126,0.18);
+}
+
+.cardImageContainer {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: #f6f2fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 0 18px;
+}
+
+.cardAutor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cardAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #eee;
+  border: 2px solid #603c7e22;
+}
+
+.cardAutorNombre {
+  font-weight: 600;
+  color: #603c7e;
+  font-size: 1rem;
+}
+
+.cardFecha {
+  color: #888;
+  font-size: 0.92rem;
+}
+
+.cardContenido {
+  padding: 14px 18px 4px 18px;
+  font-size: 1.08rem;
+  color: #333;
+  line-height: 1.6;
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 18px 16px 18px;
+  border-top: 1px solid #f0eaf7;
+  margin-top: 12px;
+}
+
+.cardLike, .cardComment {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #603c7e;
+  font-weight: 500;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.cardLike:hover, .cardComment:hover {
+  color: #8e44ad;
+}
+
+.loading {
+  text-align: center;
+  color: #603c7e;
+  font-weight: bold;
+  padding: 18px 0;
+}
+
+.error {
+  text-align: center;
+  color: #d32f2f;
+  font-weight: bold;
+  padding: 18px 0;
+}
+
+.endMessage {
+  text-align: center;
+  color: #888;
+  font-size: 1rem;
+  padding: 18px 0;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .feedContainer {
+    max-width: 100%;
+    padding: 12px 0;
+  }
+  .card {
+    border-radius: 12px;
+  }
+  .cardHeader, .cardContenido, .cardActions {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+/* Carrusel */
+.carruselBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(96,60,126,0.7);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0.85;
+  transition: background 0.2s;
+}
+
+.carruselBtnLeft {
+  left: 12px;
+}
+
+.carruselBtnRight {
+  right: 12px;
+}
+
+.carruselIndicators {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  z-index: 2;
+}
+
+.carruselIndicator {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #d1c4e9;
+  opacity: 0.7;
+  transition: background 0.2s;
+}
+
+.carruselIndicatorActive {
+  background: #603c7e;
+  opacity: 1;
+}
+
+/* --- Instagram-like comentarios preview --- */
+.comentariosPreview {
+  margin: 0 18px 0 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.comentarioPreviewItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+.comentarioPreviewAvatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #eee;
+  border: 1.5px solid #b39ddb44;
+  margin-top: 2px;
+}
+
+.comentarioPreviewHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #603c7e;
+}
+
+.comentarioPreviewAutor {
+  font-weight: 500;
+  color: #603c7e;
+  margin-right: 6px;
+}
+
+.comentarioPreviewFecha {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin-left: 0;
+  font-weight: 400;
+}
+
+.comentarioPreviewContenido {
+  color: #222;
+  font-size: 0.99rem;
+  margin: 0;
+  word-break: break-word;
+  font-weight: 400;
+}
+
+.comentarioPreviewVerTodos {
+  background: none;
+  border: none;
+  color: #8e44ad;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.97rem;
+  padding: 0;
+  margin: 0 0 2px 0;
+  align-self: flex-start;
+  transition: color 0.18s;
+  text-decoration: underline;
+}
+
+.comentarioPreviewVerTodos:hover {
+  color: #603c7e;
+  text-decoration: underline;
+}
+
+.cardShare {
+  color: #603c7e;
+}
+.cardShare:hover {
+  color: #8e44ad;
+  background: #f7f5fb;
+}
+
+.cardMenuWrapper {
+  position: relative;
+  margin-left: 10px;
+  display: inline-block;
+}
+
+.cardEditBtn, .cardDeleteBtn {
+  background: none;
+  border: none;
+  color: #603c7e;
+  font-size: 1rem;
+  text-align: left;
+  padding: 10px 18px 10px 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.18s, color 0.18s;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardEditBtn:hover {
+  background: #ede7f6;
+  color: #8e44ad;
+}
+
+.cardDeleteBtn:hover {
+  background: #fdeaea;
+  color: #d32f2f;
+}
+
+.fabCrearPost {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 100;
+  background: linear-gradient(90deg, #8e44ad 60%, #603c7e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  aspect-ratio: 1 / 1;      /* Asegura círculo perfecto */
+  box-shadow: 0 4px 18px rgba(96,60,126,0.18);
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+  padding: 0;               /* Elimina padding extra */
+}
+.fabCrearPost:hover {
+  background: linear-gradient(90deg, #603c7e 60%, #8e44ad 100%);
+  box-shadow: 0 6px 28px rgba(96,60,126,0.28);
+  transform: scale(1.07);
+}
+@media (max-width: 700px) {
+  .fabCrearPost {
+    bottom: 18px;
+    right: 18px;
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+  }
+}

@@ -33,7 +33,7 @@
   font-family: 'Poppins', sans-serif;
   font-weight: bold;
   margin-bottom: 1rem;
-  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(90deg, #5a4e7c, #a17cca);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -115,7 +115,7 @@
   align-items: center;
   padding: 0.5rem 1rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(135deg, #5a4e7c, #a17cca);
   color: white;
   font-weight: bold;
   box-shadow: 0 4px 12px rgba(90, 78, 124, 0.3);
@@ -159,7 +159,12 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
@@ -218,7 +223,12 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
@@ -231,17 +241,17 @@
   .surveyHeader {
     margin-bottom: 1.5rem;
   }
-  
+
   .surveyDescription {
     margin-bottom: 1rem;
   }
-  
+
   .badgeContainer {
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
   }
-  
+
   .categoryBadge,
   .timeBadge {
     padding: 0.4rem 0.8rem;
@@ -260,17 +270,17 @@
   .badgeContainer {
     animation: none;
   }
-  
+
   .categoryBadge,
   .timeBadge {
     transition: none;
   }
-  
+
   .categoryBadge:hover,
   .timeBadge:hover {
     transform: none;
   }
-  
+
   .categoryBadge::before,
   .timeBadge::before {
     display: none;
@@ -291,7 +301,7 @@
     -webkit-text-fill-color: initial;
     color: #000;
   }
-  
+
   .categoryBadge,
   .timeBadge {
     border: 2px solid #000;

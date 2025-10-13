@@ -9,25 +9,15 @@ export default function SurveyHeader({
 }) {
   return (
     <div className={styles.surveyHeader}>
-      <h1 className={styles.surveyTitle}>
-        {title}
-      </h1>
+      <h1 className={styles.surveyTitle}>{title}</h1>
 
-      {description && (
-        <p className={styles.surveyDescription}>
-          {description}
-        </p>
-      )}
+      {description && <p className={styles.surveyDescription}>{description}</p>}
 
       <div className={styles.badgeContainer}>
-        <span className={styles.categoryBadge}>
-          {category}
-        </span>
+        <span className={styles.categoryBadge}>{category}</span>
 
         {estimatedTime && (
-          <span className={styles.timeBadge}>
-            {estimatedTime} min aprox.
-          </span>
+          <span className={styles.timeBadge}>{estimatedTime} min aprox.</span>
         )}
       </div>
     </div>

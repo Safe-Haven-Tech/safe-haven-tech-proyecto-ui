@@ -22,11 +22,7 @@ const ScaleQuestion = ({ question, answer, onAnswer }) => {
           const isLongLabel = label && label.length > 8;
 
           return (
-            <div
-              key={index}
-              className={styles.scaleOption}
-              title={label}
-            >
+            <div key={index} className={styles.scaleOption} title={label}>
               <button
                 type="button"
                 onClick={() => onAnswer(value)}
@@ -54,9 +50,7 @@ const ScaleQuestion = ({ question, answer, onAnswer }) => {
       </div>
 
       {answer && (
-        <div className={styles.selectedIndicator}>
-          Seleccionado: {answer}
-        </div>
+        <div className={styles.selectedIndicator}>Seleccionado: {answer}</div>
       )}
     </div>
   );
@@ -127,7 +121,10 @@ export default function QuestionCard({
               style={{ color: questionColor }}
             ></i>
             <div>
-              <h6 className={styles.questionNumber} style={{ color: questionColor }}>
+              <h6
+                className={styles.questionNumber}
+                style={{ color: questionColor }}
+              >
                 Pregunta {questionNumber} de {totalQuestions}
               </h6>
               <small className={styles.questionType}>
@@ -145,16 +142,16 @@ export default function QuestionCard({
               {question.obligatoria ? 'Obligatoria' : 'Opcional'}
             </span>
             {!isValid && question.obligatoria && (
-              <i className={`bi bi-exclamation-triangle-fill ${styles.warningIcon}`}></i>
+              <i
+                className={`bi bi-exclamation-triangle-fill ${styles.warningIcon}`}
+              ></i>
             )}
           </div>
         </div>
 
         {/* Cuerpo */}
         <div className={styles.questionBody}>
-          <h5 className={styles.questionText}>
-            {question.enunciado}
-          </h5>
+          <h5 className={styles.questionText}>{question.enunciado}</h5>
 
           <div className="question-content">
             {question.tipo === 'escala' && (
@@ -171,7 +168,9 @@ export default function QuestionCard({
               'escala',
             ].includes(question.tipo) && (
               <div className={styles.unsupportedAlert}>
-                <i className={`bi bi-exclamation-triangle ${styles.alertIcon}`}></i>
+                <i
+                  className={`bi bi-exclamation-triangle ${styles.alertIcon}`}
+                ></i>
                 <div className={styles.alertContent}>
                   <div className={styles.alertTitle}>
                     Tipo de pregunta no soportado: {question.tipo}

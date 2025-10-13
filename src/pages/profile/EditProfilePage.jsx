@@ -1,8 +1,6 @@
-/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\pages\profile\EditProfilePage.jsx */
-import React, { useCallback } from 'react';
+import React, { useCallback,useState } from 'react';
 import EditarPerfilForm from '../../components/Profile/EditProfile/EditProfileForm';
-import PreviewCard from '../../components/Profile/EditProfile/PreviewCard';
-import ModalConfirmation from '../../components/Profile/EditProfile/ModalConfirmation';
+import ModalConfirmation from '../../components/Profile/EditProfile/modalConfirmation';
 import { useEditarPerfil } from '../../hooks/useEditProfile';
 import styles from './EditProfilePage.module.css';
 
@@ -15,6 +13,18 @@ export default function EditarPerfil() {
     eliminarFotoActual,
     handleGuardar,
   } = useEditarPerfil();
+
+   const [previewData, setPreviewData] = useState({
+    nombreCompleto: state.nombreCompleto,
+    nombreUsuario: state.nombreUsuario,
+    pronombres: state.pronombres,
+    biografia: state.biografia,
+    previsualizacionImagen: state.previsualizacionImagen,
+    fotoEliminada: state.fotoEliminada,
+  });
+    const handleFormPreviewChange = useCallback((data) => {
+    setPreviewData(data);
+  }, []);
 
   const cancelarEliminacion = useCallback(() => {
     dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
@@ -33,7 +43,9 @@ export default function EditarPerfil() {
   // Mostrar skeleton mientras carga
   if (state.mostrarSkeleton) {
     return (
-      <div className={`d-flex flex-column justify-content-center align-items-center ${styles.skeletonContainer}`}>
+      <div
+        className={`d-flex flex-column justify-content-center align-items-center ${styles.skeletonContainer}`}
+      >
         <div
           className={`spinner-border text-success mb-3 ${styles.skeletonSpinner}`}
           role="status"
@@ -47,7 +59,6 @@ export default function EditarPerfil() {
 
   return (
     <div className={styles.editProfileContainer}>
-      {/* Formulario de edición */}
       <EditarPerfilForm
         state={state}
         dispatch={dispatch}
@@ -56,18 +67,9 @@ export default function EditarPerfil() {
         onEliminarImagen={eliminarImagenSeleccionada}
         onEliminarFoto={eliminarFotoActual}
         onCancelarEliminacion={cancelarEliminacion}
+        onFormPreviewChange={handleFormPreviewChange} // NUEVO PROP
       />
 
-      {/* Vista previa */}
-      <PreviewCard
-        usuario={state.usuario}
-        nombreUsuario={state.nombreUsuario}
-        nombreCompleto={state.nombreCompleto}
-        pronombres={state.pronombres}
-        biografia={state.biografia}
-        fotoEliminada={state.fotoEliminada}
-        previsualizacionImagen={state.previsualizacionImagen}
-      />
 
       {/* Modal de confirmación */}
       <ModalConfirmation
@@ -78,7 +80,7 @@ export default function EditarPerfil() {
             <p>
               ¿Estás seguro de que quieres cambiar tu nickname de{' '}
               <strong>@{state.usuario?.nombreUsuario}</strong> a{' '}
-              <strong>@{state.nombreUsuario}</strong>?
+              <strong>@{state.formData?.nombreUsuario}</strong>?
             </p>
             <p className="text-warning">
               <i className="bi bi-exclamation-triangle me-1"></i>

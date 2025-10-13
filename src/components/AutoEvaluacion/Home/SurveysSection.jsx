@@ -1,19 +1,24 @@
-/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\components\AutoEvaluacion\Home\SurveysSection.jsx */
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './SurveysSection.module.css';
 import { fetchEncuestas } from '../../../services/surveysServices';
 
-const validTopics = [
-  'Bienestar emocional',
-  'Relaciones cercanas',
-  'Autoestima y autoconcepto',
-  'Habilidades sociales',
-  'Salud y hábitos',
-  'Orientación emocional',
-  'Prevención y señales de alerta',
-];
+// Mapeo de values a labels
+const topicLabels = {
+  bienestar: 'Bienestar emocional',
+  salud_mental: 'Salud mental',
+  relaciones_cercanas: 'Relaciones cercanas',
+  autoestima_autoconcepto: 'Autoestima y autoconcepto',
+  habilidades_sociales: 'Habilidades sociales',
+  salud_habitos: 'Salud y hábitos',
+  orientacion_emocional: 'Orientación emocional',
+  prevencion_alerta: 'Prevención y señales de alerta',
+  estres: 'Estrés',
+  ansiedad: 'Ansiedad',
+  depresion: 'Depresión',
+  otro: 'Otro',
+};
 
 export default function SurveysSection({ selectedTopic, batchSize = 3 }) {
   const navigate = useNavigate();
@@ -29,7 +34,10 @@ export default function SurveysSection({ selectedTopic, batchSize = 3 }) {
       try {
         setLoading(true);
         const data = await fetchEncuestas();
-        const filtered = data.filter((s) => validTopics.includes(s.categoria));
+        // Filtrar solo encuestas con categoría válida
+        const filtered = data.filter((s) =>
+          Object.keys(topicLabels).includes(s.categoria)
+        );
         setSurveys(filtered);
       } catch (err) {
         console.error('Error cargando encuestas:', err);
@@ -40,12 +48,12 @@ export default function SurveysSection({ selectedTopic, batchSize = 3 }) {
     loadSurveys();
   }, []);
 
-  // Filtrado por tópico
+  // Filtrado por tópico seleccionado
   const filteredSurveys = useMemo(
     () =>
       !selectedTopic || selectedTopic === 'Todas'
         ? surveys
-        : surveys.filter((s) => s.categoria === selectedTopic),
+        : surveys.filter((s) => topicLabels[s.categoria] === selectedTopic),
     [surveys, selectedTopic]
   );
 
@@ -78,7 +86,8 @@ export default function SurveysSection({ selectedTopic, batchSize = 3 }) {
   const handleLoadMore = () => setVisibleCount((prev) => prev + batchSize);
   const handleSurveyClick = (surveyId) => navigate(`/encuesta/${surveyId}`);
 
-  if (loading) return <p className={styles.loadingText}>Cargando encuestas...</p>;
+  if (loading)
+    return <p className={styles.loadingText}>Cargando encuestas...</p>;
 
   return (
     <section className="my-5">
@@ -101,11 +110,12 @@ export default function SurveysSection({ selectedTopic, batchSize = 3 }) {
                     className={`card ${styles.surveyCard}`}
                     onClick={() => handleSurveyClick(survey._id)}
                   >
-                    <h5 className={styles.surveyTitle}>
-                      {survey.titulo}
-                    </h5>
+                    <h5 className={styles.surveyTitle}>{survey.titulo}</h5>
                     <p className={styles.surveyDescription}>
                       {survey.descripcion}
+                    </p>
+                    <p className={styles.surveyCategory}>
+                      {topicLabels[survey.categoria] || survey.categoria}
                     </p>
                   </div>
                 </div>

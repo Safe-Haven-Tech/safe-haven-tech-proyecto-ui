@@ -28,7 +28,7 @@
 
 /* Contenedor de evaluaciones */
 .evaluationsContainer {
-  background-color: #F9F9F9;
+  background-color: #f9f9f9;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   border-radius: 1rem;
   padding: 1.5rem;
@@ -151,7 +151,7 @@
 }
 
 .ctaLink {
-  color: #5A4E7C;
+  color: #5a4e7c;
   font-weight: 600;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -159,7 +159,7 @@
 }
 
 .ctaLink:hover {
-  color: #A17CCA;
+  color: #a17cca;
   text-decoration: none;
 }
 
@@ -170,7 +170,7 @@
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(90deg, #5a4e7c, #a17cca);
   transition: width 0.3s ease;
 }
 
@@ -200,12 +200,12 @@
     margin-top: 70px;
     padding: 0 0.5rem;
   }
-  
+
   .evaluationsContainer {
     padding: 1rem;
     border-radius: 0.75rem;
   }
-  
+
   .ctaContainer {
     margin-top: 1.5rem;
     padding: 0.75rem;

@@ -101,12 +101,11 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
- 
   useEffect(() => {
     const handleTokenChange = () => {
       const newToken = localStorage.getItem('token');
       const newRefreshToken = localStorage.getItem('refreshToken');
-      
+
       if (newToken !== token) {
         setToken(newToken);
       }
@@ -117,7 +116,7 @@ export const AuthProvider = ({ children }) => {
 
     // Escuchar el evento customizado
     window.addEventListener('tokenChanged', handleTokenChange);
-    
+
     return () => {
       window.removeEventListener('tokenChanged', handleTokenChange);
     };

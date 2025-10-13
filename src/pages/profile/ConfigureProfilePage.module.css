@@ -95,7 +95,7 @@
     min-height: 100vh;
     min-height: -webkit-fill-available;
   }
-  
+
   @media (max-width: 375px) {
     .configureContainer {
       padding-top: 60px;
@@ -103,13 +103,13 @@
       padding-left: 8px;
       padding-right: 8px;
     }
-    
+
     .loadingContainer {
       padding-left: 8px;
       padding-right: 8px;
     }
   }
-  
+
   @media (max-width: 320px) {
     .configureContainer {
       padding-top: 50px;
@@ -133,7 +133,7 @@
   .configureContainer {
     padding-top: 75px;
   }
-  
+
   @media (min-width: 992px) {
     .configureContainer {
       padding-top: 100px;
@@ -184,7 +184,7 @@
     padding-left: max(10px, env(safe-area-inset-left));
     padding-right: max(10px, env(safe-area-inset-right));
   }
-  
+
   @media (min-width: 992px) {
     .configureContainer {
       padding-left: max(15px, env(safe-area-inset-left));
@@ -199,7 +199,7 @@
     padding-top: 50px;
     padding-bottom: 20px;
   }
-  
+
   @media (min-width: 992px) {
     .configureContainer {
       padding-top: 80px;
@@ -223,7 +223,7 @@
     padding: 20px;
     min-height: auto;
   }
-  
+
   .loadingContainer {
     padding: 10px;
   }

@@ -6,7 +6,15 @@ import { useAuth } from '../context/useAuth';
 import styles from './Navbar.module.css';
 
 // ----------------- Componente reutilizable ORIGINAL -----------------
-const NavButton = ({ label, onClick, style, hoverStyle, isLink, to, className = '' }) => {
+const NavButton = ({
+  label,
+  onClick,
+  style,
+  hoverStyle,
+  isLink,
+  to,
+  className = '',
+}) => {
   const [hover, setHover] = useState(false);
 
   const combinedStyle = {
@@ -38,8 +46,6 @@ const NavButton = ({ label, onClick, style, hoverStyle, isLink, to, className = 
     );
   }
 
-  
-
   return (
     <button
       onClick={onClick}
@@ -59,7 +65,6 @@ export default function Navbar() {
   const [_version, setVersion] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
-  
 
   // Estados para responsive
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -104,7 +109,7 @@ export default function Navbar() {
     else navigate('/perfil');
   };
 
-  const handleSearchClick = () => console.log('Buscar posts...');
+
 
   // 🆕 NUEVO: Handler para panel de administración
   const handleAdminPanelClick = () => {
@@ -121,6 +126,7 @@ export default function Navbar() {
     { label: 'Recursos informativos', path: '/recursosinformativos' },
     { label: 'Contacto de expertos', path: '/contactoexpertos' },
     { label: 'Nuestro foro', path: '/foro' },
+    { label: 'Tu Feed', path: '/publicaciones' },
   ];
 
   // ---------- Botones invitado ORIGINAL ----------
@@ -146,18 +152,22 @@ export default function Navbar() {
   // ---------- Botones usuario logueado + ADMIN ----------
   const userButtons = [
     // 🆕 BOTÓN ADMIN (solo si rol === 'administrador')
-    ...(isUserAdmin() ? [{
-      label: 'Admin',
-      onClick: handleAdminPanelClick,
-      style: { 
-        backgroundColor: '#dc3545', // Rojo para destacar
-        color: '#ffffff', 
-        border: 'none',
-        fontWeight: '700',
-      },
-      hoverStyle: { backgroundColor: '#c82333', color: '#ffffff' },
-    }] : []),
-    
+    ...(isUserAdmin()
+      ? [
+          {
+            label: 'Admin',
+            onClick: handleAdminPanelClick,
+            style: {
+              backgroundColor: '#dc3545', // Rojo para destacar
+              color: '#ffffff',
+              border: 'none',
+              fontWeight: '700',
+            },
+            hoverStyle: { backgroundColor: '#c82333', color: '#ffffff' },
+          },
+        ]
+      : []),
+
     // Botones originales
     {
       label: 'Mi Perfil',
@@ -184,22 +194,7 @@ export default function Navbar() {
   ];
 
   // ---------- Botón de búsqueda ORIGINAL ----------
-  const searchButton = {
-    label: '🔍',
-    onClick: handleSearchClick,
-    style: {
-      background: 'transparent',
-      border: 'none',
-      borderRadius: '50%',
-      width: 40,
-      height: 40,
-      fontSize: 22,
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    hoverStyle: { backgroundColor: '#2d5016', color: '#ffffff' },
-  };
+
 
   return (
     <>
@@ -221,8 +216,8 @@ export default function Navbar() {
         }}
       >
         {/* Logo ORIGINAL */}
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="navbar-brand d-flex align-items-center"
           style={{ flexShrink: 0 }}
         >
@@ -246,7 +241,10 @@ export default function Navbar() {
             style={{ position: 'relative', zIndex: 2110 }}
           >
             {/* Menú principal ORIGINAL */}
-            <ul className="navbar-nav mb-2 mb-lg-0" style={{ marginLeft: 'auto' }}>
+            <ul
+              className="navbar-nav mb-2 mb-lg-0"
+              style={{ marginLeft: 'auto' }}
+            >
               {menuItems.map((item, idx) => (
                 <li className="nav-item" key={idx}>
                   <NavButton
@@ -270,7 +268,7 @@ export default function Navbar() {
               className="d-flex align-items-center"
               style={{ gap: 24, marginLeft: '1rem' }}
             >
-              <NavButton {...searchButton} />
+              
               {(usuario ? userButtons : guestButtons).map((btn, idx) => (
                 <NavButton key={idx} {...btn} />
               ))}
@@ -282,11 +280,11 @@ export default function Navbar() {
         {isMobile && (
           <div className={styles.mobileControls}>
             {/* Búsqueda móvil */}
-            <NavButton {...searchButton} />
+           
 
             {/* Notificaciones móvil (solo si está autenticado) */}
             {usuario && (
-              <NavButton {...userButtons.find(btn => btn.label === '🔔')} />
+              <NavButton {...userButtons.find((btn) => btn.label === '🔔')} />
             )}
 
             {/* Hamburger Menu */}
@@ -305,7 +303,9 @@ export default function Navbar() {
 
       {/* Mobile Menu Overlay */}
       {isMobile && (
-        <div className={`${styles.mobileMenuOverlay} ${isMobileMenuOpen ? styles.open : ''}`}>
+        <div
+          className={`${styles.mobileMenuOverlay} ${isMobileMenuOpen ? styles.open : ''}`}
+        >
           <div className={styles.mobileMenuContent}>
             {/* Menu Items */}
             <div className={styles.mobileMenuItems}>
@@ -337,7 +337,7 @@ export default function Navbar() {
                       ⚙️ Panel de Administración
                     </button>
                   )}
-                  
+
                   <button
                     className={styles.mobileProfileButton}
                     onClick={() => {

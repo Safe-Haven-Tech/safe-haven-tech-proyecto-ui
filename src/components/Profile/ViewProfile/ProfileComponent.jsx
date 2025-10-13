@@ -1,11 +1,29 @@
-/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\components\Profile\ViewProfile\ProfileComponent.jsx */
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import styles from './ProfileComponent.module.css';
-
-// Asegúrate de que esta ruta sea correcta según tu estructura de carpetas
 import perfilPlaceholder from '../../../assets/perfil_placeholder.png';
 
+// Utilidad para obtener un thumbnail de video
+const getVideoThumbnail = (url) =>
+  new Promise((resolve) => {
+    const video = document.createElement('video');
+    video.src = url;
+    video.crossOrigin = 'anonymous';
+    video.muted = true;
+    video.currentTime = 0.5;
+    video.onloadeddata = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((blob) => {
+        resolve(URL.createObjectURL(blob));
+        URL.revokeObjectURL(video.src);
+      }, 'image/jpeg', 0.8);
+    };
+    video.onerror = () => resolve('');
+  });
 
 const ProfileComponent = React.memo(
   ({
@@ -17,6 +35,7 @@ const ProfileComponent = React.memo(
     getCurrentUser,
     onFollowToggle,
     onEditProfile,
+    perfilPosts,
     onConfigureProfile,
   }) => {
     const navigate = useNavigate();
@@ -40,7 +59,7 @@ const ProfileComponent = React.memo(
               {error}
             </div>
             <div className={styles.errorButtons}>
-              <button 
+              <button
                 className={`btn btn-primary ${styles.errorButton}`}
                 onClick={() => navigate('/')}
               >
@@ -79,7 +98,7 @@ const ProfileComponent = React.memo(
       <div className={styles.profileContainer}>
         {/* Header moderno tipo Instagram */}
         <div className={styles.profileHeader}>
-          <div className={`container-fluid ${styles.headerContainer}`}>
+          <div className={`container ${styles.headerContainer}`}>
             <div className={styles.profileInfo}>
               {/* Avatar */}
               <div className={styles.avatarContainer}>
@@ -140,7 +159,7 @@ const ProfileComponent = React.memo(
                       >
                         Mensaje
                       </button>
-                      <button 
+                      <button
                         className={`btn btn-outline-dark btn-sm ${styles.actionButton} ${styles.iconButton}`}
                       >
                         <i className="bi bi-person-plus"></i>
@@ -161,16 +180,13 @@ const ProfileComponent = React.memo(
                     seguidores
                   </span>
                   <span className={styles.statItem}>
-                    <strong>{usuario.seguidos?.length || 0}</strong>{' '}
-                    seguidos
+                    <strong>{usuario.seguidos?.length || 0}</strong> seguidos
                   </span>
                 </div>
 
                 {/* Fila 3: Bio y detalles */}
                 <div className={styles.bioSection}>
-                  <h2 className={styles.fullName}>
-                    {usuario.nombreCompleto}
-                  </h2>
+                  <h2 className={styles.fullName}>{usuario.nombreCompleto}</h2>
 
                   {usuario.pronombres && (
                     <span
@@ -192,8 +208,8 @@ const ProfileComponent = React.memo(
                   <div className={styles.badges}>
                     <span
                       className={`badge ${
-                        usuario.visibilidadPerfil === 'publico' 
-                          ? 'bg-success' 
+                        usuario.visibilidadPerfil === 'publico'
+                          ? 'bg-success'
                           : 'bg-warning'
                       } ${styles.badge}`}
                     >
@@ -202,7 +218,10 @@ const ProfileComponent = React.memo(
                         : '🔒 Privado'}
                     </span>
                     <span style={{ color: '#6c757d' }}>•</span>
-                    <span className="text-capitalize" style={{ color: '#6c757d' }}>
+                    <span
+                      className="text-capitalize"
+                      style={{ color: '#6c757d' }}
+                    >
                       {usuario.rol}
                     </span>
                     {isOwnProfile && (
@@ -219,7 +238,8 @@ const ProfileComponent = React.memo(
         </div>
 
         {/* Contenido del perfil */}
-        <div className={`container ${styles.profileContent}`}>
+        {/* Cambia container por container-fluid para el grid de posts */}
+        <div className={`container-fluid ${styles.profileContent}`}>
           {isPrivateProfile && !isOwnProfile ? (
             // PERFIL PRIVADO - No es el mío
             <div className={styles.privateProfile}>
@@ -233,7 +253,7 @@ const ProfileComponent = React.memo(
 
               {/* Botones según estado del usuario */}
               {currentUser ? (
-                <button 
+                <button
                   className={`btn btn-primary ${styles.privateButton}`}
                   onClick={onFollowToggle}
                 >
@@ -260,26 +280,38 @@ const ProfileComponent = React.memo(
             </div>
           ) : (
             // PERFIL PÚBLICO O PROPIO - Mostrar contenido
-            <ProfileContent usuario={usuario} isOwnProfile={isOwnProfile} />
+            <ProfileContent
+              usuario={usuario}
+              isOwnProfile={isOwnProfile}
+              perfilPosts={perfilPosts}
+            />
           )}
         </div>
+        {isOwnProfile && (
+          <button
+            className={styles.fabCrearPost}
+            title="Crear nueva publicación"
+            onClick={() => navigate('/crear-post')}
+          >
+            <i className="bi bi-plus-lg"></i>
+          </button>
+        )}
       </div>
     );
   }
 );
 
 // Componente separado para el contenido de publicaciones
-const ProfileContent = React.memo(({ usuario, isOwnProfile }) => {
+const ProfileContent = React.memo(({ usuario, isOwnProfile, perfilPosts }) => {
   return (
     <>
-      {/* Mensaje si no hay posts */}
-      {(!usuario.posts || usuario.posts.length === 0) && (
+      {(!perfilPosts || perfilPosts.length === 0) && (
         <div className={styles.noPostsContainer}>
           <div className={styles.noPostsIcon}>📷</div>
           <h5 className={`text-muted mb-2 ${styles.noPostsTitle}`}>
             {isOwnProfile
-              ? 'Aún no tienes publicaciones'
-              : 'Este usuario no tiene publicaciones'}
+              ? 'Aún no tienes publicaciones de perfil'
+              : 'Este usuario no tiene publicaciones de perfil'}
           </h5>
           {isOwnProfile && (
             <p className={`text-muted small ${styles.noPostsText}`}>
@@ -289,11 +321,10 @@ const ProfileContent = React.memo(({ usuario, isOwnProfile }) => {
         </div>
       )}
 
-      {/* Grid de Posts */}
-      {usuario.posts && usuario.posts.length > 0 && (
-        <div className={`row ${styles.postsGrid}`}>
-          {usuario.posts.map((post, index) => (
-            <PostGridItem key={index} post={post} usuario={usuario} />
+      {perfilPosts && perfilPosts.length > 0 && (
+        <div className={`row justify-content-center ${styles.postsGrid}`}>
+          {perfilPosts.map((post, index) => (
+            <PostGridItem key={post._id || index} post={post} usuario={usuario} />
           ))}
         </div>
       )}
@@ -301,29 +332,72 @@ const ProfileContent = React.memo(({ usuario, isOwnProfile }) => {
   );
 });
 
-// Componente para cada item del grid de posts
+// PostGridItem con preview de video si corresponde
 const PostGridItem = React.memo(({ post, usuario }) => {
-  return (
-    <div className="col-4">
-      <div className={styles.postItem}>
-        <img
-          src={post.imagen || usuario.avatar || perfilPlaceholder}
-          onError={(e) => {
-            e.target.src = perfilPlaceholder;
-          }}
-          alt="publicación"
-          className={styles.postImage}
-        />
+  const [thumb, setThumb] = React.useState('');
+  const multimedia = Array.isArray(post.multimedia) ? post.multimedia : [];
+  const primerArchivo = multimedia.length > 0 ? multimedia[0] : null;
 
-        {/* Overlay con estadísticas */}
+  React.useEffect(() => {
+    if (!primerArchivo) return;
+    const ext = primerArchivo.split('.').pop().toLowerCase();
+    if (['mp4', 'webm', 'ogg', 'mov'].includes(ext)) {
+      getVideoThumbnail(primerArchivo).then((t) => setThumb(t));
+    }
+  }, [primerArchivo]);
+
+  const esVideo =
+    primerArchivo &&
+    ['mp4', 'webm', 'ogg', 'mov'].includes(
+      primerArchivo.split('.').pop().toLowerCase()
+    );
+
+  const imagenSrc =
+    esVideo && thumb
+      ? thumb
+      : primerArchivo ||
+        usuario.avatar ||
+        perfilPlaceholder;
+
+  return (
+    <div className="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+      <div className={styles.postItem} style={{ cursor: 'pointer', position: 'relative' }}>
+        <Link to={`/publicacion/${post._id}`}>
+          <img
+            src={imagenSrc}
+            onError={(e) => {
+              e.target.src = perfilPlaceholder;
+            }}
+            alt="publicación"
+            className={styles.postImage}
+            style={{ width: '100%', objectFit: 'cover', borderRadius: 12 }}
+          />
+          {esVideo && (
+            <span
+              style={{
+                position: 'absolute',
+                top: 8,
+                right: 12,
+                background: 'rgba(0,0,0,0.55)',
+                color: '#fff',
+                borderRadius: 6,
+                padding: '2px 7px',
+                fontSize: 18,
+                zIndex: 2,
+              }}
+            >
+              <i className="bi bi-play-fill"></i>
+            </span>
+          )}
+        </Link>
         <div className={styles.postOverlay}>
           <div className={styles.postStat}>
             <i className="bi bi-heart-fill"></i>
-            <span>{post.likes || 0}</span>
+            <span>{Array.isArray(post.likes) ? post.likes.length : post.likes || 0}</span>
           </div>
           <div className={styles.postStat}>
             <i className="bi bi-chat-fill"></i>
-            <span>{post.comentarios || 0}</span>
+            <span>{Array.isArray(post.comentarios) ? post.comentarios.length : post.comentarios || 0}</span>
           </div>
         </div>
       </div>

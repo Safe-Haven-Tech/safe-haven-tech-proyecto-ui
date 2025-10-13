@@ -1,11 +1,9 @@
-// src/components/EditarPerfil/EditarPerfilForm.jsx
 import React, { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AvatarUploader from './AvatarUploader';
 import EliminarFotoLink from './DeletePhotoLink';
 import Alertas from './Alerts';
 import { useEditarPerfilValidation } from '../../../hooks/useEditProfileValidations';
-
 
 const EditarPerfilForm = React.memo(
   ({
@@ -135,6 +133,15 @@ const EditarPerfilForm = React.memo(
       },
       [isFieldValidating, isFieldValid, validatingNickname]
     );
+
+    // NUEVO: Permitir guardar si hay cambios en la imagen o se eliminó la foto
+    const hasImageChange =
+      state.previsualizacionImagen ||
+      state.fotoEliminada;
+
+    const canSave =
+      hasChanges() ||
+      hasImageChange;
 
     return (
       <div
@@ -356,7 +363,7 @@ const EditarPerfilForm = React.memo(
             state.cargando ||
             validatingNickname ||
             !isFormValid ||
-            !hasChanges()
+            !canSave
           }
           style={{
             borderRadius: '14px',
@@ -366,7 +373,7 @@ const EditarPerfilForm = React.memo(
               state.cargando ||
               validatingNickname ||
               !isFormValid ||
-              !hasChanges()
+              !canSave
                 ? 0.7
                 : 1,
           }}

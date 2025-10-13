@@ -49,7 +49,7 @@
 
 .userEvaluationsCard {
   background: white;
-  border: 2px solid #A17CCA;
+  border: 2px solid #a17cca;
   border-radius: 16px;
   padding: 1.5rem;
   max-width: 100%;
@@ -74,7 +74,7 @@
 }
 
 .cardTitle {
-  color: #5A4E7C;
+  color: #5a4e7c;
   font-weight: bold;
   margin-bottom: 0.5rem;
   font-size: 1.1rem;
@@ -107,7 +107,7 @@
   width: 100%;
   font-weight: 600;
   padding: 0.875rem 1rem;
-  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(90deg, #5a4e7c, #a17cca);
   border: none;
   border-radius: 12px;
   color: white;
@@ -149,7 +149,7 @@
   margin-bottom: 1.5rem;
   text-align: center;
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(90deg, #5a4e7c, #a17cca);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

@@ -3,7 +3,9 @@
   opacity: 0;
   transform: translateY(20px);
   animation: none;
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
 }
 
 .cardWrapper.animated {
@@ -19,7 +21,7 @@
   height: 100%;
   width: 100%;
   position: relative;
-  
+
   /* Estilos visuales */
   padding: 1.5rem;
   border-radius: 20px;
@@ -28,7 +30,7 @@
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
   overflow: hidden;
-  
+
   /* Background dinámico desde getBackgroundColor */
   background: white; /* Fallback */
 }
@@ -139,7 +141,7 @@
   cursor: help;
   align-self: flex-start;
   white-space: nowrap;
-  
+
   /* Colores desde getBadgeColor utility */
   background: #f8f9fa; /* Fallback */
   color: #495057; /* Fallback */
@@ -174,7 +176,7 @@
 .tipText {
   font-family: 'Poppins', sans-serif;
   font-style: italic;
-  color: #5A4E7C;
+  color: #5a4e7c;
   font-size: clamp(0.8rem, 1.5vw, 0.9rem);
   line-height: 1.5;
   margin: 0;
@@ -191,14 +193,14 @@
   font-weight: 600;
   margin-top: 1.5rem;
   padding: 0.875rem 1.25rem;
-  background: linear-gradient(135deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(135deg, #5a4e7c, #a17cca);
   border: none;
   border-radius: 15px;
   color: white;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  
+
   /* Layout */
   display: flex;
   align-items: center;
@@ -207,7 +209,7 @@
   width: 100%;
   position: relative;
   overflow: hidden;
-  
+
   /* Sombra inicial */
   box-shadow: 0 4px 15px rgba(90, 78, 124, 0.3);
 }
@@ -284,15 +286,33 @@
 }
 
 /* Animaciones escalonadas */
-.cardWrapper:nth-child(1) { animation-delay: 0.1s; }
-.cardWrapper:nth-child(2) { animation-delay: 0.2s; }
-.cardWrapper:nth-child(3) { animation-delay: 0.3s; }
-.cardWrapper:nth-child(4) { animation-delay: 0.4s; }
-.cardWrapper:nth-child(5) { animation-delay: 0.5s; }
-.cardWrapper:nth-child(6) { animation-delay: 0.6s; }
-.cardWrapper:nth-child(7) { animation-delay: 0.7s; }
-.cardWrapper:nth-child(8) { animation-delay: 0.8s; }
-.cardWrapper:nth-child(9) { animation-delay: 0.9s; }
+.cardWrapper:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.cardWrapper:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.cardWrapper:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.cardWrapper:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.cardWrapper:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.cardWrapper:nth-child(6) {
+  animation-delay: 0.6s;
+}
+.cardWrapper:nth-child(7) {
+  animation-delay: 0.7s;
+}
+.cardWrapper:nth-child(8) {
+  animation-delay: 0.8s;
+}
+.cardWrapper:nth-child(9) {
+  animation-delay: 0.9s;
+}
 
 /* Responsive específico */
 @media (max-width: 480px) {
@@ -300,18 +320,18 @@
     padding: 1.25rem;
     border-radius: 16px;
   }
-  
+
   .downloadButton {
     padding: 0.75rem 1rem;
     font-size: 0.85rem;
     margin-top: 1rem;
   }
-  
+
   .riskBadge {
     padding: 0.4rem 0.8rem;
     font-size: 0.75rem;
   }
-  
+
   .tipText {
     padding: 0.75rem;
     font-size: 0.8rem;
@@ -338,11 +358,11 @@
     animation: none;
     transition: none;
   }
-  
+
   .evaluationCard:hover {
     transform: translateY(-2px);
   }
-  
+
   .downloadButton::before {
     display: none;
   }
@@ -353,11 +373,11 @@
   .evaluationCard {
     border: 2px solid #333;
   }
-  
+
   .evaluationCard:hover {
-    border-color: #5A4E7C;
+    border-color: #5a4e7c;
   }
-  
+
   .downloadButton {
     border: 2px solid white;
   }

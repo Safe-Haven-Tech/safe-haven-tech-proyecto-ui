@@ -9,15 +9,15 @@ import ResourcesSection from '../../components/RecursosInformativos/Home/Resourc
 
 export default function InformationalResourcesHome() {
   const [selectedTopic, setSelectedTopic] = useState(null);
-  
-  const LoadingFallback = ({ text = "Cargando..." }) => (
+
+  const LoadingFallback = ({ text = 'Cargando...' }) => (
     <div className={styles.loadingContainer}>
       <div className={styles.loadingSpinner}></div>
       {text}
     </div>
   );
 
-  const ErrorFallback = ({ error, title = "Error al cargar" }) => (
+  const ErrorFallback = ({ error, title = 'Error al cargar' }) => (
     <div className={styles.errorContainer}>
       <div className={styles.errorTitle}>{title}</div>
       <div className={styles.errorMessage}>
@@ -25,15 +25,16 @@ export default function InformationalResourcesHome() {
       </div>
     </div>
   );
-  
+
   return (
     <div className={styles.resourcesHome}>
       {/* Espaciado para navbar */}
       <div className={styles.navbarSpacer}>
-        
         {/* Welcome Card */}
         <div className={styles.welcomeContainer}>
-          <Suspense fallback={<LoadingFallback text="Cargando bienvenida..." />}>
+          <Suspense
+            fallback={<LoadingFallback text="Cargando bienvenida..." />}
+          >
             <WelcomeCard
               title="¡Bienvenido a los recursos informativos!"
               subtitle="Accede a información confiable y recursos educativos para tu bienestar."
@@ -45,10 +46,11 @@ export default function InformationalResourcesHome() {
 
         {/* Contenedor principal */}
         <div className={`container ${styles.mainContainer}`}>
-          
           {/* Benefits Section - 🎯 YA SIN ${styles.section} */}
           <div className={styles.benefitsSection}>
-            <Suspense fallback={<LoadingFallback text="Cargando beneficios..." />}>
+            <Suspense
+              fallback={<LoadingFallback text="Cargando beneficios..." />}
+            >
               <BenefitsSection />
             </Suspense>
           </div>
@@ -59,7 +61,7 @@ export default function InformationalResourcesHome() {
           {/* Topics Filter - 🎯 REMOVIDO: ${styles.section} */}
           <div className={styles.topicsSection}>
             <Suspense fallback={<LoadingFallback text="Cargando filtros..." />}>
-              <TopicsFilter 
+              <TopicsFilter
                 onSelect={setSelectedTopic}
                 selectedTopic={selectedTopic}
               />
@@ -71,21 +73,20 @@ export default function InformationalResourcesHome() {
 
           {/* Sección de recursos */}
           <div className={styles.resourcesSection}>
-            <h3 className={styles.resourcesTitle}>
-              Recursos disponibles
-            </h3>
-            
+            <h3 className={styles.resourcesTitle}>Recursos disponibles</h3>
+
             {/* 🎯 MANTENER: ${styles.section} solo en ResourcesSection si quieres hover effect */}
             <div className={styles.section}>
-              <Suspense fallback={<LoadingFallback text="Cargando recursos..." />}>
-                <ResourcesSection 
+              <Suspense
+                fallback={<LoadingFallback text="Cargando recursos..." />}
+              >
+                <ResourcesSection
                   selectedTopic={selectedTopic}
                   onTopicChange={setSelectedTopic}
                 />
               </Suspense>
             </div>
           </div>
-          
         </div>
       </div>
     </div>

@@ -167,8 +167,12 @@ export default function SignInPage() {
       <div className={styles.overlay}></div>
 
       {/* Contenedor principal */}
-      <div className={`container-fluid position-relative p-0 h-100 ${styles.contentContainer}`}>
-        <div className={`row justify-content-between align-items-stretch h-100 g-0 ${styles.mainRow}`}>
+      <div
+        className={`container-fluid position-relative p-0 h-100 ${styles.contentContainer}`}
+      >
+        <div
+          className={`row justify-content-between align-items-stretch h-100 g-0 ${styles.mainRow}`}
+        >
           {/* Panel izquierdo */}
           <div className={`col-lg-6 ${styles.leftPanel}`}>
             <WelcomeSection />

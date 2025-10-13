@@ -42,7 +42,7 @@
   width: 2.5rem;
   height: 2.5rem;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #5A4E7C;
+  border-top: 4px solid #5a4e7c;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -56,8 +56,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loadingText {
@@ -98,7 +102,7 @@
 
 .backButton {
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(135deg, #5a4e7c, #a17cca);
   color: white;
   border: none;
   border-radius: 12px;
@@ -251,7 +255,7 @@
   border-radius: 12px;
   font-weight: 600;
   color: white;
-  background: linear-gradient(135deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(135deg, #5a4e7c, #a17cca);
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -337,18 +341,18 @@
     margin-top: 60px;
     padding: 0.75rem;
   }
-  
+
   .navigationButtons {
     flex-direction: column;
     gap: 0.75rem;
   }
-  
+
   .navButton {
     width: 100%;
     justify-content: center;
     padding: 0.75rem;
   }
-  
+
   .toastContainer {
     top: 0.5rem;
     right: 0.5rem;
@@ -366,12 +370,12 @@
     animation: none;
     transition: none;
   }
-  
+
   .navButton:hover,
   .exitButton:hover {
     transform: none;
   }
-  
+
   .navButton::before {
     display: none;
   }

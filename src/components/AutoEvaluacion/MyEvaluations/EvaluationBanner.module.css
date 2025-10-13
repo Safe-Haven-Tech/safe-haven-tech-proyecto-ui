@@ -1,6 +1,6 @@
 /* Banner principal */
 .evaluationBanner {
-  background: linear-gradient(135deg, #5A4E7C 0%, #7B68A8 50%, #A17CCA 100%);
+  background: linear-gradient(135deg, #5a4e7c 0%, #7b68a8 50%, #a17cca 100%);
   box-shadow: 0 6px 20px rgba(90, 78, 124, 0.25);
   border-radius: 1rem;
   padding: 1.5rem;
@@ -41,7 +41,11 @@
   right: -20%;
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
   animation: float 6s ease-in-out infinite;
 }
@@ -53,13 +57,18 @@
   left: -10%;
   width: 150px;
   height: 150px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 60%
+  );
   border-radius: 50%;
   animation: float 8s ease-in-out infinite reverse;
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
   50% {
@@ -74,7 +83,7 @@
     top: -40%;
     right: -15%;
   }
-  
+
   .evaluationBanner::after {
     width: 200px;
     height: 200px;
@@ -192,13 +201,13 @@
   .evaluationBanner::after {
     animation: none;
   }
-  
+
   .greeting,
   .evaluationInfo,
   .lastEvaluation {
     animation: none;
   }
-  
+
   .evaluationBanner:hover {
     transform: none;
   }

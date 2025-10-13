@@ -1,12 +1,20 @@
 /* Animaciones globales */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes slideInUp {
@@ -727,6 +735,7 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
+  pointer-events: none;
 }
 
 @media (min-width: 576px) {
@@ -765,11 +774,11 @@
     animation: none !important;
     transition: none !important;
   }
-  
+
   .postItem:hover {
     transform: none;
   }
-  
+
   .loadingSpinner {
     animation: none;
   }
@@ -780,19 +789,19 @@
   .profileContainer {
     background: #fff;
   }
-  
+
   .profileHeader {
     border-bottom: 2px solid #000;
   }
-  
+
   .nickname {
     color: #000;
   }
-  
+
   .actionButton {
     border: 2px solid #000;
   }
-  
+
   .postItem {
     border: 2px solid #000;
   }
@@ -826,5 +835,41 @@
 @media (min-width: 768px) {
   .wFullMdAuto {
     width: auto;
+  }
+}
+
+.fabCrearPost {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 200;
+  background: linear-gradient(90deg, #8e44ad 60%, #603c7e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  aspect-ratio: 1 / 1;
+  box-shadow: 0 4px 18px rgba(96,60,126,0.18);
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+  padding: 0;
+}
+.fabCrearPost:hover {
+  background: linear-gradient(90deg, #603c7e 60%, #8e44ad 100%);
+  box-shadow: 0 6px 28px rgba(96,60,126,0.28);
+  transform: scale(1.07);
+}
+@media (max-width: 700px) {
+  .fabCrearPost {
+    bottom: 18px;
+    right: 18px;
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
   }
 }

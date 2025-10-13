@@ -1,81 +1,89 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../../context/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { fetchEncuestas, crearEncuesta } from '../../services/surveysServices';
+import {
+  fetchEncuestas,
+  crearEncuesta,
+  desactivarEncuesta,
+  eliminarEncuesta,
+  activarEncuesta,
+  actualizarEncuesta,
+} from '../../services/surveysServices';
 import styles from './SurveysManagement.module.css';
 
-const ESCALA_OPCIONES = ["Nunca", "Raramente", "A veces", "Frecuentemente", "Siempre"];
-// SOLO usa los valores permitidos por el backend:
+const ESCALA_OPCIONES = [
+  'Nunca',
+  'Raramente',
+  'A veces',
+  'Frecuentemente',
+  'Siempre',
+];
 const validCategories = [
   { value: 'salud_mental', label: 'Salud mental' },
   { value: 'bienestar', label: 'Bienestar emocional' },
   { value: 'estres', label: 'Estrés' },
   { value: 'ansiedad', label: 'Ansiedad' },
   { value: 'depresion', label: 'Depresión' },
-  { value: 'otro', label: 'Otro' }
+  { value: 'otro', label: 'Otro' },
 ];
 
 const SurveysManagement = () => {
   const { usuario } = useAuth();
   const navigate = useNavigate();
 
-  // Estados principales
   const [encuestas, setEncuestas] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [paginacion, setPaginacion] = useState({});
-  
-  // Estados para filtros y búsqueda
   const [filtros, setFiltros] = useState({
     busqueda: '',
     categoria: '',
     activa: '',
-    pagina: 1
+    pagina: 1,
   });
-
-  // Estados para modales
   const [mostrarModal, setMostrarModal] = useState(false);
   const [encuestaEditando, setEncuestaEditando] = useState(null);
   const [modoModal, setModoModal] = useState('crear');
-
-  // Estados para formulario
   const [formulario, setFormulario] = useState({
     titulo: '',
     descripcion: '',
     categoria: validCategories[0].value,
     activa: true,
-    preguntas: []
+    preguntas: [],
   });
-
-  // Estados para estadísticas
   const [estadisticas, setEstadisticas] = useState({
     total: 0,
     porCategoria: {},
     activas: 0,
     inactivas: 0,
-    resumen: {}
+    resumen: {},
   });
-
-  // Estado para loading de estadísticas
   const [loadingEstadisticas, setLoadingEstadisticas] = useState(true);
-
-  // Estados para validación
   const [erroresValidacion, setErroresValidacion] = useState({});
-
-  // Solo para preguntas tipo escala
   const [nuevaPregunta, setNuevaPregunta] = useState({
     texto: '',
-    orden: 1
+    orden: 1,
   });
-
-  // Estado para controlar si ya se cargaron los datos iniciales
   const [datosInicializados, setDatosInicializados] = useState(false);
-
-  // Ref para evitar llamadas duplicadas
   const inicializandoRef = useRef(false);
   const estadisticasCargadasRef = useRef(false);
 
-  // Verificar autenticación y permisos
+  // Modal: animación, cerrar con Esc y enfocar primer campo
+  const tituloInputRef = useRef(null);
+  useEffect(() => {
+    if (mostrarModal && tituloInputRef.current) {
+      tituloInputRef.current.focus();
+    }
+  }, [mostrarModal]);
+  useEffect(() => {
+    if (!mostrarModal) return;
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') setMostrarModal(false);
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [mostrarModal]);
+
   useEffect(() => {
     if (!usuario) {
       navigate('/login');
@@ -87,62 +95,67 @@ const SurveysManagement = () => {
     }
   }, [usuario, navigate]);
 
-  // Función para cargar encuestas
-  const cargarEncuestas = useCallback(async (mostrarLoading = true) => {
-    try {
-      if (mostrarLoading) setLoading(true);
-      setError(null);
+  const cargarEncuestas = useCallback(
+    async (mostrarLoading = true) => {
+      try {
+        if (mostrarLoading) setLoading(true);
+        setError(null);
 
-      const params = new URLSearchParams();
-      if (filtros.busqueda) params.append('busqueda', filtros.busqueda);
-      if (filtros.categoria) params.append('categoria', filtros.categoria);
-      if (filtros.activa !== '') params.append('activa', filtros.activa);
-      params.append('pagina', filtros.pagina);
-      params.append('limite', 10);
+        const params = new URLSearchParams();
+        if (filtros.busqueda) params.append('busqueda', filtros.busqueda);
+        if (filtros.categoria) params.append('categoria', filtros.categoria);
+        if (filtros.activa !== '') params.append('activa', filtros.activa);
+        params.append('pagina', filtros.pagina);
+        params.append('limite', 10);
 
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/encuestas?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+        const token = localStorage.getItem('token');
+        const response = await fetch(
+          `http://localhost:3000/api/encuestas?${params}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (!response.ok) throw new Error('Error al cargar encuestas');
+
+        const data = await response.json();
+        let encuestasArray = [];
+        if (Array.isArray(data)) {
+          encuestasArray = data;
+        } else if (data.data && Array.isArray(data.data)) {
+          encuestasArray = data.data;
+        } else if (data.encuestas && Array.isArray(data.encuestas)) {
+          encuestasArray = data.encuestas;
+        } else {
+          encuestasArray = [];
         }
-      });
+        setEncuestas(encuestasArray);
 
-      if (!response.ok) throw new Error('Error al cargar encuestas');
-
-      const data = await response.json();
-      let encuestasArray = [];
-      if (Array.isArray(data)) {
-        encuestasArray = data;
-      } else if (data.data && Array.isArray(data.data)) {
-        encuestasArray = data.data;
-      } else if (data.encuestas && Array.isArray(data.encuestas)) {
-        encuestasArray = data.encuestas;
-      } else {
-        encuestasArray = [];
+        if (data.paginacion) {
+          setPaginacion(data.paginacion);
+        } else {
+          setPaginacion({
+            paginaActual: 1,
+            totalPaginas: 1,
+            total: encuestasArray.length,
+          });
+        }
+      } catch (error) {
+        setError(error.message);
+        setEncuestas([]);
+      } finally {
+        if (mostrarLoading) setLoading(false);
       }
-      setEncuestas(encuestasArray);
+    },
+    [filtros]
+  );
 
-      if (data.paginacion) {
-        setPaginacion(data.paginacion);
-      } else {
-        setPaginacion({
-          paginaActual: 1,
-          totalPaginas: 1,
-          total: encuestasArray.length
-        });
-      }
-    } catch (error) {
-      setError(error.message);
-      setEncuestas([]);
-    } finally {
-      if (mostrarLoading) setLoading(false);
-    }
-  }, [filtros]);
-
-  // Función para cargar estadísticas
   const cargarEstadisticas = useCallback(async () => {
-    if (estadisticasCargadasRef.current || loadingEstadisticas === false) return;
+    if (estadisticasCargadasRef.current || loadingEstadisticas === false)
+      return;
     estadisticasCargadasRef.current = true;
     setLoadingEstadisticas(true);
     try {
@@ -153,23 +166,25 @@ const SurveysManagement = () => {
         porCategoria: {},
         activas: 0,
         inactivas: 0,
-        resumen: {}
+        resumen: {},
       });
     } finally {
       setLoadingEstadisticas(false);
     }
   }, [loadingEstadisticas]);
 
-  // Función para calcular estadísticas manualmente
   const calcularEstadisticasManualmente = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/encuestas?limite=1000', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await fetch(
+        'http://localhost:3000/api/encuestas?limite=1000',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
         }
-      });
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -187,19 +202,29 @@ const SurveysManagement = () => {
         const estadisticasCalculadas = {
           total: todasLasEncuestas.length,
           porCategoria: {},
-          activas: todasLasEncuestas.filter(e => e.activa === true).length,
-          inactivas: todasLasEncuestas.filter(e => e.activa === false).length,
+          activas: todasLasEncuestas.filter((e) => e.activa === true).length,
+          inactivas: todasLasEncuestas.filter((e) => e.activa === false).length,
           resumen: {
-            totalPreguntas: todasLasEncuestas.reduce((sum, e) => sum + (e.preguntas?.length || 0), 0),
-            promedioPreguntas: todasLasEncuestas.length > 0 
-              ? Math.round(todasLasEncuestas.reduce((sum, e) => sum + (e.preguntas?.length || 0), 0) / todasLasEncuestas.length)
-              : 0
-          }
+            totalPreguntas: todasLasEncuestas.reduce(
+              (sum, e) => sum + (e.preguntas?.length || 0),
+              0
+            ),
+            promedioPreguntas:
+              todasLasEncuestas.length > 0
+                ? Math.round(
+                    todasLasEncuestas.reduce(
+                      (sum, e) => sum + (e.preguntas?.length || 0),
+                      0
+                    ) / todasLasEncuestas.length
+                  )
+                : 0,
+          },
         };
 
-        todasLasEncuestas.forEach(encuesta => {
+        todasLasEncuestas.forEach((encuesta) => {
           const categoria = encuesta.categoria || 'sin_categoria';
-          estadisticasCalculadas.porCategoria[categoria] = (estadisticasCalculadas.porCategoria[categoria] || 0) + 1;
+          estadisticasCalculadas.porCategoria[categoria] =
+            (estadisticasCalculadas.porCategoria[categoria] || 0) + 1;
         });
 
         setEstadisticas(estadisticasCalculadas);
@@ -212,36 +237,32 @@ const SurveysManagement = () => {
         porCategoria: {},
         activas: 0,
         inactivas: 0,
-        resumen: {}
+        resumen: {},
       });
     }
   };
 
-  // Cargar datos iniciales
   useEffect(() => {
-    if (usuario && 
-        (usuario.rol === 'administrador' || usuario.rol === 'profesional') && 
-        !datosInicializados && 
-        !inicializandoRef.current) {
+    if (
+      usuario &&
+      (usuario.rol === 'administrador' || usuario.rol === 'profesional') &&
+      !datosInicializados &&
+      !inicializandoRef.current
+    ) {
       inicializandoRef.current = true;
       setDatosInicializados(true);
-      Promise.all([
-        cargarEncuestas(true),
-        cargarEstadisticas()
-      ]).finally(() => {
+      Promise.all([cargarEncuestas(true), cargarEstadisticas()]).finally(() => {
         inicializandoRef.current = false;
       });
     }
   }, [usuario, datosInicializados, cargarEncuestas, cargarEstadisticas]);
 
-  // Cargar encuestas cuando cambien los filtros
   useEffect(() => {
     if (datosInicializados && !inicializandoRef.current) {
       cargarEncuestas(true);
     }
   }, [filtros, datosInicializados, cargarEncuestas]);
 
-  // Validación
   const validarFormulario = () => {
     const errores = {};
     if (!formulario.titulo?.trim()) {
@@ -250,7 +271,10 @@ const SurveysManagement = () => {
     if (!formulario.descripcion?.trim()) {
       errores.descripcion = 'La descripción es obligatoria';
     }
-    if (!formulario.categoria || !validCategories.map(c => c.value).includes(formulario.categoria)) {
+    if (
+      !formulario.categoria ||
+      !validCategories.map((c) => c.value).includes(formulario.categoria)
+    ) {
       errores.categoria = 'Debe seleccionar una categoría válida';
     }
     if (!formulario.preguntas || formulario.preguntas.length === 0) {
@@ -258,64 +282,71 @@ const SurveysManagement = () => {
     } else {
       formulario.preguntas.forEach((pregunta, index) => {
         if (!pregunta.enunciado?.trim()) {
-          errores[`pregunta_${index}`] = `La pregunta ${index + 1} no puede estar vacía`;
+          errores[`pregunta_${index}`] =
+            `La pregunta ${index + 1} no puede estar vacía`;
         }
       });
     }
     return errores;
   };
 
-  // Filtros
   const manejarCambioFiltro = (campo, valor) => {
-    setFiltros(prev => ({
+    setFiltros((prev) => ({
       ...prev,
       [campo]: valor,
-      pagina: 1
+      pagina: 1,
     }));
   };
 
-  // Formulario
   const manejarCambioFormulario = (campo, valor) => {
-    setFormulario(prev => ({
+    setFormulario((prev) => ({
       ...prev,
-      [campo]: valor
+      [campo]: valor,
     }));
     if (erroresValidacion[campo]) {
-      setErroresValidacion(prev => ({
+      setErroresValidacion((prev) => ({
         ...prev,
-        [campo]: null
+        [campo]: null,
       }));
     }
   };
 
-  // Preguntas tipo escala
   const agregarPregunta = () => {
     const nuevaP = {
       enunciado: nuevaPregunta.texto.trim(),
       tipo: 'escala',
       opciones: ESCALA_OPCIONES,
       orden: formulario.preguntas.length + 1,
-      obligatoria: true
+      obligatoria: true,
     };
-    setFormulario(prev => ({
+    setFormulario((prev) => ({
       ...prev,
-      preguntas: [...prev.preguntas, nuevaP]
+      preguntas: [...prev.preguntas, nuevaP],
     }));
     setNuevaPregunta({
       texto: '',
-      orden: formulario.preguntas.length + 2
+      orden: formulario.preguntas.length + 2,
     });
   };
 
   const eliminarPregunta = (index) => {
-    setFormulario(prev => ({
+    setFormulario((prev) => ({
       ...prev,
-      preguntas: prev.preguntas.filter((_, i) => i !== index)
-        .map((p, i) => ({ ...p, orden: i + 1 }))
+      preguntas: prev.preguntas
+        .filter((_, i) => i !== index)
+        .map((p, i) => ({ ...p, orden: i + 1 })),
     }));
   };
 
-  // Modal crear
+  const editarPregunta = (index, nuevoTexto) => {
+    setFormulario((prev) => ({
+      ...prev,
+      preguntas: prev.preguntas.map((p, i) =>
+        i === index ? { ...p, enunciado: nuevoTexto } : p
+      ),
+    }));
+  };
+
   const abrirModalCrear = () => {
     setModoModal('crear');
     setEncuestaEditando(null);
@@ -324,56 +355,122 @@ const SurveysManagement = () => {
       descripcion: '',
       categoria: validCategories[0].value,
       activa: true,
-      preguntas: []
+      preguntas: [],
     });
     setErroresValidacion({});
     setNuevaPregunta({
       texto: '',
-      orden: 1
+      orden: 1,
     });
     setMostrarModal(true);
   };
 
-  // Guardar encuesta (solo creación con preguntas tipo escala)
+  const abrirModalEditar = (encuesta) => {
+    setModoModal('editar');
+    setEncuestaEditando(encuesta);
+    setFormulario({
+      titulo: encuesta.titulo,
+      descripcion: encuesta.descripcion,
+      categoria: encuesta.categoria,
+      activa: encuesta.activa,
+      preguntas: encuesta.preguntas || [],
+    });
+    setErroresValidacion({});
+    setNuevaPregunta({
+      texto: '',
+      orden: (encuesta.preguntas?.length || 0) + 1,
+    });
+    setMostrarModal(true);
+  };
+
   const guardarEncuesta = async () => {
     try {
       const errores = validarFormulario();
       if (Object.keys(errores).length > 0) {
         setErroresValidacion(errores);
-        alert('Por favor corrija los errores en el formulario');
         return;
       }
+      setLoading(true);
       const token = localStorage.getItem('token');
       const preguntasLimpias = formulario.preguntas.map((p, idx) => ({
         enunciado: p.enunciado,
         tipo: 'escala',
         opciones: ESCALA_OPCIONES,
         orden: idx + 1,
-        obligatoria: true
+        obligatoria: true,
       }));
       const datosLimpios = {
         titulo: formulario.titulo.trim(),
         descripcion: formulario.descripcion.trim(),
         categoria: formulario.categoria,
         activa: Boolean(formulario.activa),
-        preguntas: preguntasLimpias
+        preguntas: preguntasLimpias,
       };
       if (modoModal === 'crear') {
         await crearEncuesta(datosLimpios, token);
-        alert('Encuesta creada exitosamente');
+      } else if (modoModal === 'editar' && encuestaEditando) {
+        await actualizarEncuesta(encuestaEditando._id, datosLimpios, token);
       }
       setMostrarModal(false);
       estadisticasCargadasRef.current = false;
-      await Promise.all([
-        cargarEncuestas(false),
-        cargarEstadisticas()
-      ]);
+      await Promise.all([cargarEncuestas(false), cargarEstadisticas()]);
     } catch (error) {
-      alert(error.message || 'Error al guardar la encuesta');
+      setError(error.message || 'Error al guardar la encuesta');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!usuario || (usuario.rol !== 'administrador' && usuario.rol !== 'profesional')) {
+  const handleDesactivarEncuesta = async (encuestaId) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    setLoading(true);
+    const res = await desactivarEncuesta(encuestaId, token);
+    if (res.success) {
+      await cargarEncuestas(false);
+      estadisticasCargadasRef.current = false;
+      await cargarEstadisticas();
+    } else {
+      setError(res.mensaje || 'No se pudo desactivar la encuesta');
+    }
+    setLoading(false);
+  };
+
+  const handleActivarEncuesta = async (encuestaId) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    setLoading(true);
+    const res = await activarEncuesta(encuestaId, token);
+    if (res.success) {
+      await cargarEncuestas(false);
+      estadisticasCargadasRef.current = false;
+      await cargarEstadisticas();
+    } else {
+      setError(res.mensaje || 'No se pudo activar la encuesta');
+    }
+    setLoading(false);
+  };
+
+  const handleEliminarEncuesta = async (encuestaId) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    if (!window.confirm('¿Seguro que deseas eliminar esta encuesta?')) return;
+    setLoading(true);
+    const res = await eliminarEncuesta(encuestaId, token);
+    if (res.success) {
+      await cargarEncuestas(false);
+      estadisticasCargadasRef.current = false;
+      await cargarEstadisticas();
+    } else {
+      setError(res.mensaje || 'No se pudo eliminar la encuesta');
+    }
+    setLoading(false);
+  };
+
+  if (
+    !usuario ||
+    (usuario.rol !== 'administrador' && usuario.rol !== 'profesional')
+  ) {
     return null;
   }
 
@@ -383,9 +480,9 @@ const SurveysManagement = () => {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.headerLeft}>
-            <button 
+            <button
               className={styles.backButton}
-              onClick={() => navigate('/admin')}
+              onClick={() => navigate('/admin/panel')}
             >
               ← Volver al Panel
             </button>
@@ -394,10 +491,7 @@ const SurveysManagement = () => {
               <p>Administra las encuestas de evaluación psicológica</p>
             </div>
           </div>
-          <button 
-            className={styles.createButton}
-            onClick={abrirModalCrear}
-          >
+          <button className={styles.createButton} onClick={abrirModalCrear}>
             + Crear Encuesta
           </button>
         </div>
@@ -434,7 +528,9 @@ const SurveysManagement = () => {
             <div key={value} className={styles.statCard}>
               <div className={styles.statContent}>
                 <div className={styles.statNumber}>
-                  {loadingEstadisticas ? '...' : (estadisticas.porCategoria?.[value] || 0)}
+                  {loadingEstadisticas
+                    ? '...'
+                    : estadisticas.porCategoria?.[value] || 0}
                 </div>
                 <div className={styles.statLabel}>{label}</div>
               </div>
@@ -462,7 +558,9 @@ const SurveysManagement = () => {
           >
             <option value="">Todas las categorías</option>
             {validCategories.map(({ value, label }) => (
-              <option key={value} value={value}>{label}</option>
+              <option key={value} value={value}>
+                {label}
+              </option>
             ))}
           </select>
           <select
@@ -494,44 +592,68 @@ const SurveysManagement = () => {
                 <div key={encuesta._id} className={styles.surveyCard}>
                   <div className={styles.surveyHeader}>
                     <span className={styles.surveyCategory}>
-                      {validCategories.find(c => c.value === encuesta.categoria)?.label || encuesta.categoria}
+                      {validCategories.find(
+                        (c) => c.value === encuesta.categoria
+                      )?.label || encuesta.categoria}
                     </span>
-                    <span className={`${styles.statusBadge} ${encuesta.activa ? styles.active : styles.inactive}`}>
+                    <span
+                      className={`${styles.statusBadge} ${encuesta.activa ? styles.active : styles.inactive}`}
+                    >
                       {encuesta.activa ? 'Activa' : 'Inactiva'}
                     </span>
                   </div>
                   <div className={styles.surveyContent}>
                     <h3 className={styles.surveyTitle}>{encuesta.titulo}</h3>
-                    <p className={styles.surveyDescription}>{encuesta.descripcion}</p>
+                    <p className={styles.surveyDescription}>
+                      {encuesta.descripcion}
+                    </p>
                     <div className={styles.surveyMeta}>
                       <div className={styles.surveyStats}>
-                        <span> {encuesta.preguntas?.length || 0} preguntas</span>
+                        <span>
+                          {' '}
+                          {encuesta.preguntas?.length || 0} preguntas
+                        </span>
                         <span> {encuesta.totalRespuestas || 0} respuestas</span>
-                        <span> {new Date(encuesta.fechaCreacion).toLocaleDateString()}</span>
+                        <span>
+                          {' '}
+                          {new Date(
+                            encuesta.fechaCreacion
+                          ).toLocaleDateString()}
+                        </span>
                       </div>
                     </div>
                   </div>
                   <div className={styles.surveyActions}>
                     <button
                       className={styles.editButton}
-                      // onClick={() => abrirModalEditar(encuesta)}
-                      disabled
+                      onClick={() => abrirModalEditar(encuesta)}
+                      disabled={loading}
                     >
-                      Editar
+                      {loading ? 'Cargando...' : 'Editar'}
                     </button>
                     <button
                       className={`${styles.toggleButton} ${encuesta.activa ? styles.deactivate : styles.activate}`}
-                      // onClick={() => alternarEstadoActivo(encuesta)}
-                      disabled
+                      onClick={() =>
+                        encuesta.activa
+                          ? handleDesactivarEncuesta(encuesta._id)
+                          : handleActivarEncuesta(encuesta._id)
+                      }
+                      disabled={loading}
                     >
-                      {encuesta.activa ? 'Desactivar' : 'Activar'}
+                      {loading
+                        ? encuesta.activa
+                          ? 'Desactivando...'
+                          : 'Activando...'
+                        : encuesta.activa
+                          ? 'Desactivar'
+                          : 'Activar'}
                     </button>
                     <button
                       className={styles.deleteButton}
-                      // onClick={() => eliminarEncuesta(encuesta._id)}
-                      disabled
+                      onClick={() => handleEliminarEncuesta(encuesta._id)}
+                      disabled={loading}
                     >
-                      Eliminar
+                      {loading ? 'Eliminando...' : 'Eliminar'}
                     </button>
                   </div>
                 </div>
@@ -541,8 +663,10 @@ const SurveysManagement = () => {
               <div className={styles.pagination}>
                 <button
                   className={styles.paginationButton}
-                  disabled={filtros.pagina <= 1}
-                  onClick={() => manejarCambioFiltro('pagina', filtros.pagina - 1)}
+                  disabled={filtros.pagina <= 1 || loading}
+                  onClick={() =>
+                    manejarCambioFiltro('pagina', filtros.pagina - 1)
+                  }
                 >
                   ← Anterior
                 </button>
@@ -551,8 +675,12 @@ const SurveysManagement = () => {
                 </span>
                 <button
                   className={styles.paginationButton}
-                  disabled={filtros.pagina >= paginacion.totalPaginas}
-                  onClick={() => manejarCambioFiltro('pagina', filtros.pagina + 1)}
+                  disabled={
+                    filtros.pagina >= paginacion.totalPaginas || loading
+                  }
+                  onClick={() =>
+                    manejarCambioFiltro('pagina', filtros.pagina + 1)
+                  }
                 >
                   Siguiente →
                 </button>
@@ -564,10 +692,20 @@ const SurveysManagement = () => {
 
       {/* Modal */}
       {mostrarModal && (
-        <div className={styles.modalOverlay} onClick={() => setMostrarModal(false)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setMostrarModal(false)}
+        >
+          <div
+            className={`${styles.modal} ${styles.modalSlideIn}`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className={styles.modalHeader}>
-              <h2>{modoModal === 'crear' ? 'Crear Nueva Encuesta' : 'Editar Encuesta'}</h2>
+              <h2>
+                {modoModal === 'crear'
+                  ? 'Crear Nueva Encuesta'
+                  : 'Editar Encuesta'}
+              </h2>
               <button
                 className={styles.closeButton}
                 onClick={() => setMostrarModal(false)}
@@ -586,14 +724,19 @@ const SurveysManagement = () => {
                         Título <span className={styles.required}>*</span>
                       </label>
                       <input
+                        ref={tituloInputRef}
                         type="text"
                         className={`${styles.input} ${erroresValidacion.titulo ? styles.inputError : ''}`}
                         value={formulario.titulo}
-                        onChange={(e) => manejarCambioFormulario('titulo', e.target.value)}
+                        onChange={(e) =>
+                          manejarCambioFormulario('titulo', e.target.value)
+                        }
                         placeholder="Título de la encuesta"
                       />
                       {erroresValidacion.titulo && (
-                        <span className={styles.errorMessage}>{erroresValidacion.titulo}</span>
+                        <span className={styles.errorMessage}>
+                          {erroresValidacion.titulo}
+                        </span>
                       )}
                     </div>
                     <div className={styles.formGroup}>
@@ -603,14 +746,20 @@ const SurveysManagement = () => {
                       <select
                         className={`${styles.select} ${erroresValidacion.categoria ? styles.inputError : ''}`}
                         value={formulario.categoria}
-                        onChange={(e) => manejarCambioFormulario('categoria', e.target.value)}
+                        onChange={(e) =>
+                          manejarCambioFormulario('categoria', e.target.value)
+                        }
                       >
                         {validCategories.map(({ value, label }) => (
-                          <option key={value} value={value}>{label}</option>
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
                         ))}
                       </select>
                       {erroresValidacion.categoria && (
-                        <span className={styles.errorMessage}>{erroresValidacion.categoria}</span>
+                        <span className={styles.errorMessage}>
+                          {erroresValidacion.categoria}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -621,11 +770,15 @@ const SurveysManagement = () => {
                     <textarea
                       className={`${styles.textarea} ${erroresValidacion.descripcion ? styles.inputError : ''}`}
                       value={formulario.descripcion}
-                      onChange={(e) => manejarCambioFormulario('descripcion', e.target.value)}
+                      onChange={(e) =>
+                        manejarCambioFormulario('descripcion', e.target.value)
+                      }
                       placeholder="Descripción de la encuesta"
                     />
                     {erroresValidacion.descripcion && (
-                      <span className={styles.errorMessage}>{erroresValidacion.descripcion}</span>
+                      <span className={styles.errorMessage}>
+                        {erroresValidacion.descripcion}
+                      </span>
                     )}
                   </div>
                   <div className={styles.formGroup}>
@@ -634,7 +787,9 @@ const SurveysManagement = () => {
                         type="checkbox"
                         className={styles.checkbox}
                         checked={formulario.activa}
-                        onChange={(e) => manejarCambioFormulario('activa', e.target.checked)}
+                        onChange={(e) =>
+                          manejarCambioFormulario('activa', e.target.checked)
+                        }
                       />
                       <label className={styles.checkboxLabel}>
                         Encuesta activa
@@ -647,14 +802,19 @@ const SurveysManagement = () => {
                   <h3 className={styles.sectionTitle}>
                     Preguntas ({formulario.preguntas.length})
                     {erroresValidacion.preguntas && (
-                      <span className={styles.errorMessage}> - {erroresValidacion.preguntas}</span>
+                      <span className={styles.errorMessage}>
+                        {' '}
+                        - {erroresValidacion.preguntas}
+                      </span>
                     )}
                   </h3>
                   <div className={styles.questionsList}>
                     {formulario.preguntas.map((pregunta, index) => (
                       <div key={index} className={styles.questionCard}>
                         <div className={styles.questionHeader}>
-                          <span className={styles.questionNumber}>Pregunta {index + 1}</span>
+                          <span className={styles.questionNumber}>
+                            Pregunta {index + 1}
+                          </span>
                           <button
                             type="button"
                             className={styles.deleteQuestionButton}
@@ -664,7 +824,20 @@ const SurveysManagement = () => {
                           </button>
                         </div>
                         <div className={styles.questionContent}>
-                          <p className={styles.questionText}>{pregunta.enunciado}</p>
+                          <input
+                            type="text"
+                            className={`${styles.input} ${erroresValidacion[`pregunta_${index}`] ? styles.inputError : ''}`}
+                            value={pregunta.enunciado}
+                            onChange={(e) =>
+                              editarPregunta(index, e.target.value)
+                            }
+                            placeholder="Editar enunciado de la pregunta"
+                          />
+                          {erroresValidacion[`pregunta_${index}`] && (
+                            <span className={styles.errorMessage}>
+                              {erroresValidacion[`pregunta_${index}`]}
+                            </span>
+                          )}
                           <div className={styles.questionMeta}>
                             <span className={styles.questionType}>escala</span>
                             <span className={styles.questionOptions}>
@@ -681,14 +854,23 @@ const SurveysManagement = () => {
                 </div>
                 {/* Nueva pregunta */}
                 <div className={styles.formSection}>
-                  <h3 className={styles.sectionTitle}>Agregar Nueva Pregunta</h3>
+                  <h3 className={styles.sectionTitle}>
+                    Agregar Nueva Pregunta
+                  </h3>
                   <div className={styles.formGroup}>
-                    <label className={styles.label}>Enunciado de la pregunta</label>
+                    <label className={styles.label}>
+                      Enunciado de la pregunta
+                    </label>
                     <input
                       type="text"
                       className={styles.input}
                       value={nuevaPregunta.texto}
-                      onChange={(e) => setNuevaPregunta(prev => ({ ...prev, texto: e.target.value }))}
+                      onChange={(e) =>
+                        setNuevaPregunta((prev) => ({
+                          ...prev,
+                          texto: e.target.value,
+                        }))
+                      }
                       placeholder="Escriba el enunciado"
                     />
                   </div>
@@ -696,12 +878,19 @@ const SurveysManagement = () => {
                     type="button"
                     className={styles.addQuestionButton}
                     onClick={agregarPregunta}
-                    disabled={!nuevaPregunta.texto.trim()}
+                    disabled={!nuevaPregunta.texto.trim() || loading}
                   >
                     ➕ Agregar Pregunta
                   </button>
-                  <div style={{marginTop: 10, fontSize: '0.95em', color: '#5a6c6d'}}>
-                    Todas las preguntas serán tipo <b>escala</b> con opciones: {ESCALA_OPCIONES.join(', ')}
+                  <div
+                    style={{
+                      marginTop: 10,
+                      fontSize: '0.95em',
+                      color: '#5a6c6d',
+                    }}
+                  >
+                    Todas las preguntas serán tipo <b>escala</b> con opciones:{' '}
+                    {ESCALA_OPCIONES.join(', ')}
                   </div>
                 </div>
               </form>
@@ -710,15 +899,20 @@ const SurveysManagement = () => {
               <button
                 className={styles.cancelButton}
                 onClick={() => setMostrarModal(false)}
+                disabled={loading}
               >
                 Cancelar
               </button>
               <button
                 className={styles.saveButton}
                 onClick={guardarEncuesta}
-                disabled={Object.keys(erroresValidacion).length > 0}
+                disabled={Object.keys(erroresValidacion).length > 0 || loading}
               >
-                {modoModal === 'crear' ? 'Crear Encuesta' : 'Actualizar Encuesta'}
+                {loading
+                  ? 'Guardando...'
+                  : modoModal === 'crear'
+                    ? 'Crear Encuesta'
+                    : 'Actualizar Encuesta'}
               </button>
             </div>
           </div>

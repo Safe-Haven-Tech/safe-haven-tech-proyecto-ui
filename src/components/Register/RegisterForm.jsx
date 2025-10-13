@@ -41,13 +41,13 @@ const RegisterForm = React.memo(
 
     const getInputClasses = (fieldName) => {
       let classes = styles.formInput;
-      
+
       if (fieldValidation[fieldName] === 'valid') {
         classes += ` ${styles.inputValid}`;
       } else if (fieldValidation[fieldName] === 'invalid') {
         classes += ` ${styles.inputInvalid}`;
       }
-      
+
       return classes;
     };
 
@@ -75,7 +75,9 @@ const RegisterForm = React.memo(
         );
       if (!validatingNickname && nicknameAvailable)
         return (
-          <div className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}>
+          <div
+            className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}
+          >
             Nickname disponible ✅
           </div>
         );
@@ -112,7 +114,9 @@ const RegisterForm = React.memo(
           feedback: () => {
             if (validationErrors.email) {
               return (
-                <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+                <div
+                  className={`${styles.feedbackMessage} ${styles.feedbackError}`}
+                >
                   {validationErrors.email}
                 </div>
               );
@@ -120,12 +124,16 @@ const RegisterForm = React.memo(
             if (!formData.email) return null;
             if (!validateEmail(formData.email))
               return (
-                <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+                <div
+                  className={`${styles.feedbackMessage} ${styles.feedbackError}`}
+                >
                   Email inválido
                 </div>
               );
             return (
-              <div className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}>
+              <div
+                className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}
+              >
                 Correo válido ✅
               </div>
             );
@@ -142,19 +150,26 @@ const RegisterForm = React.memo(
           feedback: () => {
             if (validationErrors.password) {
               return (
-                <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+                <div
+                  className={`${styles.feedbackMessage} ${styles.feedbackError}`}
+                >
                   {validationErrors.password}
                 </div>
               );
             }
             if (!formData.password) return null;
             return fieldValidation.password === 'valid' ? (
-              <div className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}>
+              <div
+                className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}
+              >
                 Contraseña válida ✅
               </div>
             ) : (
-              <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
-                La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número
+              <div
+                className={`${styles.feedbackMessage} ${styles.feedbackError}`}
+              >
+                La contraseña debe tener al menos 8 caracteres, una mayúscula,
+                una minúscula y un número
               </div>
             );
           },
@@ -171,18 +186,24 @@ const RegisterForm = React.memo(
           feedback: () => {
             if (validationErrors.confirmPassword) {
               return (
-                <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+                <div
+                  className={`${styles.feedbackMessage} ${styles.feedbackError}`}
+                >
                   {validationErrors.confirmPassword}
                 </div>
               );
             }
             if (!formData.confirmPassword) return null;
             return fieldValidation.confirmPassword === 'valid' ? (
-              <div className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}>
+              <div
+                className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}
+              >
                 Las contraseñas coinciden ✅
               </div>
             ) : (
-              <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+              <div
+                className={`${styles.feedbackMessage} ${styles.feedbackError}`}
+              >
                 Las contraseñas no coinciden
               </div>
             );
@@ -197,7 +218,9 @@ const RegisterForm = React.memo(
           placeholder: 'Selecciona tu fecha de nacimiento',
           feedback: () =>
             validationErrors.fechaNacimiento && (
-              <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+              <div
+                className={`${styles.feedbackMessage} ${styles.feedbackError}`}
+              >
                 {validationErrors.fechaNacimiento}
               </div>
             ),
@@ -217,14 +240,8 @@ const RegisterForm = React.memo(
       <div className={styles.registerFormContainer}>
         {/* Header */}
         <div className={styles.formHeader}>
-          <img
-            src={Logo}
-            alt="SafeHaven Logo"
-            className={styles.logo}
-          />
-          <h2 className={styles.formTitle}>
-            Crear Cuenta
-          </h2>
+          <img src={Logo} alt="SafeHaven Logo" className={styles.logo} />
+          <h2 className={styles.formTitle}>Crear Cuenta</h2>
           <p className={styles.formSubtitle}>
             Únete a nuestra comunidad de apoyo
           </p>
@@ -252,10 +269,7 @@ const RegisterForm = React.memo(
 
           {inputs.map((input) => (
             <div className={styles.inputGroup} key={input.name}>
-              <label
-                htmlFor={input.name}
-                className={styles.inputLabel}
-              >
+              <label htmlFor={input.name} className={styles.inputLabel}>
                 <i className={`fas fa-${input.icon} ${styles.inputIcon}`}></i>
                 {input.label}
               </label>
@@ -298,14 +312,22 @@ const RegisterForm = React.memo(
                     disabled={loading}
                     required
                     placeholder={input.placeholder}
-                    maxLength={input.name === 'email' ? 254 : input.name.includes('password') ? 128 : 50}
+                    maxLength={
+                      input.name === 'email'
+                        ? 254
+                        : input.name.includes('password')
+                          ? 128
+                          : 50
+                    }
                     aria-describedby={`${input.name}-feedback`}
                   />
 
                   {/* Tick de validación */}
                   {input.showTick &&
                     fieldValidation[input.name] === 'valid' && (
-                      <i className={`fas fa-check ${styles.validationTick}`}></i>
+                      <i
+                        className={`fas fa-check ${styles.validationTick}`}
+                      ></i>
                     )}
 
                   {/* Botón toggle */}
@@ -314,7 +336,11 @@ const RegisterForm = React.memo(
                       type="button"
                       className={styles.passwordToggle}
                       onClick={input.toggleShow}
-                      aria-label={input.type === 'text' ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                      aria-label={
+                        input.type === 'text'
+                          ? 'Ocultar contraseña'
+                          : 'Mostrar contraseña'
+                      }
                     >
                       <i
                         className={`fas fa-${input.type === 'text' ? 'eye-slash' : 'eye'}`}
@@ -325,7 +351,11 @@ const RegisterForm = React.memo(
               )}
 
               {/* Feedback */}
-              <div id={`${input.name}-feedback`} role="region" aria-live="polite">
+              <div
+                id={`${input.name}-feedback`}
+                role="region"
+                aria-live="polite"
+              >
                 {input.feedback()}
               </div>
             </div>
@@ -358,9 +388,7 @@ const RegisterForm = React.memo(
             disabled={loading || !isFormValid}
             aria-describedby="submit-status"
           >
-            <span>
-              {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
-            </span>
+            <span>{loading ? 'Creando cuenta...' : 'Crear Cuenta'}</span>
           </button>
         </form>
 
@@ -368,10 +396,7 @@ const RegisterForm = React.memo(
         <div className={styles.formFooter}>
           <p className={styles.footerText}>
             ¿Ya tienes una cuenta?{' '}
-            <a
-              href="/Login"
-              className={styles.footerLink}
-            >
+            <a href="/Login" className={styles.footerLink}>
               Inicia sesión aquí
             </a>
           </p>

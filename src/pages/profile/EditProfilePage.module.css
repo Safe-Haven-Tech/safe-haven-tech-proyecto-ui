@@ -149,7 +149,7 @@
     /* Asegurar que no haya scroll horizontal */
     overflow-x: hidden;
   }
-  
+
   /* Reducir aún más el gap en pantallas muy pequeñas */
   @media (max-width: 375px) {
     .editProfileContainer {
@@ -192,11 +192,11 @@
     padding-top: 70px;
     gap: 12px;
   }
-  
+
   .skeletonContainer {
     padding: 15px 8px;
   }
-  
+
   :global(.modal-content) {
     margin: 8px;
     border-radius: 10px;
@@ -242,7 +242,7 @@
     /* Reducir efectos pesados en móvil */
     backdrop-filter: blur(2px);
   }
-  
+
   :global(.modal-content) {
     /* Animación más sutil en móvil */
     transition: transform 0.2s ease-out;

@@ -7,14 +7,17 @@ const EvaluationBanner = ({ usuario, respuestas }) => (
       <h4 className={styles.greeting}>
         ¡Hola, {usuario?.nombreUsuario || 'usuario'}!
       </h4>
-      
+
       <p className={styles.evaluationInfo}>
-        Has completado <span className={styles.boldText}>{respuestas.length}</span> autoevaluación(es).
+        Has completado{' '}
+        <span className={styles.boldText}>{respuestas.length}</span>{' '}
+        autoevaluación(es).
       </p>
-      
+
       {respuestas[0] && (
         <p className={styles.lastEvaluation}>
-          Última evaluación: <span className={styles.boldText}>
+          Última evaluación:{' '}
+          <span className={styles.boldText}>
             {respuestas[0].encuestaId?.titulo}
           </span>
         </p>

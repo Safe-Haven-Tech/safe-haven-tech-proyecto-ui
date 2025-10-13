@@ -69,7 +69,9 @@
   z-index: 2;
   max-width: 500px;
   width: 100%;
-  max-height: calc(100vh - 2rem); /* 🎯 NUEVO: Limita altura considerando padding */
+  max-height: calc(
+    100vh - 2rem
+  ); /* 🎯 NUEVO: Limita altura considerando padding */
   animation: slideInUp 0.6s ease-out;
 }
 
@@ -152,8 +154,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Error state */
@@ -185,12 +191,12 @@
     max-height: 100vh; /* 🎯 ASEGURADO: Sin scroll */
     overflow: hidden;
   }
-  
+
   .contentContainer {
     max-width: 100%;
     max-height: calc(100vh - 1rem); /* 🎯 NUEVO: Ajustado para padding mínimo */
   }
-  
+
   .formWrapper {
     border-radius: 16px;
   }
@@ -202,11 +208,11 @@
     padding: 0.5rem;
     align-items: center;
   }
-  
+
   .contentContainer {
     max-height: calc(100vh - 1rem);
   }
-  
+
   .formWrapper {
     border-radius: 16px;
   }
@@ -220,7 +226,7 @@
     max-height: 100vh;
     overflow: hidden;
   }
-  
+
   .contentContainer {
     max-height: calc(100vh - 1rem);
   }
@@ -231,11 +237,11 @@
   .registerContainer {
     padding: 0.25rem;
   }
-  
+
   .contentContainer {
     max-height: calc(100vh - 0.5rem);
   }
-  
+
   .formWrapper {
     border-radius: 12px;
   }
@@ -246,7 +252,7 @@
   .registerContainer {
     padding: 3rem; /* 🎯 REDUCIDO: De 4rem a 3rem */
   }
-  
+
   .contentContainer {
     max-width: 600px;
     max-height: calc(100vh - 6rem); /* 🎯 NUEVO: Ajustado */
@@ -258,11 +264,11 @@
   .contentContainer {
     animation: none;
   }
-  
+
   .formWrapper:hover {
     transform: none;
   }
-  
+
   .loadingSpinner {
     animation: none;
     border-top-color: white;
@@ -276,11 +282,11 @@
     border: 2px solid #000;
     backdrop-filter: none;
   }
-  
+
   .overlay {
     background: rgba(0, 0, 0, 0.7);
   }
-  
+
   .loadingFallback {
     color: #fff;
     background: rgba(0, 0, 0, 0.8);
@@ -303,15 +309,15 @@
     padding: 1rem !important;
     overflow: visible !important; /* 🎯 NUEVO: Visible en print */
   }
-  
+
   .overlay {
     display: none;
   }
-  
+
   .contentContainer {
     max-height: none; /* 🎯 NUEVO: Sin límite en print */
   }
-  
+
   .formWrapper {
     box-shadow: none;
     border: 1px solid #000;

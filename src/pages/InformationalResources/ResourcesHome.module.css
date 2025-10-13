@@ -148,7 +148,7 @@
   margin-bottom: 2rem;
   text-align: center;
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(90deg, #5a4e7c, #a17cca);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -180,7 +180,7 @@
   transform: translateX(-50%);
   width: 60px;
   height: 4px;
-  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
+  background: linear-gradient(90deg, #5a4e7c, #a17cca);
   border-radius: 2px;
   animation: expandLine 0.6s ease-out 1.2s both;
 }
@@ -198,7 +198,7 @@
   .resourcesTitle::after {
     width: 80px;
   }
-  
+
   @keyframes expandLine {
     100% {
       width: 80px;
@@ -210,12 +210,12 @@
   .resourcesTitle {
     margin-bottom: 2.5rem;
   }
-  
+
   .resourcesTitle::after {
     width: 100px;
     bottom: -12px;
   }
-  
+
   @keyframes expandLine {
     100% {
       width: 100px;
@@ -269,7 +269,7 @@
   justify-content: center;
   align-items: center;
   min-height: 200px;
-  color: #5A4E7C;
+  color: #5a4e7c;
   font-size: clamp(1rem, 2vw, 1.2rem);
 }
 
@@ -277,15 +277,19 @@
   width: 2rem;
   height: 2rem;
   border: 3px solid rgba(90, 78, 124, 0.2);
-  border-top: 3px solid #5A4E7C;
+  border-top: 3px solid #5a4e7c;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-right: 1rem;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Error states */
@@ -344,14 +348,14 @@
     animation: none !important;
     transition: none !important;
   }
-  
+
   .section:hover {
     transform: none;
   }
-  
+
   .loadingSpinner {
     animation: none;
-    border-top-color: #5A4E7C;
+    border-top-color: #5a4e7c;
   }
 }
 
@@ -362,15 +366,15 @@
     -webkit-text-fill-color: initial;
     color: #000;
   }
-  
+
   .resourcesTitle::after {
     background: #000;
   }
-  
+
   .sectionDivider {
     background: #000;
   }
-  
+
   .section:hover {
     background: rgba(0, 0, 0, 0.1);
     border: 1px solid #000;
@@ -389,22 +393,22 @@
   .resourcesHome {
     background: white !important;
   }
-  
+
   .navbarSpacer {
     padding-top: 0 !important;
   }
-  
+
   .section {
     margin: 0;
     padding: 0;
   }
-  
+
   .section:hover {
     background: none;
     box-shadow: none;
     transform: none;
   }
-  
+
   .resourcesTitle::after {
     display: none;
   }

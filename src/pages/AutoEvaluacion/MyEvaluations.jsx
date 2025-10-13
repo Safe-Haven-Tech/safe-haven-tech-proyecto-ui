@@ -111,7 +111,7 @@ const MyEvaluations = () => {
   return (
     <div className={`container ${styles.container}`}>
       {pdfLoading && <PdfOverlay />}
-      
+
       <div className={styles.fadeSlideUp}>
         <EvaluationBanner usuario={usuario} respuestas={respuestas} />
       </div>

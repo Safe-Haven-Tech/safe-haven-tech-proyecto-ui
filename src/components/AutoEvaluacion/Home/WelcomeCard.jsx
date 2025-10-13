@@ -38,7 +38,7 @@ export default function WelcomeCard({
         fullWidth ? styles.welcomeCardFullWidth : ''
       }`}
       style={{
-        '--welcome-image': `url(${evaluationWelcome})` // 🎯 NUEVO: Pasamos la imagen como variable CSS
+        '--welcome-image': `url(${evaluationWelcome})`, // 🎯 NUEVO: Pasamos la imagen como variable CSS
       }}
     >
       {/* Fondos decorativos */}
@@ -51,17 +51,11 @@ export default function WelcomeCard({
       <div className={styles.mainContainer}>
         {/* Texto */}
         <div className={styles.textContainer}>
-          <h1 className={styles.title}>
-            {title}
-          </h1>
+          <h1 className={styles.title}>{title}</h1>
 
-          <h4 className={styles.subtitle}>
-            {subtitle}
-          </h4>
+          <h4 className={styles.subtitle}>{subtitle}</h4>
 
-          <p className={styles.description}>
-            {description}
-          </p>
+          <p className={styles.description}>{description}</p>
 
           {/* Mini-cajas con iconos */}
           <div className={styles.miniBoxesContainer}>

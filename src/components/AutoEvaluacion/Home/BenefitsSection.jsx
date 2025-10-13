@@ -38,7 +38,7 @@ export default function BenefitsSection() {
       <h2 className={styles.sectionTitle}>
         Lo que descubrirás con tu autoevaluación
       </h2>
-      
+
       <p className={styles.sectionSubtitle}>
         Responde preguntas sencillas para reflexionar sobre tu bienestar y tus
         relaciones.
@@ -47,15 +47,9 @@ export default function BenefitsSection() {
       <div className={styles.benefitsGrid}>
         {items.map((item, idx) => (
           <div key={idx} className={`card ${styles.benefitCard}`}>
-            <div className={styles.iconWrapper}>
-              {item.icon}
-            </div>
-            <h5 className={styles.benefitTitle}>
-              {item.title}
-            </h5>
-            <p className={styles.benefitDescription}>
-              {item.description}
-            </p>
+            <div className={styles.iconWrapper}>{item.icon}</div>
+            <h5 className={styles.benefitTitle}>{item.title}</h5>
+            <p className={styles.benefitDescription}>{item.description}</p>
           </div>
         ))}
       </div>

@@ -3,16 +3,19 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './ResourcesSection.module.css';
-import { fetchRecursos, incrementarVisitas } from '../../../services/informationalResourcesService';
+import {
+  fetchRecursos,
+  incrementarVisitas,
+} from '../../../services/informationalResourcesService';
 
 // Función para obtener el icono según el tipo de recurso
 const getResourceIcon = (tipo) => {
   const iconMap = {
-    'articulo': 'bi-file-text',
-    'guia': 'bi-book', 
-    'manual': 'bi-journal-bookmark',
-    'video': 'bi-play-circle',
-    'infografia': 'bi-image',
+    articulo: 'bi-file-text',
+    guia: 'bi-book',
+    manual: 'bi-journal-bookmark',
+    video: 'bi-play-circle',
+    infografia: 'bi-image',
   };
   return iconMap[tipo] || 'bi-file-earmark';
 };
@@ -20,11 +23,11 @@ const getResourceIcon = (tipo) => {
 // Función para obtener la clase de color según el tipo de recurso
 const getResourceColorClass = (tipo) => {
   const colorClassMap = {
-    'articulo': styles.colorArticulo,
-    'guia': styles.colorGuia,
-    'manual': styles.colorManual,
-    'video': styles.colorVideo,
-    'infografia': styles.colorInfografia,
+    articulo: styles.colorArticulo,
+    guia: styles.colorGuia,
+    manual: styles.colorManual,
+    video: styles.colorVideo,
+    infografia: styles.colorInfografia,
   };
   return colorClassMap[tipo] || styles.colorDefault;
 };
@@ -63,8 +66,9 @@ export default function ResourcesSection({ selectedTopic, batchSize = 9 }) {
     () =>
       !selectedTopic || selectedTopic === 'Todos'
         ? resources
-        : resources.filter((resource) => 
-            resource.topicos && resource.topicos.includes(selectedTopic)
+        : resources.filter(
+            (resource) =>
+              resource.topicos && resource.topicos.includes(selectedTopic)
           ),
     [resources, selectedTopic]
   );
@@ -85,7 +89,12 @@ export default function ResourcesSection({ selectedTopic, batchSize = 9 }) {
   useEffect(() => {
     if (visibleCount > batchSize && displayedResources.length > 0) {
       const newIndexes = Array.from(
-        { length: Math.min(batchSize, displayedResources.length - (visibleCount - batchSize)) },
+        {
+          length: Math.min(
+            batchSize,
+            displayedResources.length - (visibleCount - batchSize)
+          ),
+        },
         (_, i) => visibleCount - batchSize + i
       );
       setAnimateIndexes(newIndexes);
@@ -125,9 +134,15 @@ export default function ResourcesSection({ selectedTopic, batchSize = 9 }) {
                 </div>
                 <div className={styles.skeletonBody}>
                   <div className="placeholder-glow">
-                    <div className={`${styles.skeletonLine} ${styles.wide}`}></div>
-                    <div className={`${styles.skeletonLine} ${styles.full}`}></div>
-                    <div className={`${styles.skeletonLine} ${styles.half}`}></div>
+                    <div
+                      className={`${styles.skeletonLine} ${styles.wide}`}
+                    ></div>
+                    <div
+                      className={`${styles.skeletonLine} ${styles.full}`}
+                    ></div>
+                    <div
+                      className={`${styles.skeletonLine} ${styles.half}`}
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -145,9 +160,7 @@ export default function ResourcesSection({ selectedTopic, batchSize = 9 }) {
         <div className={styles.noResourcesIcon}>
           <i className="bi bi-search"></i>
         </div>
-        <h4 className={styles.noResourcesTitle}>
-          No se encontraron recursos
-        </h4>
+        <h4 className={styles.noResourcesTitle}>No se encontraron recursos</h4>
         <p className={styles.noResourcesText}>
           {selectedTopic
             ? `No hay recursos disponibles para el tópico "${selectedTopic}"`
@@ -174,13 +187,15 @@ export default function ResourcesSection({ selectedTopic, batchSize = 9 }) {
           const isAnimating = animateIndexes.includes(index);
           const resourceColorClass = getResourceColorClass(resource.tipo);
           const resourceIcon = getResourceIcon(resource.tipo);
-          
+
           return (
             <div
               key={resource._id}
               className={`${styles.resourceColumn} ${isAnimating ? styles.newResourceCard : ''}`}
               style={{
-                animationDelay: isAnimating ? `${(index % batchSize) * 100}ms` : '0ms',
+                animationDelay: isAnimating
+                  ? `${(index % batchSize) * 100}ms`
+                  : '0ms',
               }}
             >
               <div
@@ -199,9 +214,13 @@ export default function ResourcesSection({ selectedTopic, batchSize = 9 }) {
                 {/* Imagen principal */}
                 <div
                   className={`${styles.resourceImage} ${!resource.imagenPrincipal ? styles.resourceImageGradient : ''}`}
-                  style={resource.imagenPrincipal ? {
-                    backgroundImage: `url(${resource.imagenPrincipal})`
-                  } : {}}
+                  style={
+                    resource.imagenPrincipal
+                      ? {
+                          backgroundImage: `url(${resource.imagenPrincipal})`,
+                        }
+                      : {}
+                  }
                 >
                   {/* Badge de tipo */}
                   <div className={styles.typeBadge}>
@@ -226,9 +245,7 @@ export default function ResourcesSection({ selectedTopic, batchSize = 9 }) {
 
                 <div className={`card-body ${styles.cardBody}`}>
                   {/* Título */}
-                  <h5 className={styles.resourceTitle}>
-                    {resource.titulo}
-                  </h5>
+                  <h5 className={styles.resourceTitle}>{resource.titulo}</h5>
 
                   {/* Descripción */}
                   <p className={styles.resourceDescription}>
@@ -239,10 +256,7 @@ export default function ResourcesSection({ selectedTopic, batchSize = 9 }) {
                   {resource.topicos && resource.topicos.length > 0 && (
                     <div className={styles.topicsContainer}>
                       {resource.topicos.slice(0, 2).map((topico, idx) => (
-                        <span
-                          key={idx}
-                          className={styles.topicBadge}
-                        >
+                        <span key={idx} className={styles.topicBadge}>
                           {topico}
                         </span>
                       ))}
@@ -261,12 +275,13 @@ export default function ResourcesSection({ selectedTopic, batchSize = 9 }) {
                         <i className="bi bi-eye"></i>
                         {resource.visitas || 0}
                       </small>
-                      {resource.calificacion && resource.calificacion.promedio > 0 && (
-                        <small className={styles.ratingItem}>
-                          <i className="bi bi-star-fill"></i>
-                          {resource.calificacion.promedio.toFixed(1)}
-                        </small>
-                      )}
+                      {resource.calificacion &&
+                        resource.calificacion.promedio > 0 && (
+                          <small className={styles.ratingItem}>
+                            <i className="bi bi-star-fill"></i>
+                            {resource.calificacion.promedio.toFixed(1)}
+                          </small>
+                        )}
                     </div>
                     <div className={styles.viewLink}>
                       Ver recurso

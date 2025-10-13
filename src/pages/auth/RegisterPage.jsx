@@ -73,14 +73,16 @@ export default function RegisterPage() {
 
         await registrarUsuario(payload);
         setSuccess('¡Cuenta creada exitosamente! Redirigiendo al login...');
-        
+
         // Usar navigate en lugar de window.location
         setTimeout(() => {
           window.location.href = '/login';
         }, 2000);
       } catch (err) {
         console.error('Error en registro:', err);
-        setError(err.message || 'Error al crear la cuenta. Intenta nuevamente.');
+        setError(
+          err.message || 'Error al crear la cuenta. Intenta nuevamente.'
+        );
       } finally {
         setLoading(false);
       }
@@ -146,9 +148,7 @@ export default function RegisterPage() {
       {/* Contenedor principal */}
       <div className={styles.contentContainer}>
         <div className={styles.formWrapper}>
-          <Suspense fallback={<LoadingFallback />}>
-            {memoizedForm}
-          </Suspense>
+          <Suspense fallback={<LoadingFallback />}>{memoizedForm}</Suspense>
         </div>
       </div>
     </div>

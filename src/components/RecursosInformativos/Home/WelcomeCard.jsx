@@ -11,9 +11,9 @@ import LightningIcon from '../../../assets/icons/Lightning.svg';
 import BookIcon from '../../../assets/icons/Book.svg';
 
 export default function WelcomeCard({
-  title = "Autoevaluaciones de Salud Mental",
-  subtitle = "Conoce tu bienestar emocional",
-  description = "Completa evaluaciones profesionales diseñadas para ayudarte a entender tu estado mental y emocional actual.",
+  title = 'Autoevaluaciones de Salud Mental',
+  subtitle = 'Conoce tu bienestar emocional',
+  description = 'Completa evaluaciones profesionales diseñadas para ayudarte a entender tu estado mental y emocional actual.',
   fullWidth = false,
 }) {
   const miniBoxes = [
@@ -35,7 +35,7 @@ export default function WelcomeCard({
         fullWidth ? styles.welcomeCardFullWidth : ''
       }`}
       style={{
-        '--welcome-image': `url(${evaluationWelcome})`
+        '--welcome-image': `url(${evaluationWelcome})`,
       }}
     >
       {/* Fondos decorativos */}
@@ -48,17 +48,11 @@ export default function WelcomeCard({
       <div className={styles.mainContainer}>
         {/* Texto */}
         <div className={styles.textContainer}>
-          <h1 className={styles.title}>
-            {title}
-          </h1>
+          <h1 className={styles.title}>{title}</h1>
 
-          <h4 className={styles.subtitle}>
-            {subtitle}
-          </h4>
+          <h4 className={styles.subtitle}>{subtitle}</h4>
 
-          <p className={styles.description}>
-            {description}
-          </p>
+          <p className={styles.description}>{description}</p>
 
           {/* Mini-cajas con iconos */}
           <div className={styles.miniBoxesContainer}>
