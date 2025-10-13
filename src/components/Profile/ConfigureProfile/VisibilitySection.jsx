@@ -13,7 +13,7 @@ const VisibilitySection = ({ visibilidadPerfil, setVisibilidadPerfil }) => {
       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e9ecef')}
       onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f8f9fa')}
     >
-      <div style={{ fontSize: '1.8rem', color: '#0d6efd' }}>👁️</div>
+      <div style={{ fontSize: '1.8rem', color: '#0d6efd' }}></div>
       <div className="flex-grow-1">
         <label className="form-label fw-semibold">Visibilidad del perfil</label>
         <select

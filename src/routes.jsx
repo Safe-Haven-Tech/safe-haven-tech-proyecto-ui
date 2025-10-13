@@ -4,12 +4,12 @@ import { Routes, Route } from 'react-router-dom';
 
 import MainLayout from './layouts/MainLayout';
 
-import Home from './pages/Home/HomePage';
+import Home from './pages/home/HomePage';
 
 import Login from './pages/auth/SignIn';
 import Register from './pages/auth/RegisterPage';
 
-import Profile from './pages/Profile/ProfilePage';
+import Profile from './pages/profile/ProfilePage';
 import EditarPerfil from './pages/Profile/EditProfilePage';
 import ConfigurarPerfil from './pages/Profile/ConfigureProfilePage';
 
@@ -20,6 +20,18 @@ import MyEvaluations from './pages/AutoEvaluacion/MyEvaluations';
 import InformationalResourcesHome from './pages/InformationalResources/ResourcesHome';
 import ResourceDetail from './pages/InformationalResources/ResourceDetail';
 
+import AdminPanel from './pages/admin/AdminPanel';
+import ResourcesManagement from './pages/admin/ResourcesManagement';
+import SurveysManagement from './pages/admin/SurveysManagement';
+import UserManagement from './pages/admin/UsersManagement';
+
+import PostDetail from './pages/Publicaciones/PostDetail';
+import Publicaciones from './pages/Publicaciones/FeedPublicaciones';
+import CrearPost from './pages/Publicaciones/CreatePostPage';
+
+import ForoPage from './pages/foro/ForoPage';
+import CrearForo from './pages/foro/CreateForo';
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -29,15 +41,32 @@ export default function AppRoutes() {
 
       {/* Rutas dentro del layout */}
       <Route element={<MainLayout />}>
+
         <Route path="/" element={<Home />} />
+
         <Route path="/perfil/:nickname" element={<Profile />} />
         <Route path="/editar-perfil" element={<EditarPerfil />} />
         <Route path="/configurar-perfil" element={<ConfigurarPerfil />} />
+
         <Route path="/autoevaluacion" element={<SelfAssessment />} />
         <Route path="/encuesta/:id" element={<ViewSurvey />} />
         <Route path="/mis-evaluaciones" element={<MyEvaluations />} />
-        <Route path="/recursosinformativos" element={<InformationalResourcesHome />} />
+
+        <Route path="/recursosinformativos"element={<InformationalResourcesHome />}/>
         <Route path="/recurso/:id" element={<ResourceDetail />} />
+
+        <Route path="/admin/panel" element={<AdminPanel />} />
+        <Route path="/admin/recursos-informativos" element={<ResourcesManagement />}/>
+        <Route path="/admin/encuestas" element={<SurveysManagement />} />
+        <Route path="/admin/usuarios" element={<UserManagement />} />
+
+        <Route path="/publicacion/:id" element={<PostDetail />} />
+        <Route path="/publicaciones" element={<Publicaciones />} />
+        <Route path="/crear-post" element={<CrearPost />} />
+
+        <Route path="/foro" element={<ForoPage />} />
+        <Route path="/crear-foro" element={<CrearForo />} />
+
       </Route>
 
       {/* Ruta 404 */}

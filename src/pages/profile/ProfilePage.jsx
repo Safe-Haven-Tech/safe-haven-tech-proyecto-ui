@@ -1,3 +1,4 @@
+//src/pages/profile/ProfilePage.jsx
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -16,6 +17,7 @@ export default function Profile() {
     isOwnProfile,
     isLoading,
     error,
+    perfilPosts,
     getCurrentUser,
     handleFollowToggle,
   } = useProfile(nickname);
@@ -48,6 +50,7 @@ export default function Profile() {
       isOwnProfile={isOwnProfile}
       isLoading={isLoading}
       error={error}
+      perfilPosts={perfilPosts}
       nicknameParam={nickname}
       getCurrentUser={getCurrentUser}
       onFollowToggle={handleFollowToggleWithNavigation}

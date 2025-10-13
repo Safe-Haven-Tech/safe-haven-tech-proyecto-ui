@@ -1,0 +1,367 @@
+/* Contenedor principal - SIN SCROLL */
+.registerContainer {
+  min-height: 100vh;
+  max-height: 100vh; /* 🎯 NUEVO: Limita la altura máxima */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* 🎯 CAMBIO: De flex-start a center */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #f0f0f0;
+  position: relative;
+  padding: 1rem;
+  /* 🎯 REMOVIDO: padding-top y padding-bottom específicos */
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden; /* 🎯 CAMBIO: De overflow-x a overflow completo */
+}
+
+@media (min-width: 576px) {
+  .registerContainer {
+    padding: 1.5rem;
+    /* 🎯 REMOVIDO: padding-top y padding-bottom específicos */
+  }
+}
+
+@media (min-width: 768px) {
+  .registerContainer {
+    padding: 2rem;
+    /* 🎯 REMOVIDO: padding-top y padding-bottom específicos */
+    background-attachment: fixed;
+  }
+}
+
+@media (min-width: 992px) {
+  .registerContainer {
+    padding: 2.5rem; /* 🎯 REDUCIDO: De 3rem a 2.5rem */
+    align-items: center;
+  }
+}
+
+/* Background responsive para móviles */
+@media (max-width: 767px) {
+  .registerContainer {
+    background-attachment: scroll;
+    align-items: center; /* 🎯 NUEVO: Mantiene centrado en móvil */
+  }
+}
+
+/* Overlay */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(90, 78, 124, 0.2) 50%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  z-index: 1;
+}
+
+/* Contenedor del contenido - AJUSTADO PARA SIN SCROLL */
+.contentContainer {
+  position: relative;
+  z-index: 2;
+  max-width: 500px;
+  width: 100%;
+  max-height: calc(
+    100vh - 2rem
+  ); /* 🎯 NUEVO: Limita altura considerando padding */
+  animation: slideInUp 0.6s ease-out;
+}
+
+@media (min-width: 576px) {
+  .contentContainer {
+    max-width: 550px;
+    max-height: calc(100vh - 3rem); /* 🎯 NUEVO: Ajustado para padding mayor */
+  }
+}
+
+@media (min-width: 768px) {
+  .contentContainer {
+    max-width: 600px;
+    max-height: calc(100vh - 4rem); /* 🎯 NUEVO: Ajustado para padding mayor */
+  }
+}
+
+@media (min-width: 992px) {
+  .contentContainer {
+    max-width: 500px;
+    max-height: calc(100vh - 5rem); /* 🎯 NUEVO: Ajustado para padding mayor */
+  }
+}
+
+@keyframes slideInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Contenedor del formulario - CON SCROLL INTERNO SI ES NECESARIO */
+.formWrapper {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: auto; /* 🎯 CAMBIO: De hidden a auto para scroll interno */
+  transition: all 0.3s ease;
+  max-height: 100%; /* 🎯 NUEVO: Respeta el contenedor padre */
+}
+
+.formWrapper:hover {
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+@media (min-width: 768px) {
+  .formWrapper:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Loading fallback */
+.loadingFallback {
+  text-align: center;
+  padding: 3rem;
+  color: white;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.loadingSpinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error state */
+.errorState {
+  text-align: center;
+  padding: 2rem;
+  color: white;
+  background: rgba(220, 53, 69, 0.2);
+  border-radius: 12px;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.errorTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.errorMessage {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Responsividad para pantallas muy pequeñas - SIN SCROLL */
+@media (max-width: 320px) {
+  .registerContainer {
+    padding: 0.5rem;
+    max-height: 100vh; /* 🎯 ASEGURADO: Sin scroll */
+    overflow: hidden;
+  }
+
+  .contentContainer {
+    max-width: 100%;
+    max-height: calc(100vh - 1rem); /* 🎯 NUEVO: Ajustado para padding mínimo */
+  }
+
+  .formWrapper {
+    border-radius: 16px;
+  }
+}
+
+/* 🎯 NUEVO: Para pantallas de altura muy limitada */
+@media (max-height: 600px) {
+  .registerContainer {
+    padding: 0.5rem;
+    align-items: center;
+  }
+
+  .contentContainer {
+    max-height: calc(100vh - 1rem);
+  }
+
+  .formWrapper {
+    border-radius: 16px;
+  }
+}
+
+/* 🎯 NUEVO: Para landscape en móviles - SIN SCROLL */
+@media (max-width: 768px) and (orientation: landscape) {
+  .registerContainer {
+    padding: 0.5rem;
+    align-items: center; /* 🎯 CAMBIO: Centrado siempre */
+    max-height: 100vh;
+    overflow: hidden;
+  }
+
+  .contentContainer {
+    max-height: calc(100vh - 1rem);
+  }
+}
+
+/* 🎯 NUEVO: Para pantallas de altura muy pequeña en landscape */
+@media (max-height: 500px) and (orientation: landscape) {
+  .registerContainer {
+    padding: 0.25rem;
+  }
+
+  .contentContainer {
+    max-height: calc(100vh - 0.5rem);
+  }
+
+  .formWrapper {
+    border-radius: 12px;
+  }
+}
+
+/* Pantallas muy grandes */
+@media (min-width: 1400px) {
+  .registerContainer {
+    padding: 3rem; /* 🎯 REDUCIDO: De 4rem a 3rem */
+  }
+
+  .contentContainer {
+    max-width: 600px;
+    max-height: calc(100vh - 6rem); /* 🎯 NUEVO: Ajustado */
+  }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .contentContainer {
+    animation: none;
+  }
+
+  .formWrapper:hover {
+    transform: none;
+  }
+
+  .loadingSpinner {
+    animation: none;
+    border-top-color: white;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .formWrapper {
+    background: rgba(255, 255, 255, 1);
+    border: 2px solid #000;
+    backdrop-filter: none;
+  }
+
+  .overlay {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .loadingFallback {
+    color: #fff;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+  }
+}
+
+/* Focus dentro del contenedor */
+.formWrapper:focus-within {
+  outline: 3px solid rgba(90, 78, 124, 0.5);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .registerContainer {
+    background: white !important;
+    min-height: auto !important;
+    max-height: none !important; /* 🎯 NUEVO: Sin límite en print */
+    padding: 1rem !important;
+    overflow: visible !important; /* 🎯 NUEVO: Visible en print */
+  }
+
+  .overlay {
+    display: none;
+  }
+
+  .contentContainer {
+    max-height: none; /* 🎯 NUEVO: Sin límite en print */
+  }
+
+  .formWrapper {
+    box-shadow: none;
+    border: 1px solid #000;
+    background: white;
+    backdrop-filter: none;
+    overflow: visible; /* 🎯 NUEVO: Visible en print */
+  }
+}
+
+/* Estados de scroll suave */
+@media (min-width: 768px) {
+  .registerContainer {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Mejoras para dispositivos táctiles */
+@media (hover: none) and (pointer: coarse) {
+  .formWrapper:hover {
+    transform: none;
+  }
+}
+
+/* 🎯 NUEVO: Scroll interno estilizado para el formWrapper */
+.formWrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.formWrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.formWrapper::-webkit-scrollbar-thumb {
+  background: rgba(90, 78, 124, 0.3);
+  border-radius: 3px;
+}
+
+.formWrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(90, 78, 124, 0.5);
+}
+
+/* 🎯 NUEVO: Para Firefox */
+.formWrapper {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(90, 78, 124, 0.3) rgba(255, 255, 255, 0.1);
+}

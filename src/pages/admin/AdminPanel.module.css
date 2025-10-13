@@ -1,0 +1,390 @@
+/* ==================== ADMIN PANEL STYLES ==================== */
+
+.adminContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 100px 20px 40px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ==================== WELCOME HEADER ==================== */
+
+.welcomeHeader {
+  background: linear-gradient(135deg, #2d5016 0%, #3d6b23 100%);
+  border-radius: 16px;
+  padding: 40px;
+  margin-bottom: 40px;
+  color: white;
+  box-shadow: 0 8px 32px rgba(45, 80, 22, 0.15);
+}
+
+.welcomeContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+}
+
+.welcomeText {
+  flex: 1;
+}
+
+.welcomeTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  line-height: 1.2;
+}
+
+.welcomeSubtitle {
+  font-size: 1.2rem;
+  margin: 0 0 15px 0;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.welcomeDescription {
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+/* ==================== SECTIONS ==================== */
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d5016;
+  margin: 0 0 25px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ==================== STATS SECTION ==================== */
+
+.statsSection {
+  margin-bottom: 40px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.statCard {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.statIcon {
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #a9c5a0 0%, #8db584 100%);
+  border-radius: 12px;
+  color: white;
+}
+
+.statContent {
+  flex: 1;
+}
+
+.statNumber {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2d5016;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* ==================== FUNCTIONS SECTION ==================== */
+
+.functionsSection {
+  margin-bottom: 40px;
+}
+
+.functionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.functionCard {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 2px solid transparent;
+}
+
+.functionCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  border-color: #a9c5a0;
+}
+
+.functionIcon {
+  font-size: 2.5rem;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2d5016 0%, #3d6b23 100%);
+  border-radius: 16px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.functionContent {
+  flex: 1;
+}
+
+.functionTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2d5016;
+  margin: 0 0 8px 0;
+}
+
+.functionDescription {
+  font-size: 0.95rem;
+  color: #1469b4;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.functionArrow {
+  font-size: 1.5rem;
+  color: #a9c5a0;
+  font-weight: bold;
+  transition: transform 0.3s ease;
+}
+
+.functionCard:hover .functionArrow {
+  transform: translateX(5px);
+}
+
+/* ==================== QUICK ACTIONS ==================== */
+
+.quickActionsSection {
+  margin-bottom: 40px;
+}
+
+.quickActionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.quickActionBtn {
+  background: linear-gradient(135deg, #a9c5a0 0%, #8db584 100%);
+  color: white;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.quickActionBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(169, 197, 160, 0.4);
+  background: linear-gradient(135deg, #8db584 0%, #7ba46f 100%);
+}
+
+.quickActionIcon {
+  font-size: 1.1rem;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .adminContainer {
+    padding: 90px 15px 30px;
+  }
+
+  .welcomeHeader {
+    padding: 30px 25px;
+  }
+
+  .welcomeContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .welcomeTitle {
+    font-size: 2rem;
+  }
+
+  .timeWidget {
+    align-self: stretch;
+    text-align: center;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+  }
+
+  .statCard {
+    padding: 20px;
+  }
+
+  .functionsGrid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .functionCard {
+    padding: 25px;
+  }
+
+  .quickActionsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+}
+
+/* Móvil */
+@media (max-width: 480px) {
+  .adminContainer {
+    padding: 80px 10px 20px;
+  }
+
+  .welcomeHeader {
+    padding: 25px 20px;
+  }
+
+  .welcomeTitle {
+    font-size: 1.7rem;
+  }
+
+  .welcomeSubtitle {
+    font-size: 1rem;
+  }
+
+  .currentTime {
+    font-size: 1.5rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statCard {
+    padding: 18px;
+  }
+
+  .functionCard {
+    padding: 20px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .functionIcon {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+
+  .quickActionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionTitle {
+    font-size: 1.3rem;
+  }
+}
+
+/* ==================== ACCESSIBILITY ==================== */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .functionCard {
+    border: 2px solid #000;
+  }
+
+  .statCard {
+    border: 1px solid #000;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .adminContainer {
+    background: linear-gradient(135deg, #f5f0f0 0%, #fffcfc 100%);
+    color: white;
+  }
+
+  .statCard,
+  .functionCard {
+    background: #2d2d2d;
+    color: white;
+  }
+
+  .statLabel,
+  .functionDescription {
+    color: #adb5bd;
+  }
+
+  /* Elimina la regla para .functionCardLight aquí para que siempre se vea igual */
+}
+
+/* ==================== TARJETAS CLARAS ==================== */
+
+.functionCardLight {
+  background: linear-gradient(135deg, #f6fff6 0%, #e3fbe3 100%);
+  border: 2px solid #b7d9c2;
+  box-shadow: 0 4px 16px rgba(169, 197, 160, 0.1);
+  color: #2d5016;
+}
+.functionCardLight:hover {
+  border-color: #7fcf9c;
+  box-shadow: 0 12px 32px rgba(127, 207, 156, 0.18);
+}

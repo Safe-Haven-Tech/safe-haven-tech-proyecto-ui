@@ -1,4 +1,3 @@
-// src/hooks/useEditarPerfil.js
 import { useReducer, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LIMITES } from '../utils/validators';
@@ -40,7 +39,6 @@ function perfilReducer(state, action) {
     case 'SET_CAMPO':
       return { ...state, [action.campo]: action.valor };
 
-    // NUEVA ACCIÓN: Sincronizar datos del formulario del hook de validación
     case 'SET_FORM_DATA':
       return {
         ...state,
@@ -69,8 +67,6 @@ function perfilReducer(state, action) {
       return { ...state, cargando: action.cargando };
     case 'SET_VALIDANDO_NICKNAME':
       return { ...state, validandoNickname: action.validando };
-
-    // ACCIÓN ACTUALIZADA: Manejar disponibilidad desde el hook de validación
     case 'SET_NICKNAME_DISPONIBLE':
       return {
         ...state,
@@ -79,7 +75,6 @@ function perfilReducer(state, action) {
             ? action.disponible
             : action.disponible,
       };
-
     case 'SET_ERROR_NOMBRE':
       return { ...state, errorNombre: action.mensaje };
     case 'SET_ERROR_NICKNAME':
@@ -194,49 +189,6 @@ export const useEditarPerfil = () => {
     }
   }, [navigate, handleTokenInvalidation]);
 
-  /*
-  // Validar nickname en tiempo real
-  useEffect(() => {
-    const validarNicknameAsync = async () => {
-      if (!state.nombreUsuario || state.nombreUsuario === state.usuario?.nombreUsuario) {
-        dispatch({ type: 'SET_NICKNAME_DISPONIBLE', disponible: true });
-        return;
-      }
-
-      if (state.nombreUsuario.length < LIMITES.NICKNAME.MIN) {
-        dispatch({ type: 'SET_NICKNAME_DISPONIBLE', disponible: false });
-        return;
-      }
-
-      if (state.nombreUsuario.length > LIMITES.NICKNAME.MAX) {
-        dispatch({ type: 'SET_NICKNAME_DISPONIBLE', disponible: false });
-        return;
-      }
-
-      const regex = /^[a-zA-Z0-9_]+$/;
-      if (!regex.test(state.nombreUsuario)) {
-        dispatch({ type: 'SET_NICKNAME_DISPONIBLE', disponible: false });
-        return;
-      }
-
-      dispatch({ type: 'SET_VALIDANDO_NICKNAME', validando: true });
-      
-      try {
-        const disponible = await verificarNickname(state.nombreUsuario);
-        dispatch({ type: 'SET_NICKNAME_DISPONIBLE', disponible });
-      } catch (error) {
-        console.error('Error validando nickname:', error);
-        dispatch({ type: 'SET_NICKNAME_DISPONIBLE', disponible: false });
-      } finally {
-        dispatch({ type: 'SET_VALIDANDO_NICKNAME', validando: false });
-      }
-    };
-
-    const timeoutId = setTimeout(validarNicknameAsync, 500);
-    return () => clearTimeout(timeoutId);
-  }, [state.nombreUsuario, state.usuario?.nombreUsuario]);
-  */
-
   // Cargar datos del usuario al montar
   useEffect(() => {
     fetchUsuario();
@@ -292,12 +244,23 @@ export const useEditarPerfil = () => {
         dispatch({
           type: 'SET_IMAGEN_SELECCIONADA',
           imagen: archivo,
-          previsualizacionImagen: canvas.toDataURL('image/png'),
+          previsualizacion: canvas.toDataURL('image/png'),
+        });
+
+        // Sincroniza los datos del formulario para el PreviewCard
+        dispatch({
+          type: 'SET_FORM_DATA',
+          payload: {
+            nombreCompleto: state.nombreCompleto,
+            nombreUsuario: state.nombreUsuario,
+            biografia: state.biografia,
+            pronombres: state.pronombres,
+          },
         });
       };
     };
     reader.readAsDataURL(archivo);
-  }, []);
+  }, [state.nombreCompleto, state.nombreUsuario, state.biografia, state.pronombres]);
 
   // Eliminar imagen seleccionada
   const eliminarImagenSeleccionada = useCallback(() => {
@@ -314,7 +277,7 @@ export const useEditarPerfil = () => {
     dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
   }, []);
 
-  // Guardar cambios - ACTUALIZADO
+  // Guardar cambios
   const handleGuardar = useCallback(async () => {
     dispatch({ type: 'SET_CARGANDO', cargando: true });
     dispatch({ type: 'LIMPIAR_ALERTAS' });
@@ -354,20 +317,18 @@ export const useEditarPerfil = () => {
         esFormData
       );
 
-      // Guardar nickname anterior para comparación
       const nicknameAnterior = state.usuario?.nombreUsuario;
 
       if (resultado.nuevoToken) {
         localStorage.setItem('token', resultado.nuevoToken);
-        
-        // NUEVO: Actualizar contexto inmediatamente con los nuevos datos del token
+
         try {
           const nuevoDecoded = parseJwt(resultado.nuevoToken);
           actualizarUsuario(nuevoDecoded);
         } catch (err) {
           console.error('Error al decodificar nuevo token:', err);
         }
-        
+
         window.dispatchEvent(new Event('tokenChanged'));
       }
 
@@ -379,9 +340,7 @@ export const useEditarPerfil = () => {
       const usuarioActualizado = {
         ...state.usuario,
         ...resultado.usuario,
-        fotoPerfil: state.fotoEliminada
-          ? null
-          : resultado.usuario?.fotoPerfil,
+        fotoPerfil: state.fotoEliminada ? null : resultado.usuario?.fotoPerfil,
       };
 
       dispatch({
@@ -392,20 +351,20 @@ export const useEditarPerfil = () => {
       dispatch({ type: 'LIMPIAR_IMAGEN' });
       dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
 
-      // NUEVO: Si cambió el nickname, navegar al nuevo perfil después de un breve delay
-      if (resultado.usuario?.nombreUsuario && 
-          resultado.usuario.nombreUsuario !== nicknameAnterior) {
+      if (
+        resultado.usuario?.nombreUsuario &&
+        resultado.usuario.nombreUsuario !== nicknameAnterior
+      ) {
         setTimeout(() => {
-          navigate(`/perfil/${resultado.usuario.nombreUsuario}`, { replace: true });
-        }, 1500); // Delay para mostrar mensaje de éxito
+          navigate(`/perfil/${resultado.usuario.nombreUsuario}`, {
+            replace: true,
+          });
+        }, 1500);
       }
-
     } catch (error) {
       console.error('Error actualizando perfil:', error);
-      
-      // Manejo de errores específicos
+
       if (error.response?.status === 413) {
-        // Payload demasiado grande
         dispatch({
           type: 'SET_ERROR',
           error: 'La imagen es demasiado grande, máximo 2MB',
@@ -413,7 +372,10 @@ export const useEditarPerfil = () => {
       } else if (error.response?.data?.message) {
         dispatch({ type: 'SET_ERROR', error: error.response.data.message });
       } else if (error.message.includes('nickname')) {
-        dispatch({ type: 'SET_ERROR', error: 'El nickname no está disponible' });
+        dispatch({
+          type: 'SET_ERROR',
+          error: 'El nickname no está disponible',
+        });
       } else {
         dispatch({ type: 'SET_ERROR', error: 'Error al actualizar el perfil' });
       }
@@ -422,12 +384,11 @@ export const useEditarPerfil = () => {
     }
   }, [state, actualizarUsuario, navigate]);
 
-  // Limpiar alertas automáticamente
   useEffect(() => {
     if (state.mensaje || state.error) {
       const timer = setTimeout(() => {
         dispatch({ type: 'LIMPIAR_ALERTAS' });
-      }, 4000); // Aumentado a 4 segundos para dar tiempo a leer
+      }, 4000);
       return () => clearTimeout(timer);
     }
   }, [state.mensaje, state.error]);

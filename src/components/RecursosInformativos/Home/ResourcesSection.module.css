@@ -1,0 +1,588 @@
+/* Contenedor principal */
+.resourcesSection {
+  animation: fadeIn 0.8s ease-out;
+  max-width: 100%;
+  padding: 0;
+  width: 100%;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Estados de carga */
+.loadingContainer {
+  animation: slideInUp 0.8s ease-out;
+  max-width: 100%;
+  padding: 0;
+  width: 100%;
+}
+
+@keyframes slideInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Grid de recursos - COMPLETAMENTE PERSONALIZADO */
+.resourcesGrid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 1.5rem !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Responsive grid */
+@media (max-width: 991.98px) {
+  .resourcesGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .resourcesGrid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+}
+
+/* Columnas de recursos - SIMPLIFICADO */
+.resourceColumn {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Skeleton cards durante loading */
+.skeletonCard {
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  animation: pulse 1.5s ease-in-out infinite alternate;
+  min-height: 350px;
+  width: 100%;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.skeletonImage {
+  height: 200px;
+  background: #f8f9fa;
+  border-radius: 1rem 1rem 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeletonImage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.skeletonBody {
+  padding: 1rem;
+}
+
+.skeletonLine {
+  height: 1rem;
+  background: #e9ecef;
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+  animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+.skeletonLine.wide {
+  width: 75%;
+}
+
+.skeletonLine.full {
+  width: 100%;
+}
+
+.skeletonLine.half {
+  width: 50%;
+}
+
+/* Estado sin recursos */
+.noResourcesContainer {
+  text-align: center;
+  padding: 5rem 0;
+  animation: fadeIn 0.8s ease-out;
+  max-width: 100%;
+}
+
+.noResourcesIcon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #e8daef, #d5dbdb);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.noResourcesIcon i {
+  font-size: 2rem;
+  color: #8e7aa6;
+}
+
+.noResourcesTitle {
+  color: #5a4e7c;
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+}
+
+.noResourcesText {
+  color: #666;
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  margin-bottom: 2rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reloadButton {
+  border-color: #a17cca !important;
+  color: #a17cca !important;
+  border-radius: 25px !important;
+  padding: 10px 25px !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background: transparent !important;
+}
+
+.reloadButton:hover {
+  background: #a17cca !important;
+  color: white !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(161, 124, 202, 0.3);
+}
+
+/* Tarjeta de recurso */
+.resourceCard {
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  height: 100%;
+  min-height: 350px;
+  animation: fadeInUp 0.6s ease-out backwards;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.resourceCard:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.resourceCard:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.resourceCard:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.resourceCard:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.resourceCard:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.resourceCard:nth-child(6) {
+  animation-delay: 0.6s;
+}
+.resourceCard:nth-child(7) {
+  animation-delay: 0.7s;
+}
+.resourceCard:nth-child(8) {
+  animation-delay: 0.8s;
+}
+.resourceCard:nth-child(9) {
+  animation-delay: 0.9s;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover effect en tarjetas */
+.resourceCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Imagen de recurso */
+.resourceImage {
+  height: 200px;
+  border-radius: 1rem 1rem 0 0;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+}
+
+.resourceImageGradient {
+  background: linear-gradient(
+    135deg,
+    var(--resource-color-light),
+    var(--resource-color-medium)
+  );
+}
+
+/* Badge de tipo */
+.typeBadge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: var(--resource-color);
+  color: white;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Badge destacado */
+.featuredBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #ffd700;
+  color: #333;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.featuredBadge i {
+  font-size: 0.8rem;
+}
+
+/* Icono overlay para recursos sin imagen */
+.resourceOverlayIcon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  color: var(--resource-color);
+  opacity: 0.3;
+}
+
+/* Contenido de la tarjeta */
+.cardBody {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+/* Título del recurso */
+.resourceTitle {
+  color: #2c3e50;
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+  font-size: 1rem;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.6em;
+}
+
+/* Descripción del recurso */
+.resourceDescription {
+  color: #666;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.8em;
+  flex-grow: 1;
+}
+
+/* Contenedor de tópicos */
+.topicsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Badge de tópico */
+.topicBadge {
+  background: var(--resource-color-light);
+  color: var(--resource-color);
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 3px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.topicBadgeExtra {
+  background: #f8f9fa;
+  color: #666;
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+
+/* Footer de la tarjeta */
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f8f9fa;
+}
+
+.statsContainer {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.statItem {
+  color: #6c757d;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ratingItem {
+  color: #ffc107;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.viewLink {
+  color: var(--resource-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: transform 0.2s ease;
+}
+
+.resourceCard:hover .viewLink {
+  transform: translateX(3px);
+}
+
+/* Botón cargar más */
+.loadMoreContainer {
+  text-align: center;
+  margin-top: 3rem;
+  animation: fadeIn 0.8s ease-out 0.5s both;
+}
+
+.loadMoreButton {
+  background: linear-gradient(90deg, #5a4e7c, #a17cca);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  box-shadow: 0 4px 15px rgba(90, 78, 124, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.loadMoreButton::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.4s ease;
+}
+
+.loadMoreButton:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.loadMoreButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(90, 78, 124, 0.4);
+}
+
+/* Variables CSS para colores dinámicos */
+.colorArticulo {
+  --resource-color: #3498db;
+  --resource-color-light: #3498db33;
+  --resource-color-medium: #3498db40;
+}
+
+.colorGuia {
+  --resource-color: #2ecc71;
+  --resource-color-light: #2ecc7133;
+  --resource-color-medium: #2ecc7140;
+}
+
+.colorManual {
+  --resource-color: #9b59b6;
+  --resource-color-light: #9b59b633;
+  --resource-color-medium: #9b59b640;
+}
+
+.colorVideo {
+  --resource-color: #e74c3c;
+  --resource-color-light: #e74c3c33;
+  --resource-color-medium: #e74c3c40;
+}
+
+.colorInfografia {
+  --resource-color: #f39c12;
+  --resource-color-light: #f39c1233;
+  --resource-color-medium: #f39c1240;
+}
+
+.colorDefault {
+  --resource-color: #5a4e7c;
+  --resource-color-light: #5a4e7c33;
+  --resource-color-medium: #5a4e7c40;
+}
+
+/* Animación para nuevos elementos */
+.newResourceCard {
+  animation: slideInUp 0.6s ease-out;
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .resourceCard:hover,
+  .loadMoreButton:hover {
+    transform: none;
+  }
+
+  .loadMoreButton::before {
+    display: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .resourceCard {
+    border: 2px solid #000;
+  }
+
+  .resourceTitle {
+    color: #000;
+  }
+
+  .resourceDescription {
+    color: #333;
+  }
+
+  .noResourcesTitle {
+    color: #000;
+  }
+
+  .loadMoreButton {
+    background: #000;
+    border: 2px solid #000;
+  }
+}

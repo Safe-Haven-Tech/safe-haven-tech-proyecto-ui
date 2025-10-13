@@ -1,0 +1,268 @@
+/* Contenedor principal */
+.signInContainer {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+}
+
+/* Background image responsive */
+@media (min-width: 768px) {
+  .signInContainer {
+    background-attachment: fixed;
+  }
+}
+
+/* En móviles, usamos scroll para mejor performance */
+@media (max-width: 767px) {
+  .signInContainer {
+    background-attachment: scroll;
+    min-height: 100vh;
+    height: auto;
+  }
+}
+
+/* Overlay */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(90, 78, 124, 0.3) 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  z-index: 1;
+}
+
+/* Contenedor del contenido */
+.contentContainer {
+  position: relative;
+  z-index: 2;
+  max-height: 100vh;
+  width: 100%;
+  height: 100%;
+}
+
+/* Row principal */
+.mainRow {
+  height: 100%;
+  margin: 0;
+}
+
+/* Panel izquierdo (WelcomeSection) */
+.leftPanel {
+  display: none;
+}
+
+@media (min-width: 992px) {
+  .leftPanel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Panel derecho (LoginForm) */
+.rightPanel {
+  padding: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 992px) {
+  .rightPanel {
+    max-width: 41.666667%; /* col-lg-5 */
+  }
+}
+
+@media (min-width: 1200px) {
+  .rightPanel {
+    max-width: 33.333333%; /* col-xl-4 */
+  }
+}
+
+/* Contenedor del formulario */
+.formContainer {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  margin: 1rem;
+  animation: slideInUp 0.6s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@media (min-width: 576px) {
+  .formContainer {
+    padding: 2rem;
+    margin: 1.5rem;
+    max-width: 450px;
+  }
+}
+
+@media (min-width: 768px) {
+  .formContainer {
+    padding: 2.5rem;
+    margin: 2rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .formContainer {
+    margin: 1.5rem;
+    width: auto;
+    max-width: none;
+  }
+}
+
+@keyframes slideInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estados de carga */
+.loadingFallback {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #5a4e7c;
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+}
+
+.loadingSpinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid #e9ecef;
+  border-top: 3px solid #5a4e7c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 0.75rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Efectos de hover en el contenedor */
+.formContainer:hover {
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .formContainer:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Responsividad para pantallas muy pequeñas */
+@media (max-width: 320px) {
+  .formContainer {
+    padding: 1rem;
+    margin: 0.5rem;
+    border-radius: 15px;
+  }
+
+  .signInContainer {
+    padding: 0.5rem;
+  }
+}
+
+/* Orientación landscape en móviles */
+@media (max-width: 768px) and (orientation: landscape) {
+  .signInContainer {
+    height: auto;
+    min-height: 100vh;
+    padding: 1rem 0;
+  }
+
+  .formContainer {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .formContainer {
+    animation: none;
+  }
+
+  .formContainer:hover {
+    transform: none;
+  }
+
+  .loadingSpinner {
+    animation: none;
+    border-top-color: #5a4e7c;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .formContainer {
+    background: rgba(255, 255, 255, 1);
+    border: 2px solid #000;
+    backdrop-filter: none;
+  }
+
+  .overlay {
+    background: rgba(0, 0, 0, 0.7);
+  }
+}
+
+/* Focus dentro del contenedor */
+.formContainer:focus-within {
+  outline: 3px solid rgba(90, 78, 124, 0.5);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .signInContainer {
+    background: white !important;
+    height: auto !important;
+  }
+
+  .overlay {
+    display: none;
+  }
+
+  .formContainer {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+}

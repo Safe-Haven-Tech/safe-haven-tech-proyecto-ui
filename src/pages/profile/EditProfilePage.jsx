@@ -1,9 +1,8 @@
-// src/pages/EditarPerfil/EditarPerfil.jsx
-import React, { useCallback } from 'react';
+import React, { useCallback,useState } from 'react';
 import EditarPerfilForm from '../../components/Profile/EditProfile/EditProfileForm';
-import PreviewCard from '../../components/Profile/EditProfile/PreviewCard';
-import ModalConfirmation from '../../components/Profile/EditProfile/ModalConfirmation';
+import ModalConfirmation from '../../components/Profile/EditProfile/modalConfirmation';
 import { useEditarPerfil } from '../../hooks/useEditProfile';
+import styles from './EditProfilePage.module.css';
 
 export default function EditarPerfil() {
   const {
@@ -14,6 +13,18 @@ export default function EditarPerfil() {
     eliminarFotoActual,
     handleGuardar,
   } = useEditarPerfil();
+
+   const [previewData, setPreviewData] = useState({
+    nombreCompleto: state.nombreCompleto,
+    nombreUsuario: state.nombreUsuario,
+    pronombres: state.pronombres,
+    biografia: state.biografia,
+    previsualizacionImagen: state.previsualizacionImagen,
+    fotoEliminada: state.fotoEliminada,
+  });
+    const handleFormPreviewChange = useCallback((data) => {
+    setPreviewData(data);
+  }, []);
 
   const cancelarEliminacion = useCallback(() => {
     dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
@@ -33,12 +44,10 @@ export default function EditarPerfil() {
   if (state.mostrarSkeleton) {
     return (
       <div
-        className="d-flex flex-column justify-content-center align-items-center"
-        style={{ minHeight: '100vh' }}
+        className={`d-flex flex-column justify-content-center align-items-center ${styles.skeletonContainer}`}
       >
         <div
-          className="spinner-border text-success mb-3"
-          style={{ width: '3rem', height: '3rem' }}
+          className={`spinner-border text-success mb-3 ${styles.skeletonSpinner}`}
           role="status"
         >
           <span className="visually-hidden">Cargando perfil...</span>
@@ -49,38 +58,7 @@ export default function EditarPerfil() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        width: '100%',
-        background: '#f0f2f5',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '30px',
-        justifyContent: 'flex-start',
-        paddingTop: '120px',
-        paddingBottom: '50px',
-        paddingLeft: '20px',
-        paddingRight: '20px',
-        position: 'relative',
-        boxSizing: 'border-box',
-      }}
-    >
-      <style>
-        {`
-          .modal {
-            backdrop-filter: blur(5px);
-          }
-          .modal-content {
-            border-radius: 16px;
-            border: none;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-          }
-        `}
-      </style>
-
-      {/* Formulario de edición */}
+    <div className={styles.editProfileContainer}>
       <EditarPerfilForm
         state={state}
         dispatch={dispatch}
@@ -89,18 +67,9 @@ export default function EditarPerfil() {
         onEliminarImagen={eliminarImagenSeleccionada}
         onEliminarFoto={eliminarFotoActual}
         onCancelarEliminacion={cancelarEliminacion}
+        onFormPreviewChange={handleFormPreviewChange} // NUEVO PROP
       />
 
-      {/* Vista previa */}
-      <PreviewCard
-        usuario={state.usuario}
-        nombreUsuario={state.nombreUsuario}
-        nombreCompleto={state.nombreCompleto}
-        pronombres={state.pronombres}
-        biografia={state.biografia}
-        fotoEliminada={state.fotoEliminada}
-        previsualizacionImagen={state.previsualizacionImagen}
-      />
 
       {/* Modal de confirmación */}
       <ModalConfirmation
@@ -111,7 +80,7 @@ export default function EditarPerfil() {
             <p>
               ¿Estás seguro de que quieres cambiar tu nickname de{' '}
               <strong>@{state.usuario?.nombreUsuario}</strong> a{' '}
-              <strong>@{state.nombreUsuario}</strong>?
+              <strong>@{state.formData?.nombreUsuario}</strong>?
             </p>
             <p className="text-warning">
               <i className="bi bi-exclamation-triangle me-1"></i>

@@ -1,0 +1,250 @@
+/* Contenedor principal - RESPONSIVE MEJORADO */
+.editProfileContainer {
+  min-height: 100vh;
+  width: 100%;
+  background: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px; /* Gap reducido para móvil */
+  justify-content: flex-start;
+  padding-top: 80px; /* Padding reducido para móvil */
+  padding-bottom: 30px; /* Padding reducido para móvil */
+  padding-left: 10px; /* Padding reducido para móvil */
+  padding-right: 10px; /* Padding reducido para móvil */
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Tablet - 576px y más */
+@media (min-width: 576px) {
+  .editProfileContainer {
+    gap: 20px;
+    padding-top: 90px;
+    padding-bottom: 35px;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
+/* Tablet grande - 768px y más */
+@media (min-width: 768px) {
+  .editProfileContainer {
+    gap: 25px;
+    padding-top: 100px;
+    padding-bottom: 40px;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+/* Desktop - 992px y más (DISEÑO ORIGINAL) */
+@media (min-width: 992px) {
+  .editProfileContainer {
+    gap: 30px; /* Valor original */
+    padding-top: 120px; /* Valor original */
+    padding-bottom: 50px; /* Valor original */
+    padding-left: 20px; /* Valor original */
+    padding-right: 20px; /* Valor original */
+  }
+}
+
+/* Desktop grande - 1200px y más */
+@media (min-width: 1200px) {
+  .editProfileContainer {
+    gap: 35px;
+    padding-top: 130px;
+    padding-bottom: 60px;
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+}
+
+/* Pantallas muy grandes - 1400px y más */
+@media (min-width: 1400px) {
+  .editProfileContainer {
+    gap: 40px;
+    padding-top: 140px;
+    padding-bottom: 70px;
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
+
+/* Estado de carga - RESPONSIVE */
+.skeletonContainer {
+  min-height: 100vh;
+  padding: 20px 10px; /* Padding para móvil */
+}
+
+@media (min-width: 576px) {
+  .skeletonContainer {
+    padding: 30px 15px;
+  }
+}
+
+@media (min-width: 768px) {
+  .skeletonContainer {
+    padding: 40px 20px;
+  }
+}
+
+.skeletonSpinner {
+  width: 2rem; /* Spinner más pequeño en móvil */
+  height: 2rem;
+}
+
+@media (min-width: 576px) {
+  .skeletonSpinner {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .skeletonSpinner {
+    width: 3rem; /* Tamaño original en desktop */
+    height: 3rem;
+  }
+}
+
+/* Estilos globales para modal - RESPONSIVE */
+:global(.modal) {
+  backdrop-filter: blur(3px); /* Blur reducido en móvil para performance */
+}
+
+@media (min-width: 768px) {
+  :global(.modal) {
+    backdrop-filter: blur(5px); /* Blur original en desktop */
+  }
+}
+
+:global(.modal-content) {
+  border-radius: 12px; /* Border radius reducido en móvil */
+  border: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); /* Sombra reducida en móvil */
+  margin: 10px; /* Margen en móvil para que no toque los bordes */
+}
+
+@media (min-width: 576px) {
+  :global(.modal-content) {
+    border-radius: 14px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.18);
+    margin: 20px;
+  }
+}
+
+@media (min-width: 768px) {
+  :global(.modal-content) {
+    border-radius: 16px; /* Border radius original */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); /* Sombra original */
+    margin: 30px;
+  }
+}
+
+/* Mejoras adicionales para móvil */
+@media (max-width: 575.98px) {
+  .editProfileContainer {
+    min-height: 100vh;
+    /* Asegurar que no haya scroll horizontal */
+    overflow-x: hidden;
+  }
+
+  /* Reducir aún más el gap en pantallas muy pequeñas */
+  @media (max-width: 375px) {
+    .editProfileContainer {
+      gap: 10px;
+      padding-top: 70px;
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+  }
+}
+
+/* Mejoras para tablets en orientación landscape */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .editProfileContainer {
+    padding-top: 80px; /* Reducir padding superior en landscape */
+    gap: 20px;
+  }
+}
+
+/* Optimización para pantallas táctiles */
+@media (hover: none) and (pointer: coarse) {
+  :global(.modal-content) {
+    /* Hacer el modal más fácil de tocar en móvil */
+    margin: 15px;
+    min-height: auto;
+  }
+}
+
+/* Mejora de accesibilidad para pantallas pequeñas */
+@media (max-width: 575.98px) {
+  :global(.modal-dialog) {
+    max-width: 95%; /* Modal más ancho en móvil */
+    margin: 10px auto;
+  }
+}
+
+/* Optimización para iPhone y pantallas similares */
+@media (max-width: 414px) {
+  .editProfileContainer {
+    padding-top: 70px;
+    gap: 12px;
+  }
+
+  .skeletonContainer {
+    padding: 15px 8px;
+  }
+
+  :global(.modal-content) {
+    margin: 8px;
+    border-radius: 10px;
+  }
+}
+
+/* Optimización para tablets iPad */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .editProfileContainer {
+    gap: 28px;
+    padding-top: 110px;
+    padding-bottom: 45px;
+  }
+}
+
+/* Asegurar que el contenido sea centrado en todas las pantallas */
+.editProfileContainer > * {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 576px) {
+  .editProfileContainer > * {
+    max-width: 500px; /* Limitar ancho en pantallas medianas */
+  }
+}
+
+@media (min-width: 768px) {
+  .editProfileContainer > * {
+    max-width: 600px; /* Limitar ancho en tablets */
+  }
+}
+
+@media (min-width: 992px) {
+  .editProfileContainer > * {
+    max-width: 800px; /* Limitar ancho en desktop */
+  }
+}
+
+/* Mejora de performance en móviles */
+@media (max-width: 768px) {
+  :global(.modal) {
+    /* Reducir efectos pesados en móvil */
+    backdrop-filter: blur(2px);
+  }
+
+  :global(.modal-content) {
+    /* Animación más sutil en móvil */
+    transition: transform 0.2s ease-out;
+  }
+}

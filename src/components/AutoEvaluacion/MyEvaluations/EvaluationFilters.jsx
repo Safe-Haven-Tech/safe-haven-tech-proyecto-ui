@@ -1,5 +1,5 @@
-// src/components/MyEvaluations/EvaluationFilters.jsx
 import React from 'react';
+import styles from './EvaluationFilters.module.css';
 
 const EvaluationFilters = ({
   busqueda,
@@ -11,21 +11,23 @@ const EvaluationFilters = ({
   filtroPuntaje,
   setFiltroPuntaje,
 }) => (
-  <div className="mb-4 d-flex flex-wrap gap-2">
+  <div className={styles.filtersContainer}>
+    {/* Input de búsqueda */}
     <input
       type="text"
       placeholder="Buscar por título..."
-      className="form-control"
+      className={`form-control ${styles.filterInput} ${styles.searchInput}`}
       value={busqueda}
       onChange={(e) => setBusqueda(e.target.value)}
-      style={{ borderRadius: '12px', padding: '12px', flex: '1 1 200px' }}
+      aria-label="Buscar evaluaciones por título"
     />
 
+    {/* Select de nivel de riesgo */}
     <select
-      className="form-select"
+      className={`form-select ${styles.filterSelect} ${styles.riskSelect}`}
       value={filtroNivel}
       onChange={(e) => setFiltroNivel(e.target.value)}
-      style={{ borderRadius: '12px', flex: '1 1 150px' }}
+      aria-label="Filtrar por nivel de riesgo"
     >
       <option value="">Nivel de riesgo</option>
       <option value="crítico">Crítico</option>
@@ -34,11 +36,12 @@ const EvaluationFilters = ({
       <option value="bajo">Bajo</option>
     </select>
 
+    {/* Select de fecha */}
     <select
-      className="form-select"
+      className={`form-select ${styles.filterSelect} ${styles.dateSelect}`}
       value={filtroFecha}
       onChange={(e) => setFiltroFecha(e.target.value)}
-      style={{ borderRadius: '12px', flex: '1 1 150px' }}
+      aria-label="Filtrar por fecha"
     >
       <option value="">Filtrar por fecha</option>
       <option value="7dias">Últimos 7 días</option>
@@ -46,13 +49,16 @@ const EvaluationFilters = ({
       <option value="año">Este año</option>
     </select>
 
+    {/* Input de puntaje mínimo */}
     <input
       type="number"
       placeholder="Puntaje mínimo"
-      className="form-control"
+      className={`form-control ${styles.filterInput} ${styles.scoreInput}`}
       value={filtroPuntaje}
       onChange={(e) => setFiltroPuntaje(e.target.value)}
-      style={{ borderRadius: '12px', padding: '12px', flex: '1 1 120px' }}
+      min="0"
+      max="100"
+      aria-label="Filtrar por puntaje mínimo"
     />
   </div>
 );

@@ -1,0 +1,702 @@
+/* 🎯 NUEVO: Contenedor principal SIN SCROLL */
+.registerFormContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Cambio de center a flex-start */
+  padding: 1.5rem;
+  /* 🎯 REMOVIDO: max-height y overflow-y para eliminar scroll */
+  width: 100%;
+}
+
+@media (min-width: 576px) {
+  .registerFormContainer {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .registerFormContainer {
+    padding: 2.5rem;
+  }
+}
+
+/* 🎯 NUEVO: Espaciado compacto para evitar scroll */
+@media (max-height: 700px) {
+  .registerFormContainer {
+    padding: 1.25rem;
+  }
+}
+
+/* Header del formulario - COMPACTO */
+.formHeader {
+  text-align: center;
+  margin-bottom: 1.5rem; /* 🎯 REDUCIDO de 2rem */
+  animation: fadeInDown 0.6s ease-out;
+}
+
+@media (min-width: 768px) {
+  .formHeader {
+    margin-bottom: 2rem; /* 🎯 REDUCIDO de 2.5rem */
+  }
+}
+
+@media (max-height: 700px) {
+  .formHeader {
+    margin-bottom: 1rem;
+  }
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Logo - COMPACTO */
+.logo {
+  height: 45px; /* 🎯 REDUCIDO de 50px */
+  width: auto;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease;
+  margin-bottom: 0.75rem; /* 🎯 REDUCIDO de 1rem */
+}
+
+@media (min-width: 576px) {
+  .logo {
+    height: 55px; /* 🎯 REDUCIDO de 60px */
+  }
+}
+
+@media (min-width: 768px) {
+  .logo {
+    height: 65px; /* 🎯 REDUCIDO de 70px */
+  }
+}
+
+@media (max-height: 700px) {
+  .logo {
+    height: 40px;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+/* 🎨 CAMBIO: Título VERDE */
+.formTitle {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, #2d5a27, #4caf50); /* 🎨 CAMBIO: Verde */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: clamp(1.4rem, 4vw, 1.8rem); /* 🎯 LIGERAMENTE REDUCIDO */
+  line-height: 1.2;
+}
+
+.formSubtitle {
+  color: #6c757d;
+  margin-bottom: 0;
+  font-size: clamp(0.85rem, 2vw, 0.95rem); /* 🎯 LIGERAMENTE REDUCIDO */
+}
+
+/* Formulario - ESPACIADO COMPACTO */
+.registerForm {
+  margin-bottom: 0.75rem; /* 🎯 REDUCIDO de 1rem */
+  animation: slideInUp 0.6s ease-out 0.2s both;
+}
+
+@keyframes slideInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Campos ocultos para prevenir autocompletado */
+.hiddenField {
+  display: none;
+}
+
+/* 🎯 NUEVO: Grupos de inputs COMPACTOS */
+.inputGroup {
+  margin-bottom: 1rem; /* 🎯 REDUCIDO de 1.25rem */
+  animation: fadeInLeft 0.6s ease-out backwards;
+}
+
+.inputGroup:nth-child(1) {
+  animation-delay: 0.3s;
+}
+.inputGroup:nth-child(2) {
+  animation-delay: 0.35s;
+}
+.inputGroup:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.inputGroup:nth-child(4) {
+  animation-delay: 0.45s;
+}
+.inputGroup:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+@media (max-height: 700px) {
+  .inputGroup {
+    margin-bottom: 0.75rem;
+  }
+}
+
+@keyframes fadeInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 🎨 CAMBIO: Labels con icono VERDE */
+.inputLabel {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  font-size: clamp(0.8rem, 1.5vw, 0.85rem); /* 🎯 LIGERAMENTE REDUCIDO */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.inputIcon {
+  color: #2d5a27; /* 🎨 CAMBIO: Verde oscuro */
+  font-size: 0.85rem; /* 🎯 LIGERAMENTE REDUCIDO */
+  transition: color 0.3s ease;
+}
+
+/* Input container */
+.inputContainer {
+  position: relative;
+}
+
+/* 🎨 CAMBIO: Inputs base VERDE */
+.formInput {
+  width: 100%;
+  padding: 0.75rem 1rem; /* 🎯 LIGERAMENTE REDUCIDO */
+  border: 2px solid rgba(76, 175, 80, 0.2); /* 🎨 CAMBIO: Verde */
+  border-radius: 12px;
+  background: rgba(248, 249, 250, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: clamp(0.85rem, 2vw, 0.95rem); /* 🎯 LIGERAMENTE REDUCIDO */
+  color: #2c3e50;
+  backdrop-filter: blur(5px);
+}
+
+@media (min-width: 576px) {
+  .formInput {
+    padding: 0.875rem 1.25rem;
+  }
+}
+
+@media (max-height: 700px) {
+  .formInput {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Input con botón (password) */
+.inputWithButton {
+  padding-right: 3rem;
+}
+
+@media (min-width: 576px) {
+  .inputWithButton {
+    padding-right: 3.25rem;
+  }
+}
+
+/* 🎨 CAMBIO: Estados de input VERDE con micro-interacciones */
+.formInput:focus {
+  outline: none;
+  border-color: #2d5a27; /* 🎨 CAMBIO: Verde oscuro */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(240, 255, 240, 0.95) 100%
+  ); /* 🎨 CAMBIO: Tinte verde sutil */
+  box-shadow:
+    0 0 0 3px rgba(76, 175, 80, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 0 20px rgba(76, 175, 80, 0.1); /* 🎨 CAMBIO: Glow verde */
+  transform: translateY(-1px) scale(1.01);
+}
+
+.formInput:hover:not(:disabled):not(:focus) {
+  border-color: rgba(76, 175, 80, 0.3); /* 🎨 CAMBIO: Verde */
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-0.5px);
+}
+
+.formInput:disabled {
+  background: rgba(233, 236, 239, 0.5);
+  border-color: rgba(233, 236, 239, 0.5);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* 🎨 CAMBIO: Estados de validación VERDE */
+.inputValid {
+  border-color: #4caf50; /* 🎨 CAMBIO: Verde */
+  background: rgba(76, 175, 80, 0.05); /* 🎨 CAMBIO: Fondo verde sutil */
+  box-shadow: inset 0 1px 0 rgba(76, 175, 80, 0.1);
+}
+
+.inputInvalid {
+  border-color: #dc3545;
+  background: rgba(220, 53, 69, 0.05);
+}
+
+/* 🎨 CAMBIO: Placeholder con focus verde */
+.formInput::placeholder {
+  color: rgba(108, 117, 125, 0.7);
+  font-style: italic;
+  transition: all 0.3s ease;
+}
+
+.formInput:focus::placeholder {
+  color: rgba(76, 175, 80, 0.6); /* 🎨 CAMBIO: Verde */
+  transform: translateY(-2px);
+  font-size: 0.9em;
+}
+
+/* 🎨 CAMBIO: Botón toggle password VERDE */
+.passwordToggle {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 0.85rem; /* 🎯 LIGERAMENTE REDUCIDO */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  border-radius: 6px;
+}
+
+.passwordToggle:hover {
+  color: #4caf50; /* 🎨 CAMBIO: Verde */
+  background: rgba(76, 175, 80, 0.1); /* 🎨 CAMBIO: Fondo verde */
+  transform: translateY(-50%) scale(1.1);
+}
+
+.passwordToggle:focus {
+  outline: 2px solid rgba(76, 175, 80, 0.5); /* 🎨 CAMBIO: Verde */
+  outline-offset: 2px;
+  background: rgba(76, 175, 80, 0.05);
+}
+
+.passwordToggle:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* 🎨 CAMBIO: Tick de validación VERDE */
+.validationTick {
+  position: absolute;
+  top: 50%;
+  right: 2.75rem;
+  transform: translateY(-50%);
+  color: #4caf50; /* 🎨 CAMBIO: Verde */
+  font-size: 0.85rem; /* 🎯 LIGERAMENTE REDUCIDO */
+  z-index: 5;
+  animation: tickAppear 0.3s ease-out;
+}
+
+@keyframes tickAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+/* Mensajes de feedback - COMPACTOS */
+.feedbackMessage {
+  margin-top: 0.375rem; /* 🎯 REDUCIDO de 0.5rem */
+  font-size: clamp(0.7rem, 1.2vw, 0.75rem);
+  line-height: 1.25; /* 🎯 LIGERAMENTE REDUCIDO */
+  animation: fadeInUp 0.3s ease-out;
+  display: block;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feedbackSuccess {
+  color: #4caf50; /* 🎨 CAMBIO: Verde */
+}
+
+.feedbackError {
+  color: #dc3545;
+}
+
+.feedbackInfo {
+  color: #17a2b8;
+}
+
+/* 🎨 CAMBIO: Alertas VERDE - COMPACTAS */
+.alert {
+  border: none;
+  border-radius: 12px;
+  margin-bottom: 0.75rem; /* 🎯 REDUCIDO de 1rem */
+  padding: 0.75rem 1rem; /* 🎯 LIGERAMENTE REDUCIDO */
+  font-size: clamp(0.8rem, 1.5vw, 0.85rem); /* 🎯 LIGERAMENTE REDUCIDO */
+  animation: slideInDown 0.3s ease-out;
+  border-left: 4px solid;
+}
+
+@keyframes slideInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.alertSuccess {
+  background: linear-gradient(135deg, #d4edda, #c3e6cb);
+  color: #155724;
+  border-left-color: #4caf50; /* 🎨 CAMBIO: Verde */
+}
+
+.alertError {
+  background: linear-gradient(135deg, #f8d7da, #f1b0b7);
+  color: #721c24;
+  border-left-color: #dc3545;
+}
+
+/* 🎨 CAMBIO: Botón principal VERDE con efectos premium */
+.submitButton {
+  width: 100%;
+  font-weight: 600;
+  padding: 0.875rem; /* 🎯 LIGERAMENTE REDUCIDO */
+  margin-bottom: 1rem; /* 🎯 REDUCIDO de 1.5rem */
+  background: linear-gradient(135deg, #2d5a27, #4caf50); /* 🎨 CAMBIO: Verde */
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: clamp(0.85rem, 2vw, 0.95rem); /* 🎯 LIGERAMENTE REDUCIDO */
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  /* 🎨 CAMBIO: Efectos verdes */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 4px 12px rgba(76, 175, 80, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 576px) {
+  .submitButton {
+    padding: 1rem;
+  }
+}
+
+@media (max-height: 700px) {
+  .submitButton {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 6px 20px rgba(76, 175, 80, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 30px rgba(76, 175, 80, 0.2); /* 🎨 CAMBIO: Glow verde */
+  background: linear-gradient(135deg, #2d5a27, #4caf50, #66bb6a);
+}
+
+@media (min-width: 768px) {
+  .submitButton:hover:not(:disabled) {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow:
+      0 8px 25px rgba(76, 175, 80, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 0 40px rgba(76, 175, 80, 0.25);
+  }
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+  box-shadow:
+    0 2px 8px rgba(76, 175, 80, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.1s ease;
+}
+
+.submitButton:disabled {
+  background: linear-gradient(135deg, #6c757d, #adb5bd);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 🎨 CAMBIO: Loading con shimmer verde */
+.submitButton:disabled::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Efecto ripple mejorado */
+.submitButton::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.submitButton:hover:not(:disabled)::after {
+  width: 300px;
+  height: 300px;
+  opacity: 0;
+}
+
+.submitButton span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Footer - COMPACTO */
+.formFooter {
+  text-align: center;
+  animation: fadeIn 0.6s ease-out 0.8s both;
+  margin-top: 0.5rem; /* 🎯 REDUCIDO para compactar */
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.footerText {
+  margin-bottom: 0;
+  font-size: clamp(0.75rem, 1.5vw, 0.85rem); /* 🎯 LIGERAMENTE REDUCIDO */
+  color: #6c757d;
+}
+
+/* 🎨 CAMBIO: Links VERDE */
+.footerLink {
+  font-weight: 600;
+  color: #2d5a27; /* 🎨 CAMBIO: Verde oscuro */
+  text-decoration: none;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.footerLink:hover {
+  color: #4caf50; /* 🎨 CAMBIO: Verde claro */
+  text-decoration: none;
+}
+
+.footerLink::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #2d5a27, #4caf50); /* 🎨 CAMBIO: Verde */
+  transition: width 0.3s ease;
+}
+
+.footerLink:hover::after {
+  width: 100%;
+}
+
+/* 🎯 NUEVO: Micro-interacciones mejoradas */
+.inputGroup:focus-within .inputLabel {
+  color: #2d5a27; /* 🎨 CAMBIO: Verde */
+  transform: translateY(-1px);
+}
+
+.inputGroup:focus-within .inputIcon {
+  color: #4caf50; /* 🎨 CAMBIO: Verde claro */
+  transform: scale(1.1);
+}
+
+.inputLabel::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #2d5a27, #4caf50);
+  transition: width 0.3s ease;
+  border-radius: 0.5px;
+}
+
+.inputGroup:focus-within .inputLabel::after {
+  width: 100%;
+}
+
+/* Responsividad para pantallas muy pequeñas - MÁS COMPACTO */
+@media (max-width: 320px) {
+  .registerFormContainer {
+    padding: 1rem;
+  }
+
+  .formHeader {
+    margin-bottom: 1rem;
+  }
+
+  .logo {
+    height: 35px;
+    margin-bottom: 0.5rem;
+  }
+
+  .inputGroup {
+    margin-bottom: 0.75rem;
+  }
+
+  .formInput {
+    padding: 0.625rem;
+    font-size: 0.85rem;
+  }
+
+  .inputWithButton {
+    padding-right: 2.5rem;
+  }
+
+  .submitButton {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .passwordToggle {
+    right: 0.25rem;
+    padding: 0.375rem;
+  }
+
+  .validationTick {
+    right: 2.25rem;
+  }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .submitButton:hover:not(:disabled),
+  .logo:hover,
+  .formInput:hover,
+  .formInput:focus {
+    transform: none;
+  }
+
+  .submitButton::before,
+  .submitButton::after {
+    display: none;
+  }
+}
+
+/* 🎨 CAMBIO: High contrast mode VERDE */
+@media (prefers-contrast: high) {
+  .formTitle {
+    background: none;
+    -webkit-text-fill-color: initial;
+    color: #000;
+  }
+
+  .formInput {
+    border: 2px solid #000;
+    background: #fff;
+  }
+
+  .submitButton {
+    background: #2d5a27; /* 🎨 CAMBIO: Verde oscuro */
+    border: 2px solid #000;
+  }
+
+  .footerLink {
+    color: #2d5a27; /* 🎨 CAMBIO: Verde */
+  }
+
+  .inputIcon {
+    color: #2d5a27; /* 🎨 CAMBIO: Verde */
+  }
+}

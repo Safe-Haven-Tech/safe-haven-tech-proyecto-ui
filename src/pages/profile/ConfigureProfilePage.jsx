@@ -1,7 +1,8 @@
-// src/pages/ConfigurarPerfil/ConfigurarPerfil.jsx
+/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\pages\profile\ConfigureProfilePage.jsx */
 import React from 'react';
 import { useAuth } from '../../context/useAuth';
 import { useConfigurarPerfil } from '../../hooks/useConfigurarProfile';
+import styles from './ConfigureProfilePage.module.css';
 
 import ConfigurarPerfilForm from '../../components/Profile/ConfigureProfile/ConfigureProfileForm';
 import ChangePasswordModal from '../../components/Profile/ConfigureProfile/ChangePasswordModal';
@@ -54,7 +55,7 @@ const ConfigurarPerfil = () => {
 
   if (!usuario) {
     return (
-      <div className="text-center mt-5 pt-5">
+      <div className={`text-center mt-5 pt-5 ${styles.loadingContainer}`}>
         <div className="spinner-border text-success" role="status">
           <span className="visually-hidden">Cargando...</span>
         </div>
@@ -64,20 +65,7 @@ const ConfigurarPerfil = () => {
   }
 
   return (
-    <div
-      style={{
-        paddingTop: '100px',
-        paddingBottom: '50px',
-        minHeight: '100vh',
-        background: '#f0f2f5',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        width: '100%',
-        paddingLeft: '15px',
-        paddingRight: '15px',
-      }}
-    >
+    <div className={styles.configureContainer}>
       {/* Formulario principal */}
       <ConfigurarPerfilForm
         usuario={usuario}

@@ -1,6 +1,8 @@
+/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\pages\AutoEvaluacion\MyEvaluations.jsx */
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { obtenerHistorialRespuestas } from '../../services/surveysServices';
+import styles from './MyEvaluations.module.css';
 import PdfOverlay from '../../components/AutoEvaluacion/MyEvaluations/PdfOverlay';
 import EvaluationBanner from '../../components/AutoEvaluacion/MyEvaluations/EvaluationBanner';
 import EvaluationFilters from '../../components/AutoEvaluacion/MyEvaluations/EvaluationFilters';
@@ -92,35 +94,29 @@ const MyEvaluations = () => {
 
   if (loading)
     return (
-      <div className="text-center mt-5">
-        <p>Cargando tus evaluaciones...</p>
+      <div className={styles.loadingContainer}>
+        <p className={styles.loadingText}>Cargando tus evaluaciones...</p>
       </div>
     );
+
   if (!usuario)
     return (
-      <div className="text-center mt-5">
-        <p>Debes iniciar sesión para ver tus evaluaciones.</p>
+      <div className={styles.errorContainer}>
+        <p className={styles.errorText}>
+          Debes iniciar sesión para ver tus evaluaciones.
+        </p>
       </div>
     );
 
   return (
-    <div
-      className="container"
-      style={{
-        marginTop: '100px',
-        fontFamily: "'Poppins', sans-serif",
-        position: 'relative',
-      }}
-    >
+    <div className={`container ${styles.container}`}>
       {pdfLoading && <PdfOverlay />}
-      <EvaluationBanner usuario={usuario} respuestas={respuestas} />
-      <div
-        className="p-4 rounded-4"
-        style={{
-          backgroundColor: '#F9F9F9',
-          boxShadow: '0 6px 20px rgba(0,0,0,0.08)',
-        }}
-      >
+
+      <div className={styles.fadeSlideUp}>
+        <EvaluationBanner usuario={usuario} respuestas={respuestas} />
+      </div>
+
+      <div className={styles.evaluationsContainer}>
         <EvaluationFilters
           busqueda={busqueda}
           setBusqueda={setBusqueda}
@@ -133,11 +129,13 @@ const MyEvaluations = () => {
         />
 
         {filteredRespuestas.length === 0 ? (
-          <div className="text-center">
-            <p className="text-muted">No se encontraron evaluaciones.</p>
+          <div className={styles.noEvaluationsContainer}>
+            <p className={styles.noEvaluationsText}>
+              No se encontraron evaluaciones.
+            </p>
           </div>
         ) : (
-          <div className="row g-4">
+          <div className={styles.evaluationsGrid}>
             {filteredRespuestas.map((r, idx) => (
               <EvaluationCard
                 key={r._id}
@@ -151,25 +149,16 @@ const MyEvaluations = () => {
         )}
       </div>
 
-      <div className="text-center mt-5">
-        <p>
+      <div className={styles.ctaContainer}>
+        <p className={styles.ctaText}>
           ¿Quieres realizar una nueva autoevaluación?{' '}
-          <a
-            href="/autoevaluacion"
-            style={{ color: '#5A4E7C', fontWeight: '600' }}
-          >
+          <a href="/autoevaluacion" className={styles.ctaLink}>
             Haz clic aquí
           </a>
         </p>
       </div>
 
       <ReactTooltip place="top" type="dark" effect="solid" />
-      <style>{`
-        @keyframes fadeSlideUp {
-          0% { opacity: 0; transform: translateY(20px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 };

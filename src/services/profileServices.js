@@ -331,3 +331,30 @@ export const actualizarConfiguracion = async (id, configuracion, token) => {
     throw error;
   }
 };
+
+/**
+ * Obtiene los posts de tipo "perfil" de un usuario por su ID
+ * @param {string} userId - ID del usuario
+ * @param {string} token - Token de autenticación
+ * @returns {Promise<Array>} Lista de posts de tipo "perfil"
+ */
+export const fetchPostsPerfilByUserId = async (userId, token) => {
+  try {
+    const url = `${API_URL}/api/publicaciones/usuario/${userId}?tipo=perfil`;
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    const res = await fetch(url, { headers });
+    if (!res.ok) {
+      throw new Error('No se pudieron obtener los posts de perfil');
+    }
+    const data = await res.json();
+    return data.posts;
+  } catch (error) {
+    console.error('❌ Error en fetchPostsPerfilByUserId:', error);
+    throw error;
+  }
+};

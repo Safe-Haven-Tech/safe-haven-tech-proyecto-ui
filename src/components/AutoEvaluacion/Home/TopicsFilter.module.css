@@ -1,0 +1,230 @@
+/* Sección principal */
+.topicsSection {
+  border-radius: 1.5rem;
+  background: #faf8ff;
+  box-shadow: 0 6px 18px rgba(90, 78, 124, 0.08);
+  padding: 1.5rem;
+  margin: 3rem 0;
+}
+
+@media (min-width: 576px) {
+  .topicsSection {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .topicsSection {
+    padding: 2.5rem;
+  }
+}
+
+/* Título de la sección */
+.sectionTitle {
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  background: linear-gradient(90deg, #5a4e7c, #a17cca);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: clamp(1.2rem, 3vw, 1.75rem);
+}
+
+@media (min-width: 768px) {
+  .sectionTitle {
+    margin-bottom: 2rem;
+  }
+}
+
+/* 🎯 NUEVO: Contenedor flexbox centrado (igual al original) */
+.topicsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem; /* 🎯 Equivalente a gap-3 de Bootstrap */
+  align-items: center;
+}
+
+@media (min-width: 576px) {
+  .topicsContainer {
+    gap: 1rem;
+  }
+}
+
+/* 🎯 NUEVO: Botones replicando exactamente el diseño original */
+.topicBtn {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500; /* 🎯 IGUAL al original */
+  padding: 0.5rem 1rem; /* 🎯 EXACTO al original */
+  border-radius: 2rem; /* 🎯 EXACTO al original */
+  border: 1px solid #a17cca; /* 🎯 EXACTO al original */
+  background: #f7f5fb; /* 🎯 EXACTO al original */
+  color: #5a4e7c; /* 🎯 EXACTO al original */
+  transition: all 0.3s ease; /* 🎯 EXACTO al original */
+  cursor: pointer;
+  font-size: 0.9rem; /* 🎯 EXACTO al original */
+  white-space: nowrap;
+  text-align: center;
+  position: relative;
+  /* 🎯 NUEVO: Estilos adicionales para consistencia */
+  outline: none;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Remueve estilos de botón por defecto */
+.topicBtn:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+/* 🎯 NUEVO: Hover exacto al original */
+.topicBtn:hover {
+  transform: translateY(-3px); /* 🎯 EXACTO al original */
+  background: #e6e0f5; /* 🎯 EXACTO al original */
+  color: #5a4e7c; /* 🎯 Mantiene el color original */
+  border-color: #a17cca; /* 🎯 Mantiene el borde original */
+  text-decoration: none; /* 🎯 Sin subrayado */
+}
+
+/* 🎯 NUEVO: Estado activo exacto al original */
+.topicBtnActive {
+  background: linear-gradient(
+    90deg,
+    #5a4e7c,
+    #a17cca
+  ) !important; /* 🎯 EXACTO al original */
+  color: #fff !important; /* 🎯 EXACTO al original */
+  box-shadow: 0 4px 12px rgba(90, 78, 124, 0.3); /* 🎯 EXACTO al original */
+  border-color: transparent; /* 🎯 Para que no se vea el borde sobre el gradiente */
+  transform: none; /* 🎯 Sin transform por defecto cuando está activo */
+}
+
+/* 🎯 NUEVO: Hover del botón activo */
+.topicBtnActive:hover {
+  background: linear-gradient(90deg, #5a4e7c, #a17cca) !important;
+  color: #fff !important;
+  transform: translateY(-3px); /* 🎯 Mantiene el efecto hover */
+  box-shadow: 0 6px 15px rgba(90, 78, 124, 0.4); /* 🎯 Sombra más intensa en hover */
+}
+
+/* 🎯 NUEVO: Estados de interacción */
+.topicBtn:active {
+  transform: translateY(-1px);
+}
+
+.topicBtnActive:active {
+  transform: translateY(-1px);
+}
+
+/* 🎯 NUEVO: Responsividad mejorada */
+@media (max-width: 576px) {
+  .topicBtn {
+    font-size: 0.85rem;
+    padding: 0.45rem 0.9rem;
+  }
+
+  .topicsContainer {
+    gap: 0.5rem;
+    margin: 0 -0.5rem; /* Para compensar el padding en móvil */
+  }
+}
+
+@media (min-width: 768px) {
+  .topicBtn {
+    font-size: 0.95rem;
+    padding: 0.6rem 1.2rem;
+  }
+}
+
+/* 🎯 NUEVO: Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .topicBtn,
+  .topicBtnActive {
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .topicBtn:hover,
+  .topicBtnActive:hover {
+    transform: none;
+  }
+}
+
+/* 🎯 NUEVO: Modo alto contraste */
+@media (prefers-contrast: high) {
+  .topicBtn {
+    border-width: 2px;
+    background: #fff;
+    color: #000;
+  }
+
+  .topicBtn:hover {
+    background: #f0f0f0;
+    color: #000;
+  }
+
+  .topicBtnActive {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #000 !important;
+  }
+}
+
+/* 🎯 NUEVO: Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .topicsSection {
+    background: rgba(250, 248, 255, 0.95);
+  }
+}
+
+/* 🎯 NUEVO: Animación de entrada sutil (opcional) */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.topicBtn {
+  animation: fadeInUp 0.3s ease-out backwards;
+}
+
+.topicBtn:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.topicBtn:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.topicBtn:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.topicBtn:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.topicBtn:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.topicBtn:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.topicBtn:nth-child(7) {
+  animation-delay: 0.35s;
+}
+.topicBtn:nth-child(8) {
+  animation-delay: 0.4s;
+}
+
+/* Desactivar animación si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce) {
+  .topicBtn {
+    animation: none;
+  }
+}

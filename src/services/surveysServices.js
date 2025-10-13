@@ -172,3 +172,104 @@ export const generarPDFEncuesta = async (respuesta) => {
     throw error;
   }
 };
+
+export const crearEncuesta = async (encuesta, token) => {
+  try {
+    const res = await fetch(`${API_URL}/api/encuestas`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(encuesta),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(
+        data.detalles || data.mensaje || 'Error al crear la encuesta'
+      );
+    }
+    return data.encuesta;
+  } catch (error) {
+    console.error('Error en crearEncuesta:', error);
+    throw error;
+  }
+};
+
+export const desactivarEncuesta = async (encuestaId, token) => {
+  try {
+    const res = await fetch(
+      `${API_URL}/api/encuestas/${encuestaId}/desactivar`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const data = await res.json();
+    if (!res.ok)
+      throw new Error(data.mensaje || 'Error al desactivar encuesta');
+    return { success: true, encuesta: data.encuesta };
+  } catch (error) {
+    console.error('Error en desactivarEncuesta:', error);
+    return { success: false, mensaje: error.message };
+  }
+};
+
+export const eliminarEncuesta = async (encuestaId, token) => {
+  try {
+    const res = await fetch(`${API_URL}/api/encuestas/${encuestaId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.mensaje || 'Error al eliminar encuesta');
+    return { success: true };
+  } catch (error) {
+    console.error('Error en eliminarEncuesta:', error);
+    return { success: false, mensaje: error.message };
+  }
+};
+
+export const activarEncuesta = async (encuestaId, token) => {
+  try {
+    const res = await fetch(`${API_URL}/api/encuestas/${encuestaId}/activar`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.mensaje || 'Error al activar encuesta');
+    return { success: true, encuesta: data.encuesta };
+  } catch (error) {
+    console.error('Error en activarEncuesta:', error);
+    return { success: false, mensaje: error.message };
+  }
+};
+
+export const actualizarEncuesta = async (encuestaId, datos, token) => {
+  try {
+    const res = await fetch(`${API_URL}/api/encuestas/${encuestaId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(datos),
+    });
+    const data = await res.json();
+    if (!res.ok)
+      throw new Error(data.mensaje || 'Error al actualizar encuesta');
+    return { success: true, encuesta: data.encuesta };
+  } catch (error) {
+    console.error('Error en actualizarEncuesta:', error);
+    return { success: false, mensaje: error.message };
+  }
+};

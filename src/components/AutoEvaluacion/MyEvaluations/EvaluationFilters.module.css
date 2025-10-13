@@ -1,0 +1,250 @@
+/* Contenedor principal de filtros */
+.filtersContainer {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+@media (min-width: 576px) {
+  .filtersContainer {
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .filtersContainer {
+    gap: 1.2rem;
+    margin-bottom: 2.5rem;
+  }
+}
+
+/* Estilos base para todos los inputs */
+.filterInput,
+.filterSelect {
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  min-width: 0; /* Importante para flex */
+}
+
+@media (min-width: 576px) {
+  .filterInput,
+  .filterSelect {
+    font-size: 0.95rem;
+    padding: 0.875rem 1rem;
+  }
+}
+
+/* Input de búsqueda */
+.searchInput {
+  flex: 1 1 200px;
+  min-width: 200px;
+}
+
+@media (min-width: 768px) {
+  .searchInput {
+    flex: 1 1 250px;
+    min-width: 250px;
+  }
+}
+
+/* Selects de filtro */
+.riskSelect,
+.dateSelect {
+  flex: 1 1 150px;
+  min-width: 140px;
+}
+
+@media (min-width: 768px) {
+  .riskSelect,
+  .dateSelect {
+    flex: 1 1 170px;
+    min-width: 160px;
+  }
+}
+
+/* Input de puntaje */
+.scoreInput {
+  flex: 1 1 120px;
+  min-width: 120px;
+}
+
+@media (min-width: 768px) {
+  .scoreInput {
+    flex: 1 1 140px;
+    min-width: 130px;
+  }
+}
+
+/* Estados de focus */
+.filterInput:focus,
+.filterSelect:focus {
+  outline: none;
+  border-color: #a17cca;
+  box-shadow:
+    0 0 0 3px rgba(161, 124, 202, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Estados de hover */
+.filterInput:hover,
+.filterSelect:hover {
+  border-color: #c9a3e0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Placeholder styling */
+.filterInput::placeholder {
+  color: #6c757d;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+/* Select option styling */
+.filterSelect option {
+  padding: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.filterSelect option:first-child {
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Validación visual */
+.filterInput:invalid {
+  border-color: #dc3545;
+}
+
+.filterInput:valid {
+  border-color: #28a745;
+}
+
+/* Estilos específicos para número */
+.scoreInput::-webkit-outer-spin-button,
+.scoreInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.scoreInput {
+  -moz-appearance: textfield;
+}
+
+/* Responsive stacking en pantallas pequeñas */
+@media (max-width: 575px) {
+  .filtersContainer {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .searchInput,
+  .riskSelect,
+  .dateSelect,
+  .scoreInput {
+    flex: 1;
+    min-width: 100%;
+  }
+}
+
+/* Responsive para tablets */
+@media (min-width: 576px) and (max-width: 767px) {
+  .filtersContainer {
+    justify-content: space-between;
+  }
+
+  .searchInput {
+    flex: 1 1 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .riskSelect,
+  .dateSelect,
+  .scoreInput {
+    flex: 1;
+    min-width: calc(33.333% - 0.67rem);
+  }
+}
+
+/* Animaciones de entrada */
+.filtersContainer > * {
+  animation: slideInUp 0.4s ease-out backwards;
+}
+
+.filtersContainer > *:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.filtersContainer > *:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.filtersContainer > *:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.filtersContainer > *:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+@keyframes slideInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Disabled state */
+.filterInput:disabled,
+.filterSelect:disabled {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .filterInput,
+  .filterSelect {
+    transition: none;
+  }
+
+  .filtersContainer > * {
+    animation: none;
+  }
+
+  .filterInput:hover,
+  .filterSelect:hover,
+  .filterInput:focus,
+  .filterSelect:focus {
+    transform: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .filterInput,
+  .filterSelect {
+    border-width: 3px;
+    border-color: #000;
+  }
+
+  .filterInput:focus,
+  .filterSelect:focus {
+    border-color: #0066cc;
+    box-shadow: none;
+  }
+}
