@@ -1,0 +1,138 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 27, 38, 0.25);
+  z-index: 1050;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+.modalWrapper {
+  margin-top: 80px; /* espacio para el navbar */
+  width: 100%;
+  max-width: 410px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(96, 60, 126, 0.18);
+  overflow: hidden;
+  animation: fadeInModal .22s ease;
+}
+
+/* Header */
+.modalHeader {
+  padding: 22px 28px 12px 28px;
+  border-bottom: 1px solid #f2f2f2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #faf8fc;
+}
+
+.title {
+  margin: 0;
+  font-weight: 700;
+  color: #603c7e;
+  font-size: 1.18rem;
+}
+
+/* Close button */
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #888;
+  cursor: pointer;
+  margin-left: 8px;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Body */
+.modalBody {
+  padding: 22px 28px 0 28px;
+}
+
+.formLabel {
+  display: block;
+  font-weight: 500;
+  color: #603c7e;
+  margin-bottom: 8px;
+}
+
+.select {
+  width: 100%;
+  border-radius: 8px;
+  border: 1.5px solid #e0e0e0;
+  margin-bottom: 12px;
+  font-size: 1rem;
+  padding: 8px 10px;
+  background: #fff;
+  appearance: none;
+  color: #222;
+}
+
+.textarea {
+  width: 100%;
+  border-radius: 8px;
+  border: 1.5px solid #e0e0e0;
+  font-size: 1rem;
+  padding: 10px;
+  margin-bottom: 4px;
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Error */
+.errorText {
+  color: #d32f2f;
+  font-size: 0.98rem;
+  margin-top: 8px;
+}
+
+/* Footer */
+.modalFooter {
+  padding: 18px 28px;
+  border-top: 1px solid #f2f2f2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: #faf8fc;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 8px 22px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btnCancel {
+  background: #fff;
+  color: #603c7e;
+  border: 1.5px solid #603c7e;
+}
+
+.btnPrimary {
+  background: #d32f2f;
+  color: #fff;
+  border: none;
+}
+
+/* Small responsive tweak */
+@media (max-width: 420px) {
+  .modalWrapper {
+    margin: 80px 16px 24px 16px;
+    max-width: calc(100% - 32px);
+  }
+}
+
+/* Animación */
+@keyframes fadeInModal {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}

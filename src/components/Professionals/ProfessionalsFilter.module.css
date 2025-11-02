@@ -1,0 +1,109 @@
+/* Contenedor del filtro */
+.filterWrap {
+  margin-bottom: 1rem;
+  background: #fff;
+  padding: 0.9rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(16,24,40,0.04);
+}
+
+/* Fila de búsqueda / selects */
+.searchRow {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inputs y selects */
+.input {
+  flex: 1 1 320px;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid #e6e6e6;
+  background: #fff;
+  font-size: 0.95rem;
+  color: #2f2f2f;
+  transition: box-shadow .15s ease, transform .12s ease;
+}
+.input::placeholder { color: #9aa0a6; }
+
+.select, .selectSmall {
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid #e6e6e6;
+  background: #fff;
+  font-size: 0.95rem;
+  color: #2f2f2f;
+}
+
+.selectSmall { width: 150px; }
+
+/* Focus accesible */
+.input:focus, .select:focus, .selectSmall:focus {
+  outline: none;
+  box-shadow: 0 6px 18px rgba(90,78,124,0.08);
+  border-color: #a17cca;
+}
+
+/* Chips rápidos */
+.quickChips {
+  margin-top: 0.6rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.chipBtn {
+  background: #f7f5fb;
+  border: 1px solid #a17cca;
+  color: #5a4e7c;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.chipBtn:focus { outline: none; box-shadow: 0 6px 18px rgba(90,78,124,0.06); }
+
+.chipActive {
+  background: linear-gradient(90deg,#5a4e7c,#a17cca);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(90,78,124,0.18);
+}
+
+/* Clear button */
+.clearBtn {
+  background: transparent;
+  border: 1px dashed #cfcfcf;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  color: #666;
+  cursor: pointer;
+}
+
+/* Hover / active states */
+.chipBtn:hover { transform: translateY(-3px); background: #e6e0f5; }
+.chipActive:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(90,78,124,0.22); }
+
+/* Mobile adjustments */
+@media (max-width: 575.98px) {
+  .input { flex-basis: 100%; }
+  .selectSmall { width: 100%; }
+  .searchRow { gap: 0.5rem; }
+}
+
+/* Reduced motion / accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .chipBtn, .chipActive, .input, .select { transition: none; }
+}
+
+/* High contrast adjustments */
+@media (prefers-contrast: high) {
+  .chipBtn { border-width: 2px; background: #fff; color: #000; }
+  .chipActive { background: #000 !important; color: #fff !important; }
+}

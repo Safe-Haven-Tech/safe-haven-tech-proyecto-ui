@@ -130,10 +130,9 @@
 
 .functionsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: 1fr; 
   gap: 20px;
 }
-
 .functionCard {
   background: white;
   padding: 30px;
@@ -145,6 +144,8 @@
   align-items: center;
   gap: 20px;
   border: 2px solid transparent;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .functionCard:hover {

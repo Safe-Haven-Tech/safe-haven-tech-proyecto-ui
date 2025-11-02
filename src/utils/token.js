@@ -1,12 +1,24 @@
-// utils/token.js
+/**
+ * Utilidades para manejar y parsear tokens JWT.
+ * - getToken / getCurrentUser / isTokenValid / parseJwt
+ * - Logs concisos y defensivos; devuelve null en lugar de lanzar en parseos.
+ */
 
-// Función para obtener el usuario actual desde el token almacenado
+export const getToken = () => {
+  try {
+    return localStorage.getItem('token') || null;
+  } catch {
+    return null;
+  }
+};
+
 export function getCurrentUser() {
-  const token = localStorage.getItem('token');
+  const token = getToken();
   if (!token) return null;
 
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
+    const payload = parseJwt(token);
+    if (!payload) return null;
     if (payload.exp && payload.exp < Date.now() / 1000) return null;
     return payload;
   } catch {
@@ -14,20 +26,26 @@ export function getCurrentUser() {
   }
 }
 
-// Función para parsear JWT
+export const isTokenValid = () => Boolean(getCurrentUser());
+
 export const parseJwt = (token) => {
+  if (!token || typeof token !== 'string') return null;
   try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+    const decoded = atob(padded);
     const jsonPayload = decodeURIComponent(
-      atob(base64)
+      decoded
         .split('')
         .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     );
     return JSON.parse(jsonPayload);
-  } catch (error) {
-    console.error('Error decoding token:', error);
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('parseJwt error:', err.message || err);
     return null;
   }
 };

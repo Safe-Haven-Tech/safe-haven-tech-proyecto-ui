@@ -1,9 +1,14 @@
-// src/hooks/useFormValidation.js
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import * as validators from '../utils/validators';
 import { checkNicknameAvailability } from '../services/validationService';
 
-export const useFormValidation = (initialData) => {
+/**
+ * Hook para validación de formularios de registro/edición.
+ * - Debounce para validación por campo.
+ * - Validación async para nickname con cancelación de peticiones previas.
+ * - Provee estado de errores, validación por campo y helpers de interacción (blur).
+ */
+export const useFormValidation = (initialData = {}) => {
   const [formData, setFormData] = useState(initialData);
   const [validationErrors, setValidationErrors] = useState({});
   const [fieldValidation, setFieldValidation] = useState({});
@@ -11,82 +16,86 @@ export const useFormValidation = (initialData) => {
   const [nicknameAvailable, setNicknameAvailable] = useState(true);
   const [touchedFields, setTouchedFields] = useState({});
 
-  // Actualizar touched fields cuando el usuario interactúa con un campo
+  const nicknameRequestRef = useRef({ currentToken: 0 });
+
   const handleFieldBlur = useCallback((fieldName) => {
     setTouchedFields((prev) => ({ ...prev, [fieldName]: true }));
   }, []);
 
-  // Debounce para validación de campos individuales
+  // Helper para validar campos sin bloquear el submit
+  const validateFieldSync = useCallback((name, value) => {
+    switch (name) {
+      case 'nombreUsuario':
+        return validators.validateName(value) ? null : 'Nombre inválido';
+      case 'email':
+        return validators.validateEmail(value) ? null : 'Email inválido';
+      case 'password':
+        return validators.validatePassword(value) ? null : 'Contraseña inválida';
+      case 'confirmPassword':
+        return value === formData.password ? null : 'Contraseñas no coinciden';
+      case 'nickname':
+        return validators.validateNickname(value) ? null : 'Nickname inválido';
+      default:
+        return null;
+    }
+  }, [formData.password]);
+
+  // Debounced / incremental validation (including async nickname check)
   useEffect(() => {
-    const timeoutId = setTimeout(async () => {
-      let needsUpdate = false;
+    const debounced = setTimeout(() => {
       const updates = {};
+      let updateNeeded = false;
 
-      if (touchedFields.nombreUsuario && formData.nombreUsuario) {
-        const isValid = validators.validateName(formData.nombreUsuario);
-        updates.nombreUsuario = isValid ? 'valid' : 'invalid';
-        needsUpdate = true;
+      // Validar campos que han sido touchados
+      Object.keys(touchedFields).forEach((field) => {
+        if (!touchedFields[field]) return;
+        const value = formData[field];
+        const err = validateFieldSync(field, value);
+        updates[field] = err ? 'invalid' : 'valid';
+        updateNeeded = true;
+      });
+
+      // Nickname async validation (si fue tocado y pasa la validación básica)
+      const nick = formData.nickname;
+      if (touchedFields.nickname && nick && !validateFieldSync('nickname', nick)) {
+        const token = ++nicknameRequestRef.currentToken;
+        setValidatingNickname(true);
+        // lanzar async check (no await aquí para no bloquear)
+        (async () => {
+          try {
+            const disponible = await checkNicknameAvailability(nick);
+            // ignorar si ya vino una petición más reciente
+            if (token !== nicknameRequestRef.currentToken) return;
+            setNicknameAvailable(Boolean(disponible));
+            setFieldValidation((prev) => ({ ...prev, nickname: disponible ? 'valid' : 'invalid' }));
+          } catch (err) {
+            if (token !== nicknameRequestRef.currentToken) return;
+            setNicknameAvailable(false);
+            setFieldValidation((prev) => ({ ...prev, nickname: 'invalid' }));
+          } finally {
+            if (token === nicknameRequestRef.currentToken) setValidatingNickname(false);
+          }
+        })();
       }
 
-      // Email
-      if (touchedFields.email && formData.email) {
-        const isValid = validators.validateEmail(formData.email);
-        updates.email = isValid ? 'valid' : 'invalid';
-        needsUpdate = true;
-      }
-
-      // Password
-      if (touchedFields.password && formData.password) {
-        const isValid = validators.validatePassword(formData.password);
-        updates.password = isValid ? 'valid' : 'invalid';
-        needsUpdate = true;
-      }
-
-      // Confirm Password
-      if (touchedFields.confirmPassword && formData.confirmPassword) {
-        const isValid =
-          formData.password === formData.confirmPassword &&
-          formData.confirmPassword !== '';
-        updates.confirmPassword = isValid ? 'valid' : 'invalid';
-        needsUpdate = true;
-      }
-
-      // Nickname - SOLO validar si el nickname ha sido touched
-      if (touchedFields.nickname && formData.nickname) {
-        if (!validators.validateNickname(formData.nickname)) {
-          updates.nickname = 'invalid';
-          setNicknameAvailable(false);
-          needsUpdate = true;
-        } else {
-          setValidatingNickname(true);
-          const disponible = await checkNicknameAvailability(formData.nickname);
-          setNicknameAvailable(disponible);
-          updates.nickname = disponible ? 'valid' : 'invalid';
-          needsUpdate = true;
-          setValidatingNickname(false);
-        }
-      }
-
-      if (needsUpdate) {
-        // Usar callback para evitar dependencia de fieldValidation
+      if (updateNeeded) {
         setFieldValidation((prev) => ({ ...prev, ...updates }));
       }
     }, 300);
 
-    return () => clearTimeout(timeoutId);
-  }, [formData, touchedFields]);
+    return () => clearTimeout(debounced);
+  }, [formData, touchedFields, validateFieldSync]);
 
-  // Validación completa al enviar (valida todos los campos)
+  // Validación completa al enviar
   const validateForm = useCallback(() => {
     const errors = {};
 
-    if (
-      !formData.nombreUsuario ||
-      !validators.validateName(formData.nombreUsuario)
-    ) {
+    // nombreUsuario
+    if (!formData.nombreUsuario || !validators.validateName(formData.nombreUsuario)) {
       errors.nombreUsuario = 'Nombre inválido';
     }
 
+    // nickname
     if (!formData.nickname) {
       errors.nickname = 'Nickname obligatorio';
     } else if (!validators.validateNickname(formData.nickname)) {
@@ -95,18 +104,18 @@ export const useFormValidation = (initialData) => {
       errors.nickname = 'Nickname ya en uso';
     }
 
+    // email
     if (!formData.email || !validators.validateEmail(formData.email)) {
       errors.email = 'Email inválido';
     }
 
+    // password
     if (!formData.password || !validators.validatePassword(formData.password)) {
       errors.password = 'Contraseña inválida';
     }
 
-    if (
-      !formData.confirmPassword ||
-      formData.password !== formData.confirmPassword
-    ) {
+    // confirmPassword
+    if (!formData.confirmPassword || formData.password !== formData.confirmPassword) {
       errors.confirmPassword = 'Contraseñas no coinciden';
     }
 
@@ -122,7 +131,9 @@ export const useFormValidation = (initialData) => {
     validatingNickname,
     nicknameAvailable,
     validateForm,
-    handleFieldBlur, // Nueva función para manejar blur
-    touchedFields, // Nuevo estado para tracking
+    handleFieldBlur,
+    touchedFields,
   };
 };
+
+export default useFormValidation;

@@ -1,4 +1,10 @@
-// src/hooks/useAuth.js
+/**
+ * Hook para acceder al contexto de autenticación.
+ * Lanza un Error claro si se usa fuera de un AuthProvider.
+ *
+ * Uso:
+ *   const { usuario, iniciarSesion, cerrarSesion } = useAuth();
+ */
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
@@ -9,3 +15,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export default useAuth;

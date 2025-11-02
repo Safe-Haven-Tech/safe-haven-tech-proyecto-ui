@@ -49,6 +49,7 @@ const AdminPanel = () => {
       {/* Funcionalidades Principales */}
       <section className={styles.functionsSection}>
         <h2 className={styles.sectionTitle}>Funcionalidades</h2>
+
         <div className={styles.functionsGrid}>
           {/* Gestión de Recursos Informativos */}
           <div
@@ -104,6 +105,52 @@ const AdminPanel = () => {
             </div>
             <div className={styles.functionArrow}>→</div>
           </div>
+        </div>
+
+         <div className={styles.functionsGrid}>
+
+          {/* Gestión de reportes y denuncias */}
+          <div
+            className={`${styles.functionCard} ${styles.functionCardLight}`}
+            onClick={() => handleNavigation('reportes')}
+            aria-label="Gestión de Reportes y Denuncias"
+            role="button"
+            tabIndex={0}
+          >
+            <div className={styles.functionContent}>
+              <h3 className={styles.functionTitle}>
+                Gestión de Reportes y Denuncias
+                
+              </h3>
+              <p className={styles.functionDescription}>
+                Administra y gestiona todos los reportes y denuncias de la
+                plataforma.
+              </p>
+            </div>
+            <div className={styles.functionArrow}>→</div>
+          </div>
+
+
+          <div
+            className={`${styles.functionCard} ${styles.functionCardLight}`}
+            onClick={() => handleNavigation('postulaciones ')}
+            aria-label="Gestión de postulaciones profesionales"
+            role="button"
+            tabIndex={0}
+          >
+            <div className={styles.functionContent}>
+              <h3 className={styles.functionTitle}>
+                Gestión de Postulaciones Profesionales
+                
+              </h3>
+              <p className={styles.functionDescription}>
+                Administra y gestiona todos las postulaciones de profesionales de la
+                plataforma.
+              </p>
+            </div>
+            <div className={styles.functionArrow}>→</div>
+          </div>
+
         </div>
       </section>
     </div>

@@ -1,4 +1,3 @@
-// src/hooks/useConfigurarPerfil.js
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
@@ -10,6 +9,15 @@ import {
 } from '../services/profileServices';
 import { parseJwt } from '../utils/token';
 
+/**
+ * Hook para manejar la pantalla de "Configurar perfil".
+ * Provee estado y handlers para:
+ *  - actualizar configuración general (anonimato, visibilidad, contraseña opcional)
+ *  - cambiar contraseña con modal
+ *  - eliminar cuenta con confirmación
+ *
+ * Usa tokens desde localStorage y actualiza el contexto de auth cuando procede.
+ */
 export const useConfigurarPerfil = () => {
   const [contraseña, setContraseña] = useState('');
   const [anonimo, setAnonimo] = useState(false);
@@ -34,34 +42,45 @@ export const useConfigurarPerfil = () => {
   const { usuario, actualizarUsuario, cerrarSesion } = useAuth();
   const navigate = useNavigate();
 
-  // Cargar configuración inicial
+  // Cargar configuración inicial desde contexto o backend si falta
   useEffect(() => {
-    if (usuario) {
-      setAnonimo(usuario.anonimo);
-      setVisibilidadPerfil(usuario.visibilidadPerfil || 'publico');
-      return;
-    }
+    let mounted = true;
+    const cargar = async () => {
+      if (usuario) {
+        setAnonimo(Boolean(usuario.anonimo));
+        setVisibilidadPerfil(usuario.visibilidadPerfil || 'publico');
+        return;
+      }
 
-    const cargarUsuario = async () => {
       const token = localStorage.getItem('token');
       if (!token) return navigate('/', { replace: true });
 
       try {
         const decoded = parseJwt(token);
-        const usuarioData = await fetchUsuarioCompleto(decoded.id, token);
-        actualizarUsuario(usuarioData);
-        setAnonimo(usuarioData.anonimo);
-        setVisibilidadPerfil(usuarioData.visibilidadPerfil || 'publico');
+        const userId = decoded?.id ?? decoded?._id ?? decoded?.sub;
+        if (!userId) return;
+
+        const usuarioData = await fetchUsuarioCompleto(userId, token);
+        if (!mounted) return;
+        if (usuarioData) {
+          if (actualizarUsuario) actualizarUsuario(usuarioData);
+          setAnonimo(Boolean(usuarioData.anonimo));
+          setVisibilidadPerfil(usuarioData.visibilidadPerfil || 'publico');
+        }
       } catch (err) {
-        console.error('Error cargando usuario:', err);
-        setError('Error al cargar los datos del usuario');
+        // eslint-disable-next-line no-console
+        console.error('useConfigurarPerfil cargarUsuario error:', err?.message || err);
+        if (mounted) setError('No se pudo cargar la configuración del usuario');
       }
     };
 
-    cargarUsuario();
-  }, [navigate, usuario, actualizarUsuario]);
+    cargar();
+    return () => {
+      mounted = false;
+    };
+  }, [usuario, actualizarUsuario, navigate]);
 
-  // Validar contraseña
+  // Validar contraseña con reglas mínimas
   const validarContraseña = useCallback((pass) => {
     if (!pass) return 'La contraseña es obligatoria';
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,128}$/;
@@ -71,53 +90,52 @@ export const useConfigurarPerfil = () => {
     return null;
   }, []);
 
-  // Guardar configuración
+  // Guardar configuración general (anonimato, visibilidad y contraseña opcional)
   const handleGuardar = useCallback(async () => {
     setError('');
     setMensaje('');
 
-    const errorValidacion = contraseña ? validarContraseña(contraseña) : null;
-    if (errorValidacion) {
-      setError(errorValidacion);
-      return;
+    if (contraseña) {
+      const errVal = validarContraseña(contraseña);
+      if (errVal) {
+        setError(errVal);
+        return;
+      }
     }
 
     setCargando(true);
-
     try {
       const token = localStorage.getItem('token');
-      if (!token) throw new Error('No se encontró token');
+      if (!token) throw new Error('Sesión inválida');
 
       const decoded = parseJwt(token);
-      const configuracion = {
+      const userId = decoded?.id ?? decoded?._id ?? decoded?.sub;
+      if (!userId) throw new Error('Usuario no identificado');
+
+      const payload = {
         nombreUsuario: decoded.nombreUsuario,
-        ...(contraseña && { contraseña }),
-        anonimo,
-        visibilidadPerfil,
+        anonimo: Boolean(anonimo),
+        visibilidadPerfil: visibilidadPerfil || 'publico',
+        ...(contraseña ? { contraseña } : {}),
       };
 
-      const data = await actualizarConfiguracion(
-        decoded.id,
-        configuracion,
-        token
-      );
+      const data = await actualizarConfiguracion(userId, payload, token);
+      if (data?.usuario && actualizarUsuario) actualizarUsuario(data.usuario);
+
       setMensaje('Configuración actualizada correctamente');
       setContraseña('');
-      actualizarUsuario(data.usuario);
     } catch (err) {
-      setError(err.message);
+      // mostrar mensaje claro
+      const msg = err?.message || 'Error al guardar configuración';
+      setError(msg);
+      // eslint-disable-next-line no-console
+      console.error('handleGuardar configurarPerfil error:', msg);
     } finally {
       setCargando(false);
     }
-  }, [
-    contraseña,
-    anonimo,
-    visibilidadPerfil,
-    validarContraseña,
-    actualizarUsuario,
-  ]);
+  }, [contraseña, anonimo, visibilidadPerfil, validarContraseña, actualizarUsuario]);
 
-  // Cambiar contraseña
+  // Cambiar contraseña (modal)
   const handleChangePassword = useCallback(async () => {
     setPasswordError('');
     setPasswordSuccess('');
@@ -136,59 +154,70 @@ export const useConfigurarPerfil = () => {
     }
 
     setChangingPassword(true);
-
     try {
       const token = localStorage.getItem('token');
+      if (!token) throw new Error('Sesión inválida');
+
       const data = await cambiarContraseña(currentPassword, newPassword, token);
 
-      if (data.accessToken) localStorage.setItem('token', data.accessToken);
-      if (data.refreshToken)
-        localStorage.setItem('refreshToken', data.refreshToken);
-      if (data.usuario) actualizarUsuario(data.usuario);
+      if (data?.accessToken) localStorage.setItem('token', data.accessToken);
+      if (data?.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+      if (data?.usuario && actualizarUsuario) actualizarUsuario(data.usuario);
 
       setPasswordSuccess('Contraseña cambiada exitosamente');
       setCurrentPassword('');
       setNewPassword('');
       setShowChangePasswordModal(false);
     } catch (err) {
-      setPasswordError(err.message);
+      const msg = err?.message || 'Error al cambiar contraseña';
+      setPasswordError(msg);
+      // eslint-disable-next-line no-console
+      console.error('handleChangePassword error:', msg);
     } finally {
       setChangingPassword(false);
     }
   }, [currentPassword, newPassword, actualizarUsuario]);
 
-  // Eliminar cuenta
+  // Eliminar cuenta (confirmación)
   const handleDeleteAccount = useCallback(async () => {
+    setDeleteError('');
     if (!passwordConfirm) {
       setDeleteError('Por favor, ingresa tu contraseña para confirmar');
       return;
     }
 
-    if (deleteConfirmation.toLowerCase() !== 'eliminar') {
+    if (deleteConfirmation.trim().toLowerCase() !== 'eliminar') {
       setDeleteError('Por favor, escribe "ELIMINAR" para confirmar');
       return;
     }
 
     setIsDeleting(true);
-    setDeleteError('');
-
     try {
       const token = localStorage.getItem('token');
-      const decoded = parseJwt(token);
-      await eliminarCuenta(decoded.id, passwordConfirm, token);
+      if (!token) throw new Error('Sesión inválida');
 
-      cerrarSesion();
+      const decoded = parseJwt(token);
+      const userId = decoded?.id ?? decoded?._id ?? decoded?.sub;
+      if (!userId) throw new Error('Usuario no identificado');
+
+      await eliminarCuenta(userId, passwordConfirm, token);
+
+      // Si todo OK, cerrar sesión y redirigir
+      if (cerrarSesion) cerrarSesion();
       setMensaje('Cuenta eliminada correctamente. Redirigiendo...');
-      setTimeout(() => navigate('/', { replace: true }), 2000);
+      setTimeout(() => navigate('/', { replace: true }), 1800);
     } catch (err) {
-      setDeleteError(err.message || 'Error al eliminar la cuenta');
+      const msg = err?.message || 'Error al eliminar la cuenta';
+      setDeleteError(msg);
+      // eslint-disable-next-line no-console
+      console.error('handleDeleteAccount error:', msg);
     } finally {
       setIsDeleting(false);
     }
   }, [passwordConfirm, deleteConfirmation, cerrarSesion, navigate]);
 
   return {
-    // Estados
+    // estados
     contraseña,
     setContraseña,
     anonimo,
@@ -199,7 +228,7 @@ export const useConfigurarPerfil = () => {
     mensaje,
     cargando,
 
-    // Estados modales
+    // cambiar contraseña
     showChangePasswordModal,
     setShowChangePasswordModal,
     currentPassword,
@@ -209,7 +238,9 @@ export const useConfigurarPerfil = () => {
     passwordError,
     passwordSuccess,
     changingPassword,
+    handleChangePassword,
 
+    // eliminar cuenta
     showDeleteModal,
     setShowDeleteModal,
     passwordConfirm,
@@ -219,11 +250,10 @@ export const useConfigurarPerfil = () => {
     deleteConfirmation,
     setDeleteConfirmation,
     isDeleting,
-
-    // Handlers
-    handleGuardar,
-    handleChangePassword,
     handleDeleteAccount,
+
+    // acciones generales
+    handleGuardar,
     validarContraseña,
   };
 };

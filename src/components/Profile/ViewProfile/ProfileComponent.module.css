@@ -840,8 +840,8 @@
 
 .fabCrearPost {
   position: fixed;
-  bottom: 32px;
-  right: 32px;
+  bottom: 25px;
+  right: 100px;
   z-index: 200;
   background: linear-gradient(90deg, #8e44ad 60%, #603c7e 100%);
   color: #fff;

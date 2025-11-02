@@ -1,22 +1,14 @@
-/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\components\Navbar.jsx */
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/Logo.png';
-import { useAuth } from '../context/useAuth';
+import { useAuth } from '../hooks/useAuth';
 import styles from './Navbar.module.css';
+import NotificationsModal from './NotificationsModal';
+import { obtenerNotificaciones } from '../services/redSocialServices';
 
-// ----------------- Componente reutilizable ORIGINAL -----------------
-const NavButton = ({
-  label,
-  onClick,
-  style,
-  hoverStyle,
-  isLink,
-  to,
-  className = '',
-}) => {
+// Reusable NavButton
+const NavButton = ({ label, onClick, style, hoverStyle, isLink, to, className = '' }) => {
   const [hover, setHover] = useState(false);
-
   const combinedStyle = {
     borderRadius: '6px',
     padding: '10px 18px',
@@ -59,86 +51,81 @@ const NavButton = ({
   );
 };
 
-// ----------------- Navbar principal ORIGINAL + ADMIN -----------------
 export default function Navbar() {
   const { usuario } = useAuth();
-  const [_version, setVersion] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Estados para responsive
+  const [_version, setVersion] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [notifModalOpen, setNotifModalOpen] = useState(false);
+  const [badge, setBadge] = useState(0);
 
-  // ORIGINAL: useEffect para token
   useEffect(() => {
     const handleTokenChange = () => setVersion((v) => v + 1);
     window.addEventListener('tokenChanged', handleTokenChange);
     return () => window.removeEventListener('tokenChanged', handleTokenChange);
   }, []);
 
-  // Hook para detectar tamaño de pantalla
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth <= 768);
-      if (window.innerWidth > 768) {
-        setIsMobileMenuOpen(false);
-      }
+      if (window.innerWidth > 768) setIsMobileMenuOpen(false);
     };
-
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Cerrar menu móvil al cambiar de ruta
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
 
-  // 🆕 NUEVO: Verificar si es administrador
-  const isUserAdmin = () => {
-    if (!usuario) return false;
-    return usuario.rol === 'administrador';
-  };
+  // load badge count
+  useEffect(() => {
+    let mounted = true;
+    const loadBadge = async () => {
+      if (!usuario) { setBadge(0); return; }
+      try {
+        const res = await obtenerNotificaciones(1, 20);
+        if (!mounted) return;
+        const items = res.notificaciones || [];
+        const noLeidas = (res.meta && (res.meta.noLeidas ?? res.meta.unreadCount)) ?? items.filter(i => !i.leida).length;
+        setBadge(noLeidas);
+      } catch (e) {
+        console.error('Error fetching notifications badge', e);
+      }
+    };
+    loadBadge();
+    const iv = setInterval(loadBadge, 30000);
+    return () => { mounted = false; clearInterval(iv); };
+  }, [usuario]);
 
-  // ORIGINAL: handlers
+  const isUserAdmin = () => usuario && usuario.rol === 'administrador';
+
   const handleProfileClick = () => {
-    if (usuario && usuario.nombreUsuario)
-      navigate(`/perfil/${usuario.nombreUsuario}`);
+    if (usuario && usuario.nombreUsuario) navigate(`/perfil/${usuario.nombreUsuario}`);
     else navigate('/perfil');
   };
 
+  const handleAdminPanelClick = () => navigate('/admin/panel');
 
+  const toggleMobileMenu = () => setIsMobileMenuOpen(v => !v);
 
-  // 🆕 NUEVO: Handler para panel de administración
-  const handleAdminPanelClick = () => {
-    navigate('/admin/panel');
-  };
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  // ---------- Menu principal ORIGINAL ----------
   const menuItems = [
     { label: 'Autoevaluación', path: '/autoevaluacion' },
     { label: 'Recursos informativos', path: '/recursosinformativos' },
-    { label: 'Contacto de expertos', path: '/contactoexpertos' },
+    { label: 'Contacto de expertos', path: '/profesionales' },
     { label: 'Nuestro foro', path: '/foro' },
     { label: 'Tu Feed', path: '/publicaciones' },
   ];
 
-  // ---------- Botones invitado ORIGINAL ----------
   const guestButtons = [
     {
       label: 'Iniciar Sesión',
       onClick: () => navigate('/login'),
-      style: {
-        backgroundColor: 'transparent',
-        color: '#2d5016',
-        border: '2px solid #2d5016',
-      },
+      style: { backgroundColor: 'transparent', color: '#2d5016', border: '2px solid #2d5016' },
       hoverStyle: { backgroundColor: '#2d5016', color: '#ffffff' },
     },
     {
@@ -149,52 +136,20 @@ export default function Navbar() {
     },
   ];
 
-  // ---------- Botones usuario logueado + ADMIN ----------
   const userButtons = [
-    // 🆕 BOTÓN ADMIN (solo si rol === 'administrador')
-    ...(isUserAdmin()
-      ? [
-          {
-            label: 'Admin',
-            onClick: handleAdminPanelClick,
-            style: {
-              backgroundColor: '#dc3545', // Rojo para destacar
-              color: '#ffffff',
-              border: 'none',
-              fontWeight: '700',
-            },
-            hoverStyle: { backgroundColor: '#c82333', color: '#ffffff' },
-          },
-        ]
-      : []),
-
-    // Botones originales
+    ...(isUserAdmin() ? [{
+      label: 'Admin',
+      onClick: handleAdminPanelClick,
+      style: { backgroundColor: '#dc3545', color: '#ffffff', border: 'none', fontWeight: '700' },
+      hoverStyle: { backgroundColor: '#c82333', color: '#ffffff' },
+    }] : []),
     {
       label: 'Mi Perfil',
       onClick: handleProfileClick,
       style: { backgroundColor: '#2d5016', color: '#ffffff', border: 'none' },
       hoverStyle: { backgroundColor: '#1f3a0f', color: '#ffffff' },
     },
-    {
-      label: '🔔',
-      onClick: () => {},
-      style: {
-        background: 'transparent',
-        border: 'none',
-        borderRadius: '50%',
-        width: 40,
-        height: 40,
-        fontSize: 22,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-      hoverStyle: { backgroundColor: '#2d5016', color: '#ffffff' },
-    },
   ];
-
-  // ---------- Botón de búsqueda ORIGINAL ----------
-
 
   return (
     <>
@@ -215,60 +170,53 @@ export default function Navbar() {
           alignItems: 'center',
         }}
       >
-        {/* Logo ORIGINAL */}
-        <Link
-          to="/"
-          className="navbar-brand d-flex align-items-center"
-          style={{ flexShrink: 0 }}
-        >
-          <img
-            src={logo}
-            alt="SafeHaven Logo"
-            style={{
-              height: isMobile ? 50 : 60,
-              width: 'auto',
-              marginRight: 12,
-              borderRadius: 8,
-            }}
-          />
+        <Link to="/" className="navbar-brand d-flex align-items-center" style={{ flexShrink: 0 }}>
+          <img src={logo} alt="SafeHaven Logo"
+            style={{ height: isMobile ? 50 : 60, width: 'auto', marginRight: 12, borderRadius: 8 }} />
         </Link>
 
-        {/* Desktop Menu ORIGINAL */}
         {!isMobile && (
-          <div
-            className="collapse navbar-collapse justify-content-end"
-            id="navbarSupportedContent"
-            style={{ position: 'relative', zIndex: 2110 }}
-          >
-            {/* Menú principal ORIGINAL */}
-            <ul
-              className="navbar-nav mb-2 mb-lg-0"
-              style={{ marginLeft: 'auto' }}
-            >
+          <div className="collapse navbar-collapse justify-content-end" id="navbarSupportedContent" style={{ position: 'relative', zIndex: 2110 }}>
+            <ul className="navbar-nav mb-2 mb-lg-0" style={{ marginLeft: 'auto' }}>
               {menuItems.map((item, idx) => (
                 <li className="nav-item" key={idx}>
                   <NavButton
                     label={item.label}
                     isLink={true}
                     to={item.path}
-                    style={{
-                      color: '#000',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      fontSize: '16px',
-                    }}
+                    style={{ color: '#000', backgroundColor: 'transparent', border: 'none', fontSize: '16px' }}
                     hoverStyle={{ color: '#fff', backgroundColor: '#2d5016' }}
                   />
                 </li>
               ))}
             </ul>
 
-            {/* Botones de búsqueda y usuario ORIGINAL + ADMIN */}
-            <div
-              className="d-flex align-items-center"
-              style={{ gap: 24, marginLeft: '1rem' }}
-            >
-              
+            <div className="d-flex align-items-center" style={{ gap: 24, marginLeft: '1rem' }}>
+              {/* Notifications */}
+              {usuario && (
+                <div style={{ position: 'relative' }}>
+                  <button className="btn btn-light" onClick={() => setNotifModalOpen(v => !v)} aria-label="Notificaciones" title="Notificaciones">
+                    🔔
+                  </button>
+                  {badge > 0 && (
+                    <span style={{
+                      position: 'absolute',
+                      top: -6,
+                      right: -6,
+                      background: '#dc3545',
+                      color: '#fff',
+                      borderRadius: '50%',
+                      width: 20,
+                      height: 20,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 12,
+                    }}>{badge}</span>
+                  )}
+                </div>
+              )}
+
               {(usuario ? userButtons : guestButtons).map((btn, idx) => (
                 <NavButton key={idx} {...btn} />
               ))}
@@ -276,23 +224,29 @@ export default function Navbar() {
           </div>
         )}
 
-        {/* Mobile Controls */}
         {isMobile && (
           <div className={styles.mobileControls}>
-            {/* Búsqueda móvil */}
-           
-
-            {/* Notificaciones móvil (solo si está autenticado) */}
             {usuario && (
-              <NavButton {...userButtons.find((btn) => btn.label === '🔔')} />
+              <button
+                className="btn btn-light"
+                onClick={() => setNotifModalOpen(v => !v)}
+                aria-label="Notificaciones"
+                title="Notificaciones"
+                style={{ marginRight: 8 }}
+              >
+                🔔
+                {badge > 0 && <span style={{
+                  marginLeft: 6,
+                  background: '#dc3545',
+                  color: '#fff',
+                  borderRadius: '50%',
+                  padding: '0 6px',
+                  fontSize: 12
+                }}>{badge}</span>}
+              </button>
             )}
 
-            {/* Hamburger Menu */}
-            <button
-              className={`${styles.hamburgerButton} ${isMobileMenuOpen ? styles.active : ''}`}
-              onClick={toggleMobileMenu}
-              aria-label="Menú"
-            >
+            <button className={`${styles.hamburgerButton} ${isMobileMenuOpen ? styles.active : ''}`} onClick={toggleMobileMenu} aria-label="Menú">
               <span className={styles.hamburgerLine}></span>
               <span className={styles.hamburgerLine}></span>
               <span className={styles.hamburgerLine}></span>
@@ -301,75 +255,41 @@ export default function Navbar() {
         )}
       </nav>
 
-      {/* Mobile Menu Overlay */}
-      {isMobile && (
-        <div
-          className={`${styles.mobileMenuOverlay} ${isMobileMenuOpen ? styles.open : ''}`}
-        >
+      {isMobile && isMobileMenuOpen && (
+        <div className={`${styles.mobileMenuOverlay} ${isMobileMenuOpen ? styles.open : ''}`}>
           <div className={styles.mobileMenuContent}>
-            {/* Menu Items */}
             <div className={styles.mobileMenuItems}>
               {menuItems.map((item, index) => (
-                <Link
-                  key={index}
-                  to={item.path}
-                  className={styles.mobileMenuItem}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
+                <Link key={index} to={item.path} className={styles.mobileMenuItem} onClick={() => setIsMobileMenuOpen(false)}>
                   {item.label}
                 </Link>
               ))}
             </div>
 
-            {/* Auth Buttons + ADMIN */}
             <div className={styles.mobileAuthSection}>
               {usuario ? (
                 <>
-                  {/* 🆕 BOTÓN ADMIN MÓVIL */}
                   {isUserAdmin() && (
-                    <button
-                      className={styles.mobileAdminButton}
-                      onClick={() => {
-                        handleAdminPanelClick();
-                        setIsMobileMenuOpen(false);
-                      }}
-                    >
+                    <button className={styles.mobileAdminButton} onClick={() => { handleAdminPanelClick(); setIsMobileMenuOpen(false); }}>
                       ⚙️ Panel de Administración
                     </button>
                   )}
-
-                  <button
-                    className={styles.mobileProfileButton}
-                    onClick={() => {
-                      handleProfileClick();
-                      setIsMobileMenuOpen(false);
-                    }}
-                  >
+                  <button className={styles.mobileProfileButton} onClick={() => { handleProfileClick(); setIsMobileMenuOpen(false); }}>
                     Mi Perfil
                   </button>
                 </>
               ) : (
                 <>
-                  <Link
-                    to="/login"
-                    className={styles.mobileLoginButton}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Iniciar Sesión
-                  </Link>
-                  <Link
-                    to="/register"
-                    className={styles.mobileRegisterButton}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Registrarse
-                  </Link>
+                  <Link to="/login" className={styles.mobileLoginButton} onClick={() => setIsMobileMenuOpen(false)}>Iniciar Sesión</Link>
+                  <Link to="/register" className={styles.mobileRegisterButton} onClick={() => setIsMobileMenuOpen(false)}>Registrarse</Link>
                 </>
               )}
             </div>
           </div>
         </div>
       )}
+
+      <NotificationsModal open={notifModalOpen} onClose={() => setNotifModalOpen(false)} onUpdateBadge={(v) => setBadge(v)} />
     </>
   );
 }

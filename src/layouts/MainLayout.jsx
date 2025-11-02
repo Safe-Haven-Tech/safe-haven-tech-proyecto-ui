@@ -6,6 +6,7 @@ import { useHideNavbar } from '../hooks/useHideNavbar';
 
 import Navbar from '../components/Navbar';
 import EmergencyButton from '../components/EmergencyButton';
+import ChatShortcut from '../components/ChatShortcut';
 
 export default function MainLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -26,6 +27,7 @@ export default function MainLayout() {
         <Navbar onMenuToggle={setMenuOpen} usuario={usuario} />
       )}
       <EmergencyButton menuOpen={menuOpen} />
+      {usuario && <ChatShortcut />}
       <main
         className="flex-grow-1 w-100 d-flex flex-column"
         style={{

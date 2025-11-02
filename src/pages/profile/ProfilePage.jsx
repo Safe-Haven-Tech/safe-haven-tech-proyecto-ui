@@ -1,17 +1,20 @@
-//src/pages/profile/ProfilePage.jsx
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import ProfileComponent from '../../components/Profile/ViewProfile/ProfileComponent';
-
 import { useProfile } from '../../hooks/useProfile';
 
-export default function Profile() {
+/**
+ * ProfilePage
+ * - Componente de presentación para la página de perfil.
+ * - Orquesta el hook useProfile (logica de datos) y provee handlers de navegación
+ *   y control de errores al componente de vista.
+ */
+export default function ProfilePage() {
   const { nickname } = useParams();
   const navigate = useNavigate();
 
-  // Usar el hook personalizado para manejar toda la lógica del perfil
   const {
     usuario,
     isOwnProfile,
@@ -20,30 +23,36 @@ export default function Profile() {
     perfilPosts,
     getCurrentUser,
     handleFollowToggle,
+    handleCancelRequest,
   } = useProfile(nickname);
 
-  /** Handlers para botones del perfil propio */
-  const handleEditProfile = () => {
+  // Navegación a editar perfil
+  const handleEditProfile = useCallback(() => {
     navigate('/editar-perfil');
-  };
+  }, [navigate]);
 
-  const handleConfigureProfile = () => {
+  // Navegación a configuración de perfil
+  const handleConfigureProfile = useCallback(() => {
     navigate('/configurar-perfil');
-  };
+  }, [navigate]);
 
-  // Wrapper para el toggle de seguir que maneja la navegación
-  const handleFollowToggleWithNavigation = async () => {
+  // Wrapper para toggle follow con manejo sencillo de errores de autenticación.
+  const handleFollowToggleWithNavigation = useCallback(async () => {
     try {
       await handleFollowToggle();
-    } catch (error) {
-      // Si el error es por falta de token, redirigir al login
-      if (error.message.includes('Token de autenticación requerido')) {
+    } catch (err) {
+      // Si la API devuelve un error relacionado con token, redirigir al login.
+      // Nota: el string exacto puede variar según la implementación del backend.
+      const mensaje = err?.message || '';
+      if (mensaje.includes('Token de autenticación requerido') || mensaje.includes('Authentication required')) {
         navigate('/login');
+      } else {
+        // Re-lanzar para que caller (o un logger global) pueda manejarlo si procede.
+        throw err;
       }
     }
-  };
+  }, [handleFollowToggle, navigate]);
 
-  // Usar el componente ProfileComponent
   return (
     <ProfileComponent
       usuario={usuario}
@@ -56,6 +65,7 @@ export default function Profile() {
       onFollowToggle={handleFollowToggleWithNavigation}
       onEditProfile={handleEditProfile}
       onConfigureProfile={handleConfigureProfile}
+      onCancelRequest={handleCancelRequest}
     />
   );
 }

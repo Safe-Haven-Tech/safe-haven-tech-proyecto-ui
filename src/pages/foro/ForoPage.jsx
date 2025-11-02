@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { fetchPublicaciones, deletePublicacion } from '../../services/publicacionesService';
+import { fetchPublicaciones } from '../../services/publicacionesService';
 import styles from './ForoPage.module.css';
 import placeholder from '../../assets/perfil_placeholder.png';
 
@@ -24,28 +24,6 @@ const TOPICOS_FORO = [
   'otros'
 ];
 
-function getUsuarioIdFromToken(token) {
-  if (!token) return null;
-  try {
-    const payload = token.split('.')[1];
-    const decoded = JSON.parse(atob(payload));
-    return decoded.id || decoded._id || null;
-  } catch {
-    return null;
-  }
-}
-
-function getUsuarioRolFromToken(token) {
-  if (!token) return null;
-  try {
-    const payload = token.split('.')[1];
-    const decoded = JSON.parse(atob(payload));
-    return decoded.rol || decoded.role || null;
-  } catch {
-    return null;
-  }
-}
-
 function acortarTexto(texto, max = 57) {
   if (!texto) return '';
   return texto.length > max ? texto.slice(0, max) + '...' : texto;
@@ -60,12 +38,8 @@ const ForoPage = () => {
   const [pagina, setPagina] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [menuAbierto, setMenuAbierto] = useState(null);
-  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
   const [topicoSeleccionado, setTopicoSeleccionado] = useState('todos');
 
-  const token = localStorage.getItem('token');
-  const usuarioId = getUsuarioIdFromToken(token);
-  const usuarioRol = getUsuarioRolFromToken(token);
 
   useEffect(() => {
     const cargarTemas = async () => {
@@ -118,73 +92,14 @@ const ForoPage = () => {
     temasFiltrados = temasFiltrados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
   }
 
-  const handleBorrarTema = async (id) => {
-    try {
-      await deletePublicacion(id, token);
-      setTemas(prev => prev.filter(t => t._id !== id));
-    } catch (err) {
-      alert(err.message || 'Error al borrar el tema');
-    }
-  };
 
-  // Renderiza el menú desplegable como portal
-  const renderDropdownMenu = (temaId) => {
-    if (menuAbierto !== temaId) return null;
-    return ReactDOM.createPortal(
-      <ul
-        className={`dropdown-menu show ${styles.foroDropdownMenu}`}
-        style={{
-          position: 'fixed',
-          top: menuPos.top,
-          left: menuPos.left,
-          zIndex: 9999
-        }}
-      >
-        <li>
-          <a className="dropdown-item" href={`/editar-post/${temaId}`} onClick={e => e.stopPropagation()}>
-            <i className="bi bi-pencil me-2"></i>Editar
-          </a>
-        </li>
-        <li>
-          <button
-            className="dropdown-item text-danger"
-            onClick={e => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (window.confirm('¿Seguro que deseas borrar este tema?')) {
-                handleBorrarTema(temaId);
-                setMenuAbierto(null);
-              }
-            }}
-          >
-            <i className="bi bi-trash me-2"></i>Borrar
-          </button>
-        </li>
-        <li>
-          <button
-            className="dropdown-item"
-            onClick={e => {
-              e.preventDefault();
-              e.stopPropagation();
-              navigator.clipboard.writeText(`${window.location.origin}/publicacion/${temaId}`);
-              alert('¡Enlace copiado!');
-              setMenuAbierto(null);
-            }}
-          >
-            <i className="bi bi-share me-2"></i>Compartir
-          </button>
-        </li>
-      </ul>,
-      document.body
-    );
-  };
 
   // Mensaje de bienvenida con estilos de módulo
   const mensajeBienvenida = (
     <div className={styles.foroBienvenida}>
       <span className={styles.foroBienvenidaIcon} role="img" aria-label="Bienvenida"></span>
       <span>
-        ¡Bienvenida/o a la comunidad SafeHaven! Este es un espacio seguro para compartir, preguntar y acompañarnos en el proceso de sanar y salir adelante tras situaciones de violencia de género. Recuerda que no estás sola/o, aquí puedes encontrar apoyo, información y experiencias de otras personas que han pasado por lo mismo. Si necesitas ayuda urgente, busca los recursos legales y profesionales en la plataforma.
+        ¡Bienvenida/o al foro de SafeHaven! Este es un espacio seguro para compartir, preguntar y acompañarnos en el proceso de sanar y salir adelante tras situaciones de violencia de género. Recuerda que no estás sola/o, aquí puedes encontrar apoyo, información y experiencias de otras personas que han pasado por lo mismo. Si necesitas ayuda urgente, busca los recursos legales y profesionales en la plataforma.
       </span>
     </div>
   );
@@ -272,11 +187,19 @@ const ForoPage = () => {
                     <span></span>
                   </div>
                   {temasFiltrados.map((tema, idx) => {
-                    // Badges visuales
+       
                     const esPopular = tema.likes?.length >= 5;
                     const esNuevo = (Date.now() - new Date(tema.fecha)) < 1000 * 60 * 60 * 24 * 2;
                     const sinRespuesta = !tema.comentarios || tema.comentarios.length === 0;
 
+            
+                    const fullAuthor = tema.autorId?.anonimo
+                      ? 'Anónimo'
+                      : tema.autorId?.nombreCompleto ||
+                        tema.autorId?.nombreUsuario ||
+                        'Usuario';
+                    const displayAuthor = acortarTexto(fullAuthor, 7);
+            
                     return (
                       <div
                         key={tema._id}
@@ -308,18 +231,14 @@ const ForoPage = () => {
                             </span>
                           )}
                         </span>
-                        <span className={styles.foroAutor}>
+                        <span className={styles.foroAutor} title={fullAuthor}>
                           <img
                             src={tema.autorId?.fotoPerfil || placeholder}
                             alt="Avatar"
                             className={styles.foroAutorImg}
                           />
                           <span className={styles.foroAutorNombre}>
-                            {tema.autorId?.anonimo
-                              ? 'Anónimo'
-                              : tema.autorId?.nombreCompleto ||
-                                tema.autorId?.nombreUsuario ||
-                                'Usuario'}
+                            {displayAuthor}
                           </span>
                         </span>
                         <span className={styles.foroFecha}>
@@ -332,46 +251,6 @@ const ForoPage = () => {
                         <span className={styles.foroComentarios}>
                           <i className="bi bi-chat-left-text" style={{ marginRight: 4 }}></i>
                           {tema.comentarios?.length || 0}
-                        </span>
-                        {/* Acciones rápidas */}
-                        <span
-                          className={styles.foroAcciones}
-                          onClick={e => e.stopPropagation()}
-                          style={{ position: 'relative' }}
-                        >
-                          {(usuarioId && (tema.autorId?._id === usuarioId || tema.autorId === usuarioId || usuarioRol === 'admin' || usuarioRol === 'administrador')) && (
-                            <>
-                              <button
-                                className={`btn btn-light btn-sm ${styles.foroDropdownBtn}`}
-                                type="button"
-                                aria-label="Abrir menú de acciones"
-                                tabIndex={0}
-                                onClick={e => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setMenuAbierto(menuAbierto === tema._id ? null : tema._id);
-                                  const rect = e.currentTarget.getBoundingClientRect();
-                                  setMenuPos({
-                                    top: rect.bottom + window.scrollY,
-                                    left: rect.right - 160 + window.scrollX // 160 = ancho aprox del menú
-                                  });
-                                }}
-                                onKeyDown={e => {
-                                  if (e.key === 'Enter' || e.key === ' ') {
-                                    setMenuAbierto(menuAbierto === tema._id ? null : tema._id);
-                                    const rect = e.currentTarget.getBoundingClientRect();
-                                    setMenuPos({
-                                      top: rect.bottom + window.scrollY,
-                                      left: rect.right - 160 + window.scrollX
-                                    });
-                                  }
-                                }}
-                              >
-                                <i className="bi bi-three-dots-vertical"></i>
-                              </button>
-                              {renderDropdownMenu(tema._id)}
-                            </>
-                          )}
                         </span>
                       </div>
                     );

@@ -52,15 +52,15 @@ const RegisterForm = React.memo(
     };
 
     const nicknameFeedback = useMemo(() => {
-      if (validationErrors.nickname) {
+      if (validationErrors.nombreUsuario) {
         return (
           <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
-            {validationErrors.nickname}
+            {validationErrors.nombreUsuario}
           </div>
         );
       }
-      if (!formData.nickname) return null;
-      if (!validateNickname(formData.nickname)) {
+      if (!formData.nombreUsuario) return null;
+      if (!validateNickname(formData.nombreUsuario)) {
         return (
           <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
             Nickname inválido (solo letras, números y guiones bajos)
@@ -89,8 +89,8 @@ const RegisterForm = React.memo(
         );
       return null;
     }, [
-      formData.nickname,
-      validationErrors.nickname,
+      formData.nombreUsuario,
+      validationErrors.nombreUsuario,
       validatingNickname,
       nicknameAvailable,
     ]);
@@ -98,7 +98,7 @@ const RegisterForm = React.memo(
     const inputs = useMemo(
       () => [
         {
-          name: 'nickname',
+          name: 'nombreUsuario',
           label: 'Nickname',
           icon: 'at',
           type: 'text',

@@ -1,8 +1,13 @@
-// src/hooks/useEditarPerfilValidation.js
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { LIMITES } from '../utils/validators';
 import { verificarNickname } from '../services/profileServices';
 
+/**
+ * Hook de validación para editar perfil.
+ * - Debounce por campo.
+ * - Validación asíncrona de nickname con manejo de concurrencia.
+ * - Devuelve helpers y estados útiles para el formulario.
+ */
 export const useEditarPerfilValidation = (initialData = {}) => {
   // Estado del formulario
   const [formData, setFormData] = useState({
@@ -20,9 +25,20 @@ export const useEditarPerfilValidation = (initialData = {}) => {
   const [nicknameDisponible, setNicknameDisponible] = useState(true);
   const [isFormValid, setIsFormValid] = useState(false);
 
-  // Referencias para debounce
+  // Referencias para debounce y concurrencia
   const debounceTimers = useRef({});
   const originalNickname = useRef(initialData.nombreUsuario);
+  const mounted = useRef(true);
+  const nicknameRequestCounter = useRef(0);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      // limpiar timers
+      Object.values(debounceTimers.current).forEach((t) => t && clearTimeout(t));
+    };
+  }, []);
 
   const originalData = useRef({
     nombreCompleto: initialData.nombreCompleto || '',
@@ -31,287 +47,233 @@ export const useEditarPerfilValidation = (initialData = {}) => {
     biografia: initialData.biografia || '',
   });
 
-  // Funciones de validación con mensajes específicos
+  /* ---------- validadores por campo ---------- */
+
   const validateNombreCompleto = (nombre) => {
-    if (!nombre || !nombre.trim()) {
-      return 'El nombre completo es obligatorio';
-    }
+    if (!nombre || !nombre.trim()) return 'El nombre completo es obligatorio';
 
-    const trimmedNombre = nombre.trim();
-    if (trimmedNombre.length < LIMITES.NOMBRE.MIN) {
+    const trimmed = nombre.trim();
+    if (trimmed.length < LIMITES.NOMBRE.MIN)
       return `El nombre debe tener al menos ${LIMITES.NOMBRE.MIN} caracteres`;
-    }
-
-    if (trimmedNombre.length > LIMITES.NOMBRE.MAX) {
+    if (trimmed.length > LIMITES.NOMBRE.MAX)
       return `El nombre no puede superar los ${LIMITES.NOMBRE.MAX} caracteres`;
-    }
 
     const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
-    if (!regex.test(trimmedNombre)) {
-      return 'El nombre solo puede contener letras, espacios y acentos';
-    }
+    if (!regex.test(trimmed)) return 'El nombre solo puede contener letras, espacios y acentos';
 
     return null;
   };
 
   const validateNickname = (nickname) => {
-    if (!nickname || !nickname.trim()) {
-      return 'El nickname es obligatorio';
-    }
-
-    const trimmedNickname = nickname.trim();
-    if (trimmedNickname.length < LIMITES.NICKNAME.MIN) {
+    if (!nickname || !nickname.trim()) return 'El nickname es obligatorio';
+    const t = nickname.trim();
+    if (t.length < LIMITES.NICKNAME.MIN)
       return `El nickname debe tener al menos ${LIMITES.NICKNAME.MIN} caracteres`;
-    }
-
-    if (trimmedNickname.length > LIMITES.NICKNAME.MAX) {
+    if (t.length > LIMITES.NICKNAME.MAX)
       return `El nickname no puede superar los ${LIMITES.NICKNAME.MAX} caracteres`;
-    }
-
     const regex = /^[a-zA-Z0-9_]+$/;
-    if (!regex.test(trimmedNickname)) {
-      return 'El nickname solo puede contener letras, números y guiones bajos (_)';
-    }
-
+    if (!regex.test(t)) return 'El nickname solo puede contener letras, números y guiones bajos (_)';
     return null;
   };
 
   const validatePronombres = (pronombres) => {
-    if (!pronombres) return null; // Campo opcional
-
-    if (pronombres.length > LIMITES.PRONOMBRES.MAX) {
+    if (!pronombres) return null;
+    if (pronombres.length > LIMITES.PRONOMBRES.MAX)
       return `Los pronombres no pueden superar los ${LIMITES.PRONOMBRES.MAX} caracteres`;
-    }
-
-    // Validación básica de caracteres permitidos
     const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ/\s]+$/;
-    if (!regex.test(pronombres)) {
-      return 'Los pronombres solo pueden contener letras, espacios y barras (/)';
-    }
-
+    if (!regex.test(pronombres)) return 'Los pronombres solo pueden contener letras, espacios y barras (/)';
     return null;
   };
 
   const validateBiografia = (biografia) => {
-    if (!biografia) return null; // Campo opcional
-
-    if (biografia.length > LIMITES.BIOGRAFIA.MAX) {
+    if (!biografia) return null;
+    if (biografia.length > LIMITES.BIOGRAFIA.MAX)
       return `La biografía no puede superar los ${LIMITES.BIOGRAFIA.MAX} caracteres`;
-    }
-
     return null;
   };
 
-  // Validación individual de campos con debounce
-  const validateField = useCallback(async (fieldName, value) => {
-    // Limpiar timer anterior
-    if (debounceTimers.current[fieldName]) {
-      clearTimeout(debounceTimers.current[fieldName]);
-    }
+  /* ---------- validación individual con debounce ---------- */
 
-    // Establecer estado de validación pendiente
-    setFieldStates((prev) => ({
-      ...prev,
-      [fieldName]: 'validating',
-    }));
+  const validateField = useCallback(
+    async (fieldName, value) => {
+      // limpiar timer anterior
+      if (debounceTimers.current[fieldName]) {
+        clearTimeout(debounceTimers.current[fieldName]);
+      }
 
-    return new Promise((resolve) => {
-      debounceTimers.current[fieldName] = setTimeout(async () => {
-        let error = null;
-        let isValid = false;
+      // marcar validando
+      setFieldStates((prev) => ({ ...prev, [fieldName]: 'validating' }));
 
-        switch (fieldName) {
-          case 'nombreCompleto':
-            error = validateNombreCompleto(value);
-            isValid = !error;
-            break;
+      return new Promise((resolve) => {
+        debounceTimers.current[fieldName] = setTimeout(async () => {
+          let error = null;
+          let isValid = true;
 
-          case 'nombreUsuario':
-            error = validateNickname(value);
-            if (!error) {
-              // Solo verificar disponibilidad si el nickname cambió
-              if (value !== originalNickname.current) {
-                setValidatingNickname(true);
-                try {
-                  const disponible = await verificarNickname(value);
-                  setNicknameDisponible(disponible);
-                  if (!disponible) {
-                    error = 'Este nickname ya está en uso';
+          try {
+            switch (fieldName) {
+              case 'nombreCompleto':
+                error = validateNombreCompleto(value);
+                isValid = !error;
+                break;
+
+              case 'nombreUsuario': {
+                error = validateNickname(value);
+                if (!error) {
+                  // verificar disponibilidad solo si cambió respecto al original
+                  if (value !== originalNickname.current) {
+                    const reqId = ++nicknameRequestCounter.current;
+                    setValidatingNickname(true);
+                    try {
+                      const disponible = await verificarNickname(value);
+                      if (!mounted.current) return resolve({ isValid: false, error: 'Interrumpido' });
+                      // ignorar respuestas antiguas
+                      if (reqId !== nicknameRequestCounter.current) return resolve({ isValid: false, error: null });
+                      setNicknameDisponible(Boolean(disponible));
+                      if (!disponible) {
+                        error = 'Este nickname ya está en uso';
+                        isValid = false;
+                      } else {
+                        isValid = true;
+                      }
+                    } catch (err) {
+                      // eslint-disable-next-line no-console
+                      console.error('validateField verificarNickname error:', err?.message || err);
+                      error = 'Error al verificar disponibilidad del nickname';
+                      isValid = false;
+                    } finally {
+                      if (reqId === nicknameRequestCounter.current && mounted.current) setValidatingNickname(false);
+                    }
+                  } else {
+                    setNicknameDisponible(true);
+                    isValid = true;
                   }
-                  isValid = disponible;
-                } catch (err) {
-                  console.log(err);
-                  error = 'Error al verificar disponibilidad del nickname';
+                } else {
                   isValid = false;
-                } finally {
-                  setValidatingNickname(false);
                 }
-              } else {
-                setNicknameDisponible(true);
-                isValid = true;
+                break;
               }
+
+              case 'pronombres':
+                error = validatePronombres(value);
+                isValid = !error;
+                break;
+
+              case 'biografia':
+                error = validateBiografia(value);
+                isValid = !error;
+                break;
+
+              default:
+                isValid = true;
             }
-            break;
+          } catch (err) {
+            // eslint-disable-next-line no-console
+            console.error('validateField error:', err?.message || err);
+            error = 'Error de validación';
+            isValid = false;
+          }
 
-          case 'pronombres':
-            error = validatePronombres(value);
-            isValid = !error;
-            break;
+          // actualizar errores y estado del campo
+          if (mounted.current) {
+            setErrors((prev) => ({ ...prev, [fieldName]: error }));
+            setFieldStates((prev) => ({ ...prev, [fieldName]: isValid ? 'valid' : 'invalid' }));
+          }
 
-          case 'biografia':
-            error = validateBiografia(value);
-            isValid = !error;
-            break;
+          resolve({ isValid, error });
+        }, 300);
+      });
+    },
+    []
+  );
 
-          default:
-            isValid = true;
-        }
+  /* ---------- helpers para UI ---------- */
 
-        // Actualizar errores
-        setErrors((prev) => ({
-          ...prev,
-          [fieldName]: error,
-        }));
-
-        // Actualizar estado del campo
-        setFieldStates((prev) => ({
-          ...prev,
-          [fieldName]: isValid ? 'valid' : 'invalid',
-        }));
-
-        resolve({ isValid, error });
-      }, 300); // 300ms debounce
-    });
-  }, []);
-
-  // Actualizar campo del formulario
   const updateField = useCallback(
     (fieldName, value) => {
-      setFormData((prev) => ({
-        ...prev,
-        [fieldName]: value,
-      }));
-
-      // Validar el campo
+      setFormData((prev) => ({ ...prev, [fieldName]: value }));
       validateField(fieldName, value);
     },
     [validateField]
   );
 
-  // Validar todo el formulario
   const validateForm = useCallback(() => {
     const newErrors = {};
 
-    // Validar todos los campos obligatorios
-    const nombreError = validateNombreCompleto(formData.nombreCompleto);
-    if (nombreError) newErrors.nombreCompleto = nombreError;
+    const nErr = validateNombreCompleto(formData.nombreCompleto);
+    if (nErr) newErrors.nombreCompleto = nErr;
 
-    const nicknameError = validateNickname(formData.nombreUsuario);
-    if (nicknameError) newErrors.nombreUsuario = nicknameError;
-    else if (
-      !nicknameDisponible &&
-      formData.nombreUsuario !== originalNickname.current
-    ) {
+    const nnErr = validateNickname(formData.nombreUsuario);
+    if (nnErr) newErrors.nombreUsuario = nnErr;
+    else if (!nicknameDisponible && formData.nombreUsuario !== originalNickname.current)
       newErrors.nombreUsuario = 'Este nickname ya está en uso';
-    }
 
-    // Validar campos opcionales si tienen contenido
     if (formData.pronombres) {
-      const pronombresError = validatePronombres(formData.pronombres);
-      if (pronombresError) newErrors.pronombres = pronombresError;
+      const pErr = validatePronombres(formData.pronombres);
+      if (pErr) newErrors.pronombres = pErr;
     }
 
     if (formData.biografia) {
-      const biografiaError = validateBiografia(formData.biografia);
-      if (biografiaError) newErrors.biografia = biografiaError;
+      const bErr = validateBiografia(formData.biografia);
+      if (bErr) newErrors.biografia = bErr;
     }
 
     setErrors(newErrors);
-    const isValid = Object.keys(newErrors).length === 0 && !validatingNickname;
-    setIsFormValid(isValid);
-
-    return isValid;
+    const ok = Object.keys(newErrors).length === 0 && !validatingNickname;
+    setIsFormValid(ok);
+    return ok;
   }, [formData, nicknameDisponible, validatingNickname]);
 
-  // Resetear validaciones
   const resetValidation = useCallback(() => {
     setErrors({});
     setFieldStates({});
     setIsFormValid(false);
   }, []);
 
-  // Obtener mensaje de ayuda para biografía con contador
   const getBiografiaHelperText = useCallback(() => {
     const length = formData.biografia?.length || 0;
     const remaining = LIMITES.BIOGRAFIA.MAX - length;
-
-    if (remaining < 20) {
-      return `${remaining} caracteres restantes`;
-    }
-
-    return `${length}/${LIMITES.BIOGRAFIA.MAX} caracteres`;
+    return remaining < 20 ? `${remaining} caracteres restantes` : `${length}/${LIMITES.BIOGRAFIA.MAX} caracteres`;
   }, [formData.biografia]);
 
   const hasChanges = useCallback(() => {
-    return Object.keys(formData).some(
-      (key) => formData[key] !== originalData.current[key]
-    );
+    return Object.keys(formData).some((key) => formData[key] !== originalData.current[key]);
   }, [formData]);
 
-  // Efecto para validar el formulario cuando cambien los errores
-  useEffect(() => {
-    const hasErrors = Object.values(errors).some((error) => error !== null);
-    const hasRequiredFields = formData.nombreCompleto && formData.nombreUsuario;
+  /* ---------- efecto para estado general del formulario ---------- */
 
-    setIsFormValid(
-      !hasErrors &&
-        hasRequiredFields &&
-        !validatingNickname &&
-        (formData.nombreUsuario === originalNickname.current ||
-          nicknameDisponible)
-    );
-  }, [
-    errors,
-    formData.nombreCompleto,
-    formData.nombreUsuario,
-    validatingNickname,
-    nicknameDisponible,
-  ]);
-
-  // Limpiar timers al desmontar
   useEffect(() => {
-    return () => {
-      Object.values(debounceTimers.current).forEach((timer) => {
-        if (timer) clearTimeout(timer);
-      });
-    };
-  }, []);
+    const hasErrors = Object.values(errors).some((e) => e != null);
+    const hasRequired = formData.nombreCompleto && formData.nombreUsuario;
+    setIsFormValid(!hasErrors && hasRequired && !validatingNickname && (formData.nombreUsuario === originalNickname.current || nicknameDisponible));
+  }, [errors, formData.nombreCompleto, formData.nombreUsuario, validatingNickname, nicknameDisponible]);
 
   return {
-    // Datos del formulario
+    // datos y setters
     formData,
     updateField,
 
-    // Estados de validación
+    // validación
     errors,
     fieldStates,
     isFormValid,
 
-    // Estados específicos del nickname
+    // nickname
     validatingNickname,
     nicknameDisponible,
 
-    // Funciones de utilidad
+    // utilidades
     validateForm,
     resetValidation,
     hasChanges,
     getBiografiaHelperText,
 
-    // Getters para estados específicos
-    getFieldState: (fieldName) => fieldStates[fieldName],
-    getFieldError: (fieldName) => errors[fieldName],
-    isFieldValid: (fieldName) => fieldStates[fieldName] === 'valid',
-    isFieldInvalid: (fieldName) => fieldStates[fieldName] === 'invalid',
-    isFieldValidating: (fieldName) => fieldStates[fieldName] === 'validating',
+    // getters por campo
+    getFieldState: (f) => fieldStates[f],
+    getFieldError: (f) => errors[f],
+    isFieldValid: (f) => fieldStates[f] === 'valid',
+    isFieldInvalid: (f) => fieldStates[f] === 'invalid',
+    isFieldValidating: (f) => fieldStates[f] === 'validating',
   };
 };
+
+export default useEditarPerfilValidation;

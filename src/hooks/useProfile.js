@@ -1,10 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   fetchUsuarioPublico,
-  toggleSeguirUsuario,
   getUsuarioActual,
   fetchPostsPerfilByUserId,
 } from '../services/profileServices';
+
+import {
+  seguirUsuario,
+  dejarDeSeguirUsuario,
+  cancelarSolicitudSeguimiento,
+} from '../services/redSocialServices';
 
 import { mapearUsuario } from '../utils/mappers';
 
@@ -18,14 +23,16 @@ export const useProfile = (nickname) => {
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [perfilPosts, setPerfilPosts] = useState([]); // Nuevo estado
+  const [perfilPosts, setPerfilPosts] = useState([]);
 
-  // Función memoizada para obtener el usuario actual
   const getCurrentUser = useCallback(() => {
-    return getUsuarioActual();
+    try {
+      return getUsuarioActual();
+    } catch {
+      return null;
+    }
   }, []);
 
-  // Función para cargar el perfil
   const loadProfile = useCallback(async () => {
     if (!nickname || nickname.trim() === '') {
       setError('Nickname inválido');
@@ -39,85 +46,108 @@ export const useProfile = (nickname) => {
     try {
       const token = localStorage.getItem('token');
       const userData = await fetchUsuarioPublico(nickname, token);
-      const mappedUser = mapearUsuario(userData);
 
+      if (!userData) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      const mappedUser = mapearUsuario(userData);
       setUsuario(mappedUser);
 
-      // Verificar si es el perfil propio
       const currentUser = getCurrentUser();
-      const ownProfile = currentUser && currentUser.id === userData._id;
-      setIsOwnProfile(ownProfile);
+      const currentUserId = currentUser?.id ?? currentUser?._id ?? currentUser?.sub ?? null;
+      const userId = userData._id ?? userData.id ?? mappedUser?._id ?? null;
 
-      // Obtener los posts de tipo "perfil"
-      const postsPerfil = await fetchPostsPerfilByUserId(userData._id, token);
-      setPerfilPosts(postsPerfil);
+      setIsOwnProfile(Boolean(currentUserId && userId && String(currentUserId) === String(userId)));
+
+      try {
+        const postsPerfil = await fetchPostsPerfilByUserId(userId, token);
+        setPerfilPosts(Array.isArray(postsPerfil) ? postsPerfil : []);
+      } catch (postsErr) {
+        // No bloquear la carga del perfil si falla la carga de posts
+        // eslint-disable-next-line no-console
+        console.error('loadProfile posts error:', postsErr?.message || postsErr);
+        setPerfilPosts([]);
+      }
     } catch (err) {
-      console.error('❌ Error cargando perfil:', err.message);
-      setError(err.message);
+      // eslint-disable-next-line no-console
+      console.error('loadProfile error:', err?.message || err);
+      setError(err?.message || 'Error cargando perfil');
+      setUsuario(null);
+      setPerfilPosts([]);
+      setIsOwnProfile(false);
     } finally {
       setIsLoading(false);
     }
   }, [nickname, getCurrentUser]);
 
-  // Función para seguir/dejar de seguir
   const handleFollowToggle = useCallback(async () => {
     if (!usuario) return;
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token de autenticación requerido');
-      }
-
-      await toggleSeguirUsuario(usuario._id, token);
-
-      // Actualizar el estado local
       const currentUser = getCurrentUser();
-      const updatedUser = { ...usuario };
+      if (!currentUser) throw new Error('Usuario no autenticado');
 
-      if (updatedUser.seguidores?.includes(currentUser?.id)) {
-        updatedUser.seguidores = updatedUser.seguidores.filter(
-          (id) => id !== currentUser.id
-        );
+      const currentUserId = currentUser?.id ?? currentUser?._id ?? currentUser?.sub ?? null;
+
+      const yaSigo = Array.isArray(usuario.seguidores)
+        ? usuario.seguidores.some((s) => {
+            const sid = typeof s === 'object' ? s._id ?? s.id ?? null : s;
+            return sid && String(sid) === String(currentUserId);
+          })
+        : false;
+
+      if (yaSigo) {
+        await dejarDeSeguirUsuario(usuario._id);
       } else {
-        updatedUser.seguidores = [
-          ...(updatedUser.seguidores || []),
-          currentUser.id,
-        ];
+        const res = await seguirUsuario(usuario._id);
+        // No usar alert; propagar info en estado si es necesario
+        if (res?.tipo === 'solicitud_enviada') {
+          setError('Solicitud de seguimiento enviada');
+        }
       }
 
-      setUsuario(updatedUser);
+      await loadProfile();
     } catch (err) {
-      console.error('❌ Error al seguir/dejar de seguir:', err);
-      setError(err.message);
-      throw err; // Re-throw para que el componente pueda manejar el error si es necesario
+      // eslint-disable-next-line no-console
+      console.error('handleFollowToggle error:', err?.message || err);
+      setError(err?.message || 'Error al actualizar seguimiento');
+      throw err;
     }
-  }, [usuario, getCurrentUser]);
+  }, [usuario, getCurrentUser, loadProfile]);
 
-  // Función para refrescar el perfil
+  const handleCancelRequest = useCallback(async () => {
+    if (!usuario) return;
+    try {
+      await cancelarSolicitudSeguimiento(usuario._id);
+      await loadProfile();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('handleCancelRequest error:', err?.message || err);
+      setError(err?.message || 'Error al cancelar solicitud');
+      throw err;
+    }
+  }, [usuario, loadProfile]);
+
   const refreshProfile = useCallback(() => {
     loadProfile();
   }, [loadProfile]);
 
-  // Cargar perfil cuando cambie el nickname
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
 
   return {
-    // Estado
     usuario,
     isOwnProfile,
     isLoading,
     error,
-    perfilPosts, 
+    perfilPosts,
 
-    // Funciones
     getCurrentUser,
     handleFollowToggle,
     refreshProfile,
-
-   
-    setError, 
+    handleCancelRequest,
+    setError,
   };
 };

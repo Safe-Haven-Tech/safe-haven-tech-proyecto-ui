@@ -75,7 +75,7 @@ export default function InformationalResourcesHome() {
           <div className={styles.resourcesSection}>
             <h3 className={styles.resourcesTitle}>Recursos disponibles</h3>
 
-            {/* 🎯 MANTENER: ${styles.section} solo en ResourcesSection si quieres hover effect */}
+            
             <div className={styles.section}>
               <Suspense
                 fallback={<LoadingFallback text="Cargando recursos..." />}

@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import carruselStyles from '../../pages/Publicaciones/PostDetail.module.css';
 import styles from '../../pages/Publicaciones/FeedPublicaciones.module.css';
 import placeholderImage from '../../assets/perfil_placeholder.png';
-import { likePublicacion, unlikePublicacion } from '../../services/publicacionesService';
+import { likePublicacion, unlikePublicacion, denunciarPublicacion } from '../../services/publicacionesService';
+
+import DenunciaModal from './denuncia';
 
 function getUsuarioIdFromToken(token) {
   if (!token) return null;
@@ -17,16 +19,6 @@ function getUsuarioIdFromToken(token) {
   }
 }
 
-function getUsuarioRolFromToken(token) {
-  if (!token) return null;
-  try {
-    const payload = token.split('.')[1];
-    const decoded = JSON.parse(atob(payload));
-    return decoded.rol || decoded.role || null;
-  } catch {
-    return null;
-  }
-}
 
 const CarruselMultimedia = ({ multimedia }) => {
   const [indice, setIndice] = useState(0);
@@ -109,7 +101,7 @@ const PublicacionCard = ({ publicacion, onDelete }) => {
 
   const token = localStorage.getItem('token');
   const usuarioId = getUsuarioIdFromToken(token);
-  const usuarioRol = getUsuarioRolFromToken(token);
+
 
   const [yaDioLike, setYaDioLike] = useState(
     Array.isArray(likes) && usuarioId
@@ -119,15 +111,12 @@ const PublicacionCard = ({ publicacion, onDelete }) => {
   const [likesCount, setLikesCount] = useState(Array.isArray(likes) ? likes.length : 0);
   const [likeLoading, setLikeLoading] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-
+  const [showDenunciaModal, setShowDenunciaModal] = useState(false);
   const [copiado, setCopiado] = useState(false);
 
   // Permitir borrar si es autor o admin
-  const puedeBorrar = usuarioId && (
-    autorId?._id === usuarioId ||
-    autorId === usuarioId ||
-    usuarioRol === 'admin' ||
-    usuarioRol === 'administrador'
+  const puedeBorrar = publicacion && usuarioId && (
+    (publicacion.autorId && (publicacion.autorId._id === usuarioId || publicacion.autorId === usuarioId))
   );
 
   // Menú de opciones (tres puntos)
@@ -200,7 +189,20 @@ const PublicacionCard = ({ publicacion, onDelete }) => {
     }
   };
 
+  // Lógica para denunciar
+  const handleDenunciar = async ({ motivo, descripcion }) => {
+    try {
+      await denunciarPublicacion(_id, motivo, descripcion);
+      alert('Denuncia enviada correctamente');
+      setShowDenunciaModal(false);
+    } catch (err) {
+      alert(err.message || 'Error al enviar denuncia');
+    }
+  };
+
   return (
+
+    
     <div className={styles.card}>
       {/* Carrusel de imágenes */}
       {multimedia && multimedia.length > 0 && (
@@ -226,8 +228,8 @@ const PublicacionCard = ({ publicacion, onDelete }) => {
         <span className={styles.cardFecha}>
           {fecha ? new Date(fecha).toLocaleString() : ''}
         </span>
-        {/* Botón de menú de opciones si es autor o admin */}
-        {puedeBorrar && (
+        {/* Menú de opciones (tres puntos) para cualquier usuario autenticado */}
+        {usuarioId && (
           <div className={styles.cardMenuWrapper} ref={menuRef}>
             <button
               className={styles.cardMenuBtn}
@@ -258,9 +260,9 @@ const PublicacionCard = ({ publicacion, onDelete }) => {
             >
               <i className="bi bi-three-dots-vertical" style={{ fontSize: '1.7rem', color: '#603c7e' }}></i>
             </button>
+
             {menuAbierto && (
-              <div className={styles.cardMenu} style={{ marginTop: 8, minWidth: 140, position: 'absolute', right: 0 }}>
-                {/* Flecha indicadora */}
+              <div className={styles.cardMenu} style={{ marginTop: 8, minWidth: 140, position: 'absolute', right: 0, zIndex: 9999 }}>
                 <div style={{
                   position: 'absolute',
                   top: -8,
@@ -272,13 +274,23 @@ const PublicacionCard = ({ publicacion, onDelete }) => {
                   boxShadow: '0 -2px 8px rgba(96,60,126,0.07)',
                   zIndex: 1,
                 }} />
-                <button
-                  className={styles.cardDeleteBtn}
-                  onClick={e => { e.stopPropagation(); setMenuAbierto(false); setConfirmarEliminar(true); }}
-                  style={{ padding: '12px 20px', fontSize: '1.08rem' }}
-                >
-                  <i className="bi bi-trash"></i> Eliminar
-                </button>
+                {puedeBorrar ? (
+                  <button
+                    className={styles.cardDeleteBtn}
+                    onClick={e => { e.stopPropagation(); setMenuAbierto(false); setConfirmarEliminar(true); }}
+                    style={{ padding: '12px 20px', fontSize: '1.08rem' }}
+                  >
+                    <i className="bi bi-trash"></i> Eliminar
+                  </button>
+                ) : (
+                  <button
+                    className={styles.cardDeleteBtn}
+                    onClick={e => { e.stopPropagation(); setMenuAbierto(false); setShowDenunciaModal(true); }}
+                    style={{ padding: '12px 20px', fontSize: '1.08rem' }}
+                  >
+                    <i className="bi bi-flag"></i> Denunciar
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -521,6 +533,12 @@ const PublicacionCard = ({ publicacion, onDelete }) => {
           </div>
         </div>
       )}
+      {/* Modal de denuncia */}
+      <DenunciaModal
+        show={showDenunciaModal}
+        onClose={() => setShowDenunciaModal(false)}
+        onSubmit={handleDenunciar}
+      />
     </div>
   );
 };

@@ -1,0 +1,98 @@
+/* Basado en Postulacion.module.css: tokens y estilos simples para admin */
+
+:root {
+  --bg: #fff;
+  --muted: #6b7280;
+  --text: #0f172a;
+  --primary: #7c3aed;
+  --danger: #b91c1c;
+  --radius: 10px;
+  --shadow: 0 8px 24px rgba(15,23,42,0.06);
+}
+
+.adminRoot {
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, var(--bg) 0%, #fbf8ff 100%);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  margin-top: 100px;
+}
+
+.title { margin: 0 0 1rem 0; color: var(--text); }
+
+.filters { display:flex; gap:0.5rem; margin-bottom:1rem; align-items:center; }
+.input { padding:0.5rem 0.75rem; border-radius:8px; border:1px solid #e6e6f0; flex:1; }
+.select { padding:0.5rem; border-radius:8px; border:1px solid #e6e6f0; }
+.btn, .btnSecondary { padding:0.5rem 0.75rem; border-radius:8px; border:none; background:var(--primary); color:#fff; cursor:pointer; }
+.btnSecondary { background:#efefef; color:var(--text); }
+
+.tableWrap { overflow:auto; border-radius:8px; background:#fff; border:1px solid #f0e9fb; }
+.table { width:100%; border-collapse:collapse; }
+.table th, .table td { padding:0.75rem; text-align:left; border-bottom:1px solid #f3f2f8; }
+.center { text-align:center; padding:1rem; color:var(--muted); }
+
+.row:hover { background:#f8f6ff; }
+
+.userCell { display:flex; flex-direction:column; }
+.userName { font-weight:600; }
+.userEmail { font-size:0.85rem; color:var(--muted); }
+
+.badge { padding:0.25rem 0.5rem; border-radius:6px; background:#eef2ff; color:var(--primary); font-weight:600; font-size:0.85rem; }
+.badge_pendiente { background:#fff7ed; color:#b45309; }
+.badge_aprobada { background:#ecfdf5; color:#065f46; }
+.badge_rechazada { background:#fff1f2; color:var(--danger); }
+
+.actionBtn {
+  margin-right: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #e6e6f0;
+  background: #ffffff;
+  color: var(--text);       
+  font-weight: 600;          
+  font-size: 0.95rem;         
+  line-height: 1;             
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;            
+  height: 32px;              
+  opacity: 1;
+}
+
+.actionBtn:focus {
+  outline: 3px solid rgba(124,58,237,0.18);
+  outline-offset: 2px;
+}
+
+/* Hover para indicar interacción */
+.actionBtn:hover {
+  background: #faf9ff;
+}
+
+
+
+.actionBtnAccept { background:#12b981; color:#fff; border:none; margin-right:0.5rem; padding:0.35rem 0.5rem; border-radius:6px; }
+.actionBtnReject { background:var(--danger); color:#fff; border:none; padding:0.35rem 0.5rem; border-radius:6px; }
+
+.pagination { display:flex; gap:0.5rem; align-items:center; justify-content:center; padding:1rem 0; }
+
+.modalOverlay { position:fixed; inset:0; background:rgba(10,10,10,0.45); display:flex; align-items:center; justify-content:center; z-index:1050; }
+.modal { width:860px; max-width:95%; background:#fff; border-radius:10px; box-shadow:var(--shadow); overflow:hidden; }
+.modalHeader { display:flex; justify-content:space-between; align-items:center; padding:1rem; border-bottom:1px solid #f3f2f8; }
+.modalBody { padding:1rem; max-height:60vh; overflow:auto; }
+.modalFooter { padding:1rem; display:flex; gap:0.75rem; justify-content:flex-end; border-top:1px solid #f3f2f8; }
+.closeBtn { border:none; background:transparent; font-size:1.5rem; cursor:pointer; }
+
+.btnAccept { background:var(--primary); color:#fff; padding:0.5rem 0.75rem; border-radius:8px; border:none; }
+.btnReject { background:var(--danger); color:#fff; padding:0.5rem 0.75rem; border-radius:8px; border:none; }
+.btnSecondary { background:#efefef; color:var(--text); padding:0.5rem 0.75rem; border-radius:8px; border:none; }
+
+.textarea { width:100%; min-height:80px; border:1px solid #e6e6f0; border-radius:8px; padding:0.5rem; }
+
+.error { color:var(--danger); margin-bottom:1rem; }
+
+.rejection { margin-top:1rem; }

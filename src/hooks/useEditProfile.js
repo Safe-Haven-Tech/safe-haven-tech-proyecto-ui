@@ -1,7 +1,7 @@
 import { useReducer, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LIMITES } from '../utils/validators';
-import { parseJwt } from '../utils/token';
+import { parseJwt, getToken as getStoredToken } from '../utils/token';
 import { useAuth } from '../context/useAuth';
 import {
   fetchUsuarioCompleto,
@@ -135,11 +135,16 @@ export const useEditarPerfil = () => {
       if (!refreshToken) throw new Error('No refresh token available');
 
       const tokens = await renovarToken(refreshToken);
-      localStorage.setItem('token', tokens.accessToken);
+      // tokens puede venir con distintas keys; manejar varios casos
+      if (tokens?.accessToken) localStorage.setItem('token', tokens.accessToken);
+      else if (tokens?.nuevoToken) localStorage.setItem('token', tokens.nuevoToken);
+      if (tokens?.refreshToken) localStorage.setItem('refreshToken', tokens.refreshToken);
+
       window.dispatchEvent(new Event('tokenChanged'));
       return true;
     } catch (error) {
-      console.error('Error renovando token:', error);
+      // eslint-disable-next-line no-console
+      console.error('handleTokenInvalidation error:', error?.message || error);
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       navigate('/login');
@@ -150,35 +155,42 @@ export const useEditarPerfil = () => {
   // Obtener datos del usuario
   const fetchUsuario = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = getStoredToken();
       if (!token) {
         navigate('/login', { replace: true });
         return;
       }
 
       const decoded = parseJwt(token);
-      if (!decoded?.id) {
+      const userId = decoded?.id ?? decoded?._id ?? decoded?.sub;
+      if (!userId) {
         throw new Error('Token inválido');
       }
 
-      const usuario = await fetchUsuarioCompleto(decoded.id, token);
+      const usuario = await fetchUsuarioCompleto(userId, token);
       dispatch({ type: 'SET_USUARIO', usuario });
     } catch (error) {
-      console.error('Error fetching user:', error);
+      // eslint-disable-next-line no-console
+      console.error('fetchUsuario error:', error?.message || error);
 
-      if (
-        error.message.includes('Token') ||
-        error.message.includes('401') ||
-        error.message.includes('403')
-      ) {
+      const msg = String(error?.message || '').toLowerCase();
+
+      if (msg.includes('token') || msg.includes('401') || msg.includes('403')) {
         const success = await handleTokenInvalidation();
         if (success) {
-          // Reintentar después de renovar token
-          const newToken = localStorage.getItem('token');
+          const newToken = getStoredToken();
           const decoded = parseJwt(newToken);
-          const usuario = await fetchUsuarioCompleto(decoded.id, newToken);
-          dispatch({ type: 'SET_USUARIO', usuario });
-          return;
+          const userId = decoded?.id ?? decoded?._id ?? decoded?.sub;
+          if (userId) {
+            try {
+              const usuario = await fetchUsuarioCompleto(userId, newToken);
+              dispatch({ type: 'SET_USUARIO', usuario });
+              return;
+            } catch (err) {
+              // eslint-disable-next-line no-console
+              console.error('fetchUsuario retry error:', err?.message || err);
+            }
+          }
         }
       }
 
@@ -187,7 +199,7 @@ export const useEditarPerfil = () => {
         error: 'Error al cargar los datos del usuario',
       });
     }
-  }, [navigate, handleTokenInvalidation]);
+  }, [handleTokenInvalidation, navigate]);
 
   // Cargar datos del usuario al montar
   useEffect(() => {
@@ -196,7 +208,7 @@ export const useEditarPerfil = () => {
 
   // Handler para seleccionar imagen
   const handleImagenSeleccionada = useCallback((event) => {
-    const archivo = event.target.files[0];
+    const archivo = event?.target?.files?.[0];
     if (!archivo) return;
 
     // Validar tipo
@@ -283,8 +295,10 @@ export const useEditarPerfil = () => {
     dispatch({ type: 'LIMPIAR_ALERTAS' });
 
     try {
-      const token = localStorage.getItem('token');
+      const token = getStoredToken();
       const decoded = parseJwt(token);
+      const userId = decoded?.id ?? decoded?._id ?? decoded?.sub;
+      if (!userId) throw new Error('Token inválido');
 
       let datosActualizacion;
       let esFormData = false;
@@ -311,25 +325,25 @@ export const useEditarPerfil = () => {
       }
 
       const resultado = await actualizarPerfil(
-        decoded.id,
+        userId,
         datosActualizacion,
         token,
         esFormData
       );
 
-      const nicknameAnterior = state.usuario?.nombreUsuario;
+      // Guardar tokens si vienen
+      if (resultado?.accessToken) localStorage.setItem('token', resultado.accessToken);
+      if (resultado?.refreshToken) localStorage.setItem('refreshToken', resultado.refreshToken);
+      if (resultado?.nuevoToken) localStorage.setItem('token', resultado.nuevoToken);
 
-      if (resultado.nuevoToken) {
-        localStorage.setItem('token', resultado.nuevoToken);
-
-        try {
-          const nuevoDecoded = parseJwt(resultado.nuevoToken);
-          actualizarUsuario(nuevoDecoded);
-        } catch (err) {
-          console.error('Error al decodificar nuevo token:', err);
-        }
-
-        window.dispatchEvent(new Event('tokenChanged'));
+      // Actualizar contexto de auth si es necesario
+      const tokenParaDecodificar = resultado?.accessToken ?? resultado?.nuevoToken ?? token;
+      try {
+        const nuevoDecoded = parseJwt(tokenParaDecodificar);
+        if (nuevoDecoded && actualizarUsuario) actualizarUsuario(nuevoDecoded);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Decodificar token tras actualizar perfil error:', err?.message || err);
       }
 
       dispatch({
@@ -339,8 +353,8 @@ export const useEditarPerfil = () => {
 
       const usuarioActualizado = {
         ...state.usuario,
-        ...resultado.usuario,
-        fotoPerfil: state.fotoEliminada ? null : resultado.usuario?.fotoPerfil,
+        ...(resultado.usuario || {}),
+        fotoPerfil: state.fotoEliminada ? null : (resultado.usuario?.fotoPerfil ?? state.usuario?.fotoPerfil),
       };
 
       dispatch({
@@ -351,6 +365,8 @@ export const useEditarPerfil = () => {
       dispatch({ type: 'LIMPIAR_IMAGEN' });
       dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
 
+      // Redirigir si cambió el nickname
+      const nicknameAnterior = state.usuario?.nombreUsuario;
       if (
         resultado.usuario?.nombreUsuario &&
         resultado.usuario.nombreUsuario !== nicknameAnterior
@@ -359,19 +375,22 @@ export const useEditarPerfil = () => {
           navigate(`/perfil/${resultado.usuario.nombreUsuario}`, {
             replace: true,
           });
-        }, 1500);
+        }, 1200);
       }
     } catch (error) {
-      console.error('Error actualizando perfil:', error);
+      // eslint-disable-next-line no-console
+      console.error('handleGuardar error:', error?.message || error);
 
-      if (error.response?.status === 413) {
+      const status = error?.status ?? null;
+      const body = error?.body ?? null;
+      if (status === 413) {
         dispatch({
           type: 'SET_ERROR',
           error: 'La imagen es demasiado grande, máximo 2MB',
         });
-      } else if (error.response?.data?.message) {
-        dispatch({ type: 'SET_ERROR', error: error.response.data.message });
-      } else if (error.message.includes('nickname')) {
+      } else if (body && (body.message || body.mensaje)) {
+        dispatch({ type: 'SET_ERROR', error: body.message || body.mensaje });
+      } else if (String(error?.message || '').toLowerCase().includes('nickname')) {
         dispatch({
           type: 'SET_ERROR',
           error: 'El nickname no está disponible',

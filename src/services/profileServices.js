@@ -1,201 +1,241 @@
-// src/services/profileServices.js
-const API_URL = import.meta.env.VITE_API_URL;
 
 /**
- * Obtiene los datos públicos de un usuario por nickname
+ * Cliente HTTP para operaciones de perfil de usuario.
+ * Entorno: Vite (import.meta.env.VITE_API_URL).
+ *
+ */
+
+const API_URL = import.meta.env.VITE_API_URL || '';
+
+/**
+ * Obtiene el token almacenado en localStorage.
+ * @returns {string|null}
+ */
+export const getToken = () => localStorage.getItem('token');
+
+/**
+ * Construye headers para fetch.
+ * - No añade Content-Type cuando se envía FormData (pasar asJson = false).
+ * @param {string|null} token
+ * @param {boolean} asJson
+ * @returns {{[k:string]:string}}
+ */
+const buildHeaders = (token = null, asJson = true) => {
+  const headers = {};
+  if (asJson) headers['Content-Type'] = 'application/json';
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+};
+
+/**
+ * Intenta parsear Response a JSON; si falla, devuelve texto o null.
+ * @param {Response} res
+ * @returns {Promise<any|null>}
+ */
+const parseResponse = async (res) => {
+  try {
+    return await res.json();
+  } catch {
+    try {
+      const text = await res.text();
+      return text || null;
+    } catch {
+      return null;
+    }
+  }
+};
+
+/**
+ * Maneja respuesta no OK: extrae mensaje útil del body si existe y lanza Error con metadatos.
+ * @param {Response} res
+ * @param {string} defaultMessage
+ * @throws {Error}
+ */
+const handleErrorResponse = async (res, defaultMessage = 'Error en la petición') => {
+  const body = await parseResponse(res).catch(() => null);
+  const message = (body && (body.detalles || body.error || body.message)) || defaultMessage || `HTTP ${res.status}`;
+  const err = new Error(message);
+  err.status = res.status;
+  err.body = body;
+  throw err;
+};
+
+/**
+ * Obtiene los datos públicos de un usuario por nickname.
  * @param {string} nickname - Nickname del usuario
- * @param {string} token - Token de autenticación (opcional)
+ * @param {string|null} token - Token de autenticación (opcional)
  * @returns {Promise<Object>} Datos del usuario
  */
 export const fetchUsuarioPublico = async (nickname, token = null) => {
+  if (!nickname) throw new Error('Nickname requerido');
+
+  const cleaned = nickname.trim();
+  const url = `${API_URL}/api/usuarios/public/${encodeURIComponent(cleaned)}`;
+
   try {
-    const url = `${API_URL}/api/usuarios/public/${encodeURIComponent(nickname.trim())}`;
-
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const res = await fetch(url, { headers });
+    const res = await fetch(url, { headers: buildHeaders(token, true) });
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-
       if (res.status === 404) {
-        throw new Error(errorData.detalles || 'Usuario no encontrado');
+        const body = await parseResponse(res).catch(() => null);
+        throw new Error(body?.detalles || 'Usuario no encontrado');
       }
-
-      throw new Error(
-        errorData.detalles || 'Error al obtener datos del usuario'
-      );
+      await handleErrorResponse(res, 'Error al obtener datos del usuario');
     }
 
-    const data = await res.json();
-    return data.usuario;
+    const data = await parseResponse(res);
+    return data?.usuario ?? null;
   } catch (error) {
-    console.error('❌ Error en fetchUsuarioPublico:', error);
+    // eslint-disable-next-line no-console
+    console.error('fetchUsuarioPublico error:', error.message || error);
     throw error;
   }
 };
 
 /**
- * Obtiene los datos completos del usuario por ID (para edición)
+ * Obtiene los datos completos del usuario por ID (para edición).
  * @param {string} id - ID del usuario
  * @param {string} token - Token de autenticación
  * @returns {Promise<Object>} Datos completos del usuario
  */
 export const fetchUsuarioCompleto = async (id, token) => {
+  if (!id) throw new Error('ID requerido');
+
+  const url = `${API_URL}/api/usuarios/${encodeURIComponent(id)}`;
+
   try {
-    const res = await fetch(`${API_URL}/api/usuarios/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Cache-Control': 'no-cache',
-      },
+    const res = await fetch(url, {
+      headers: { ...buildHeaders(token, true), 'Cache-Control': 'no-cache' },
     });
 
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(
-        errorData.detalles || 'Error al obtener datos del usuario'
-      );
-    }
+    if (!res.ok) await handleErrorResponse(res, 'Error al obtener datos del usuario');
 
-    const data = await res.json();
-    return data.usuario;
+    const data = await parseResponse(res);
+    return data?.usuario ?? null;
   } catch (error) {
-    console.error('❌ Error en fetchUsuarioCompleto:', error);
+    // eslint-disable-next-line no-console
+    console.error('fetchUsuarioCompleto error:', error.message || error);
     throw error;
   }
 };
 
 /**
- * Verificar disponibilidad de nickname
- * @param {string} nickname - Nickname a verificar
- * @returns {Promise<boolean>} True si está disponible, false si no cumple validaciones o está en uso
+ * Verificar disponibilidad de nickname.
+ * Mantiene la semántica: devuelve true sólo si la API responde { disponible: true }.
+ * @param {string} nickname
+ * @returns {Promise<boolean>}
  */
 export const verificarNickname = async (nickname) => {
+  if (!nickname) return false;
+  const url = `${API_URL}/api/usuarios/verificar-nickname/${encodeURIComponent(nickname.trim())}`;
+
   try {
-    const res = await fetch(
-      `${API_URL}/api/usuarios/verificar-nickname/${encodeURIComponent(nickname)}`
-    );
-
-    if (!res.ok) {
-      // Si hay error, asumir que no está disponible
-      return false;
-    }
-
-    const data = await res.json();
-    return data.disponible;
+    const res = await fetch(url, { headers: buildHeaders(null, true) });
+    if (!res.ok) return false;
+    const data = await parseResponse(res);
+    return Boolean(data?.disponible);
   } catch (error) {
-    console.error('❌ Error en verificarNickname:', error);
+    // eslint-disable-next-line no-console
+    console.error('verificarNickname error:', error.message || error);
     return false;
   }
 };
+
 /**
- * Actualizar perfil del usuario
+ * Actualizar perfil del usuario.
  * @param {string} id - ID del usuario
  * @param {Object|FormData} data - Datos a actualizar
  * @param {string} token - Token de autenticación
  * @param {boolean} esFormData - Si los datos son FormData
- * @returns {Promise<Object>} Respuesta de la actualización
+ * @returns {Promise<Object>}
  */
 export const actualizarPerfil = async (id, data, token, esFormData = false) => {
+  if (!id) throw new Error('ID requerido');
+
   try {
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    };
-
-    if (!esFormData) {
-      headers['Content-Type'] = 'application/json';
-    }
-
-    const res = await fetch(`${API_URL}/api/usuarios/${id}`, {
+    const res = await fetch(`${API_URL}/api/usuarios/${encodeURIComponent(id)}`, {
       method: 'PUT',
-      headers,
+      headers: buildHeaders(token, !esFormData),
       body: esFormData ? data : JSON.stringify(data),
     });
 
-    const responseData = await res.json();
-
+    const parsed = await parseResponse(res);
     if (!res.ok) {
-      throw new Error(
-        responseData.detalles?.join?.(', ') ||
-          responseData.error ||
-          responseData.message ||
-          'Error al actualizar el perfil'
-      );
+      const message =
+        parsed?.detalles?.join?.(', ') || parsed?.error || parsed?.message || 'Error al actualizar el perfil';
+      throw new Error(message);
     }
 
-    return responseData;
+    return parsed ?? {};
   } catch (error) {
-    console.error('❌ Error en actualizarPerfil:', error);
+    // eslint-disable-next-line no-console
+    console.error('actualizarPerfil error:', error.message || error);
     throw error;
   }
 };
 
 /**
- * Renovar token de acceso
+ * Renovar token de acceso.
  * @param {string} refreshToken - Refresh token
  * @returns {Promise<Object>} Nuevos tokens
  */
 export const renovarToken = async (refreshToken) => {
+  if (!refreshToken) throw new Error('Refresh token requerido');
+
   try {
     const res = await fetch(`${API_URL}/api/auth/refresh`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: buildHeaders(null, true),
       body: JSON.stringify({ refreshToken }),
     });
 
-    if (!res.ok) {
-      throw new Error('Error renovando token');
-    }
+    if (!res.ok) await handleErrorResponse(res, 'Error renovando token');
 
-    return await res.json();
+    return await parseResponse(res);
   } catch (error) {
-    console.error('❌ Error en renovarToken:', error);
+    // eslint-disable-next-line no-console
+    console.error('renovarToken error:', error.message || error);
     throw error;
   }
 };
 
 /**
- * Realiza la acción de seguir/dejar de seguir a un usuario
+ * Realiza la acción de seguir/dejar de seguir a un usuario.
  * @param {string} usuarioId - ID del usuario a seguir/dejar de seguir
  * @param {string} token - Token de autenticación
- * @returns {Promise<Object>} Respuesta de la operación
+ * @returns {Promise<Object>}
  */
 export const toggleSeguirUsuario = async (usuarioId, token) => {
+  if (!usuarioId) throw new Error('UsuarioId requerido');
+
   try {
-    const res = await fetch(`${API_URL}/api/usuarios/${usuarioId}/seguir`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    const res = await fetch(
+      `${API_URL}/api/usuarios/${encodeURIComponent(usuarioId)}/seguir`,
+      {
+        method: 'POST',
+        headers: buildHeaders(token, true),
+      }
+    );
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(errorData.detalles || 'Error al seguir/dejar de seguir');
+      const parsed = await parseResponse(res).catch(() => null);
+      throw new Error(parsed?.detalles || 'Error al seguir/dejar de seguir');
     }
 
-    return await res.json();
+    return await parseResponse(res);
   } catch (error) {
-    console.error('❌ Error en toggleSeguirUsuario:', error);
+    // eslint-disable-next-line no-console
+    console.error('toggleSeguirUsuario error:', error.message || error);
     throw error;
   }
 };
 
 /**
- * Obtiene el usuario actual desde el token JWT
- * @returns {Object|null} Datos del usuario actual o null
+ * Obtiene el usuario actual desde el token JWT almacenado en localStorage.
+ * @returns {Object|null}
  */
 export const getUsuarioActual = () => {
-  const token = localStorage.getItem('token');
+  const token = getToken();
   if (!token) return null;
 
   try {
@@ -203,158 +243,126 @@ export const getUsuarioActual = () => {
     if (payload.exp && payload.exp < Date.now() / 1000) return null;
     return payload;
   } catch (err) {
-    console.error('Error al decodificar token:', err);
+    // eslint-disable-next-line no-console
+    console.error('getUsuarioActual error:', err.message || err);
     return null;
   }
 };
 
 /**
- * Verifica si el token actual es válido
- * @returns {boolean} True si el token es válido
+ * Verifica si el token actual es válido.
+ * @returns {boolean}
  */
-export const isTokenValid = () => {
-  const user = getUsuarioActual();
-  return user !== null;
-};
+export const isTokenValid = () => Boolean(getUsuarioActual());
 
 /**
- * Obtiene el token del localStorage
- * @returns {string|null} Token o null si no existe
+ * Cambia la contraseña del usuario.
+ * @param {string} contraseñaActual
+ * @param {string} nuevaContraseña
+ * @param {string} token
+ * @returns {Promise<Object>}
  */
-export const getToken = () => {
-  return localStorage.getItem('token');
-};
+export const cambiarContraseña = async (contraseñaActual, nuevaContraseña, token) => {
+  if (!contraseñaActual || !nuevaContraseña) throw new Error('Datos de contraseña incompletos');
 
-/**
- * Cambia la contraseña del usuario
- * @param {string} contraseñaActual - Contraseña actual
- * @param {string} nuevaContraseña - Nueva contraseña
- *  @param {string} token - Token de autenticación
- * @returns {Promise<Object>} Respuesta de la operación
- * @throws {Error} Si ocurre un error durante la operación
- *
- */
-export const cambiarContraseña = async (
-  contraseñaActual,
-  nuevaContraseña,
-  token
-) => {
   try {
     const res = await fetch(`${API_URL}/api/auth/cambiar-contrasena`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        contraseñaActual,
-        nuevaContraseña,
-      }),
+      headers: buildHeaders(token, true),
+      body: JSON.stringify({ contraseñaActual, nuevaContraseña }),
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Error al cambiar contraseña');
-
-    return data;
+    const parsed = await parseResponse(res);
+    if (!res.ok) {
+      throw new Error(parsed?.error || 'Error al cambiar contraseña');
+    }
+    return parsed;
   } catch (error) {
-    console.error('❌ Error en cambiarContraseña:', error);
+    // eslint-disable-next-line no-console
+    console.error('cambiarContraseña error:', error.message || error);
     throw error;
   }
 };
 
 /**
- * Elimina la cuenta del usuario
- * @param {string} id - ID del usuario
- *  @param {string} contraseña - Contraseña del usuario
- * @param {string} token - Token de autenticación
- * * @returns {Promise<Object>} Respuesta de la operación
- * @throws {Error} Si ocurre un error durante la operación
+ * Elimina la cuenta del usuario.
+ * @param {string} id
+ * @param {string} contraseña
+ * @param {string} token
+ * @returns {Promise<Object>}
  */
 export const eliminarCuenta = async (id, contraseña, token) => {
+  if (!id || !contraseña) throw new Error('ID y contraseña requeridos');
+
   try {
-    const res = await fetch(`${API_URL}/api/usuarios/${id}`, {
+    const res = await fetch(`${API_URL}/api/usuarios/${encodeURIComponent(id)}`, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+      headers: buildHeaders(token, true),
       body: JSON.stringify({ contraseña }),
     });
 
-    const data = await res.json();
+    const parsed = await parseResponse(res);
     if (!res.ok) {
-      throw new Error(
-        data.detalles?.join?.(', ') ||
-          data.error ||
-          `Error ${res.status}: ${res.statusText}`
-      );
+      const message = parsed?.detalles?.join?.(', ') || parsed?.error || `Error ${res.status}`;
+      throw new Error(message);
     }
-
-    return data;
+    return parsed;
   } catch (error) {
-    console.error('❌ Error en eliminarCuenta:', error);
+    // eslint-disable-next-line no-console
+    console.error('eliminarCuenta error:', error.message || error);
     throw error;
   }
 };
 
 /**
- * Actualiza la configuración del usuario
- * @param {string} id - ID del usuario
- *  @param {Object} configuracion - Configuración a actualizar
- *  @param {string} token - Token de autenticación
- * * @returns {Promise<Object>} Respuesta de la operación
- * * @throws {Error} Si ocurre un error durante la operación
+ * Actualiza la configuración del usuario.
+ * @param {string} id
+ * @param {Object} configuracion
+ * @param {string} token
+ * @returns {Promise<Object>}
  */
 export const actualizarConfiguracion = async (id, configuracion, token) => {
+  if (!id) throw new Error('ID requerido');
+
   try {
-    const res = await fetch(`${API_URL}/api/usuarios/${id}`, {
+    const res = await fetch(`${API_URL}/api/usuarios/${encodeURIComponent(id)}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+      headers: buildHeaders(token, true),
       body: JSON.stringify(configuracion),
     });
 
-    const data = await res.json();
+    const parsed = await parseResponse(res);
     if (!res.ok) {
-      throw new Error(
-        data.detalles?.join?.(', ') ||
-          data.error ||
-          'Error al actualizar configuración'
-      );
+      const message = parsed?.detalles?.join?.(', ') || parsed?.error || 'Error al actualizar configuración';
+      throw new Error(message);
     }
-
-    return data;
+    return parsed;
   } catch (error) {
-    console.error('❌ Error en actualizarConfiguracion:', error);
+    // eslint-disable-next-line no-console
+    console.error('actualizarConfiguracion error:', error.message || error);
     throw error;
   }
 };
 
 /**
- * Obtiene los posts de tipo "perfil" de un usuario por su ID
- * @param {string} userId - ID del usuario
- * @param {string} token - Token de autenticación
- * @returns {Promise<Array>} Lista de posts de tipo "perfil"
+ * Obtiene los posts de tipo "perfil" de un usuario por su ID.
+ * @param {string} userId
+ * @param {string|null} token
+ * @returns {Promise<Array>}
  */
-export const fetchPostsPerfilByUserId = async (userId, token) => {
+export const fetchPostsPerfilByUserId = async (userId, token = null) => {
+  if (!userId) throw new Error('UserId requerido');
+
+  const url = `${API_URL}/api/publicaciones/usuario/${encodeURIComponent(userId)}?tipo=perfil`;
+
   try {
-    const url = `${API_URL}/api/publicaciones/usuario/${userId}?tipo=perfil`;
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-    const res = await fetch(url, { headers });
-    if (!res.ok) {
-      throw new Error('No se pudieron obtener los posts de perfil');
-    }
-    const data = await res.json();
-    return data.posts;
+    const res = await fetch(url, { headers: buildHeaders(token, true) });
+    if (!res.ok) await handleErrorResponse(res, 'Error al obtener posts de perfil');
+
+    const data = await parseResponse(res);
+    return data?.posts ?? [];
   } catch (error) {
-    console.error('❌ Error en fetchPostsPerfilByUserId:', error);
+    console.error('fetchPostsPerfilByUserId error:', error.message || error);
     throw error;
   }
 };
