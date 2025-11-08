@@ -7,7 +7,15 @@ import NotificationsModal from './NotificationsModal';
 import { obtenerNotificaciones } from '../services/redSocialServices';
 
 // Reusable NavButton
-const NavButton = ({ label, onClick, style, hoverStyle, isLink, to, className = '' }) => {
+const NavButton = ({
+  label,
+  onClick,
+  style,
+  hoverStyle,
+  isLink,
+  to,
+  className = '',
+}) => {
   const [hover, setHover] = useState(false);
   const combinedStyle = {
     borderRadius: '6px',
@@ -86,12 +94,17 @@ export default function Navbar() {
   useEffect(() => {
     let mounted = true;
     const loadBadge = async () => {
-      if (!usuario) { setBadge(0); return; }
+      if (!usuario) {
+        setBadge(0);
+        return;
+      }
       try {
         const res = await obtenerNotificaciones(1, 20);
         if (!mounted) return;
         const items = res.notificaciones || [];
-        const noLeidas = (res.meta && (res.meta.noLeidas ?? res.meta.unreadCount)) ?? items.filter(i => !i.leida).length;
+        const noLeidas =
+          (res.meta && (res.meta.noLeidas ?? res.meta.unreadCount)) ??
+          items.filter((i) => !i.leida).length;
         setBadge(noLeidas);
       } catch (e) {
         console.error('Error fetching notifications badge', e);
@@ -99,19 +112,23 @@ export default function Navbar() {
     };
     loadBadge();
     const iv = setInterval(loadBadge, 30000);
-    return () => { mounted = false; clearInterval(iv); };
+    return () => {
+      mounted = false;
+      clearInterval(iv);
+    };
   }, [usuario]);
 
   const isUserAdmin = () => usuario && usuario.rol === 'administrador';
 
   const handleProfileClick = () => {
-    if (usuario && usuario.nombreUsuario) navigate(`/perfil/${usuario.nombreUsuario}`);
+    if (usuario && usuario.nombreUsuario)
+      navigate(`/perfil/${usuario.nombreUsuario}`);
     else navigate('/perfil');
   };
 
   const handleAdminPanelClick = () => navigate('/admin/panel');
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(v => !v);
+  const toggleMobileMenu = () => setIsMobileMenuOpen((v) => !v);
 
   const menuItems = [
     { label: 'Autoevaluación', path: '/autoevaluacion' },
@@ -125,7 +142,11 @@ export default function Navbar() {
     {
       label: 'Iniciar Sesión',
       onClick: () => navigate('/login'),
-      style: { backgroundColor: 'transparent', color: '#2d5016', border: '2px solid #2d5016' },
+      style: {
+        backgroundColor: 'transparent',
+        color: '#2d5016',
+        border: '2px solid #2d5016',
+      },
       hoverStyle: { backgroundColor: '#2d5016', color: '#ffffff' },
     },
     {
@@ -137,12 +158,21 @@ export default function Navbar() {
   ];
 
   const userButtons = [
-    ...(isUserAdmin() ? [{
-      label: 'Admin',
-      onClick: handleAdminPanelClick,
-      style: { backgroundColor: '#dc3545', color: '#ffffff', border: 'none', fontWeight: '700' },
-      hoverStyle: { backgroundColor: '#c82333', color: '#ffffff' },
-    }] : []),
+    ...(isUserAdmin()
+      ? [
+          {
+            label: 'Admin',
+            onClick: handleAdminPanelClick,
+            style: {
+              backgroundColor: '#dc3545',
+              color: '#ffffff',
+              border: 'none',
+              fontWeight: '700',
+            },
+            hoverStyle: { backgroundColor: '#c82333', color: '#ffffff' },
+          },
+        ]
+      : []),
     {
       label: 'Mi Perfil',
       onClick: handleProfileClick,
@@ -170,49 +200,85 @@ export default function Navbar() {
           alignItems: 'center',
         }}
       >
-        <Link to="/" className="navbar-brand d-flex align-items-center" style={{ flexShrink: 0 }}>
-          <img src={logo} alt="SafeHaven Logo"
-            style={{ height: isMobile ? 50 : 60, width: 'auto', marginRight: 12, borderRadius: 8 }} />
+        <Link
+          to="/"
+          className="navbar-brand d-flex align-items-center"
+          style={{ flexShrink: 0 }}
+        >
+          <img
+            src={logo}
+            alt="SafeHaven Logo"
+            style={{
+              height: isMobile ? 50 : 60,
+              width: 'auto',
+              marginRight: 12,
+              borderRadius: 8,
+            }}
+          />
         </Link>
 
         {!isMobile && (
-          <div className="collapse navbar-collapse justify-content-end" id="navbarSupportedContent" style={{ position: 'relative', zIndex: 2110 }}>
-            <ul className="navbar-nav mb-2 mb-lg-0" style={{ marginLeft: 'auto' }}>
+          <div
+            className="collapse navbar-collapse justify-content-end"
+            id="navbarSupportedContent"
+            style={{ position: 'relative', zIndex: 2110 }}
+          >
+            <ul
+              className="navbar-nav mb-2 mb-lg-0"
+              style={{ marginLeft: 'auto' }}
+            >
               {menuItems.map((item, idx) => (
                 <li className="nav-item" key={idx}>
                   <NavButton
                     label={item.label}
                     isLink={true}
                     to={item.path}
-                    style={{ color: '#000', backgroundColor: 'transparent', border: 'none', fontSize: '16px' }}
+                    style={{
+                      color: '#000',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      fontSize: '16px',
+                    }}
                     hoverStyle={{ color: '#fff', backgroundColor: '#2d5016' }}
                   />
                 </li>
               ))}
             </ul>
 
-            <div className="d-flex align-items-center" style={{ gap: 24, marginLeft: '1rem' }}>
+            <div
+              className="d-flex align-items-center"
+              style={{ gap: 24, marginLeft: '1rem' }}
+            >
               {/* Notifications */}
               {usuario && (
                 <div style={{ position: 'relative' }}>
-                  <button className="btn btn-light" onClick={() => setNotifModalOpen(v => !v)} aria-label="Notificaciones" title="Notificaciones">
+                  <button
+                    className="btn btn-light"
+                    onClick={() => setNotifModalOpen((v) => !v)}
+                    aria-label="Notificaciones"
+                    title="Notificaciones"
+                  >
                     🔔
                   </button>
                   {badge > 0 && (
-                    <span style={{
-                      position: 'absolute',
-                      top: -6,
-                      right: -6,
-                      background: '#dc3545',
-                      color: '#fff',
-                      borderRadius: '50%',
-                      width: 20,
-                      height: 20,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 12,
-                    }}>{badge}</span>
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: -6,
+                        right: -6,
+                        background: '#dc3545',
+                        color: '#fff',
+                        borderRadius: '50%',
+                        width: 20,
+                        height: 20,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 12,
+                      }}
+                    >
+                      {badge}
+                    </span>
                   )}
                 </div>
               )}
@@ -229,24 +295,34 @@ export default function Navbar() {
             {usuario && (
               <button
                 className="btn btn-light"
-                onClick={() => setNotifModalOpen(v => !v)}
+                onClick={() => setNotifModalOpen((v) => !v)}
                 aria-label="Notificaciones"
                 title="Notificaciones"
                 style={{ marginRight: 8 }}
               >
                 🔔
-                {badge > 0 && <span style={{
-                  marginLeft: 6,
-                  background: '#dc3545',
-                  color: '#fff',
-                  borderRadius: '50%',
-                  padding: '0 6px',
-                  fontSize: 12
-                }}>{badge}</span>}
+                {badge > 0 && (
+                  <span
+                    style={{
+                      marginLeft: 6,
+                      background: '#dc3545',
+                      color: '#fff',
+                      borderRadius: '50%',
+                      padding: '0 6px',
+                      fontSize: 12,
+                    }}
+                  >
+                    {badge}
+                  </span>
+                )}
               </button>
             )}
 
-            <button className={`${styles.hamburgerButton} ${isMobileMenuOpen ? styles.active : ''}`} onClick={toggleMobileMenu} aria-label="Menú">
+            <button
+              className={`${styles.hamburgerButton} ${isMobileMenuOpen ? styles.active : ''}`}
+              onClick={toggleMobileMenu}
+              aria-label="Menú"
+            >
               <span className={styles.hamburgerLine}></span>
               <span className={styles.hamburgerLine}></span>
               <span className={styles.hamburgerLine}></span>
@@ -256,11 +332,18 @@ export default function Navbar() {
       </nav>
 
       {isMobile && isMobileMenuOpen && (
-        <div className={`${styles.mobileMenuOverlay} ${isMobileMenuOpen ? styles.open : ''}`}>
+        <div
+          className={`${styles.mobileMenuOverlay} ${isMobileMenuOpen ? styles.open : ''}`}
+        >
           <div className={styles.mobileMenuContent}>
             <div className={styles.mobileMenuItems}>
               {menuItems.map((item, index) => (
-                <Link key={index} to={item.path} className={styles.mobileMenuItem} onClick={() => setIsMobileMenuOpen(false)}>
+                <Link
+                  key={index}
+                  to={item.path}
+                  className={styles.mobileMenuItem}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
                   {item.label}
                 </Link>
               ))}
@@ -270,18 +353,42 @@ export default function Navbar() {
               {usuario ? (
                 <>
                   {isUserAdmin() && (
-                    <button className={styles.mobileAdminButton} onClick={() => { handleAdminPanelClick(); setIsMobileMenuOpen(false); }}>
+                    <button
+                      className={styles.mobileAdminButton}
+                      onClick={() => {
+                        handleAdminPanelClick();
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
                       ⚙️ Panel de Administración
                     </button>
                   )}
-                  <button className={styles.mobileProfileButton} onClick={() => { handleProfileClick(); setIsMobileMenuOpen(false); }}>
+                  <button
+                    className={styles.mobileProfileButton}
+                    onClick={() => {
+                      handleProfileClick();
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
                     Mi Perfil
                   </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" className={styles.mobileLoginButton} onClick={() => setIsMobileMenuOpen(false)}>Iniciar Sesión</Link>
-                  <Link to="/register" className={styles.mobileRegisterButton} onClick={() => setIsMobileMenuOpen(false)}>Registrarse</Link>
+                  <Link
+                    to="/login"
+                    className={styles.mobileLoginButton}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Iniciar Sesión
+                  </Link>
+                  <Link
+                    to="/register"
+                    className={styles.mobileRegisterButton}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Registrarse
+                  </Link>
                 </>
               )}
             </div>
@@ -289,7 +396,11 @@ export default function Navbar() {
         </div>
       )}
 
-      <NotificationsModal open={notifModalOpen} onClose={() => setNotifModalOpen(false)} onUpdateBadge={(v) => setBadge(v)} />
+      <NotificationsModal
+        open={notifModalOpen}
+        onClose={() => setNotifModalOpen(false)}
+        onUpdateBadge={(v) => setBadge(v)}
+      />
     </>
   );
 }

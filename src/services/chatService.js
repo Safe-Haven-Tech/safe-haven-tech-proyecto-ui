@@ -45,8 +45,8 @@ const parseResponse = async (res) => {
       body && (body.error || body.mensaje || body.detalles || body.message)
         ? body.error || body.mensaje || body.detalles || body.message
         : typeof body === 'string'
-        ? body
-        : `HTTP ${res.status}`;
+          ? body
+          : `HTTP ${res.status}`;
     const err = new Error(detail);
     err.status = res.status;
     err.body = body;
@@ -75,7 +75,6 @@ export const crearChat = async (token, usuarioId) => {
     const body = await parseResponse(res);
     return body?.chat ?? body;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('crearChat error:', error.message || error);
     throw error;
   }
@@ -101,7 +100,6 @@ export const obtenerChats = async (token, pagina = 1, limite = 20) => {
 
     return await parseResponse(res);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('obtenerChats error:', error.message || error);
     throw error;
   }
@@ -117,15 +115,17 @@ export const obtenerChatPorId = async (token, chatId) => {
   if (!chatId) throw new Error('chatId requerido');
 
   try {
-    const res = await fetch(`${API_URL}/api/chat/${encodeURIComponent(chatId)}`, {
-      method: 'GET',
-      headers: buildHeaders(token, false),
-    });
+    const res = await fetch(
+      `${API_URL}/api/chat/${encodeURIComponent(chatId)}`,
+      {
+        method: 'GET',
+        headers: buildHeaders(token, false),
+      }
+    );
 
     const body = await parseResponse(res);
     return body?.chat ?? body;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('obtenerChatPorId error:', error.message || error);
     throw error;
   }
@@ -139,11 +139,18 @@ export const obtenerChatPorId = async (token, chatId) => {
  * @param {number} limite
  * @returns {Promise<any>} { mensajes, paginacion, ... }
  */
-export const obtenerMensajes = async (token, chatId, pagina = 1, limite = 50) => {
+export const obtenerMensajes = async (
+  token,
+  chatId,
+  pagina = 1,
+  limite = 50
+) => {
   if (!chatId) throw new Error('chatId requerido');
 
   try {
-    const url = new URL(`${API_URL}/api/chat/${encodeURIComponent(chatId)}/mensajes`);
+    const url = new URL(
+      `${API_URL}/api/chat/${encodeURIComponent(chatId)}/mensajes`
+    );
     url.searchParams.set('pagina', String(pagina));
     url.searchParams.set('limite', String(limite));
 
@@ -154,7 +161,6 @@ export const obtenerMensajes = async (token, chatId, pagina = 1, limite = 50) =>
 
     return await parseResponse(res);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('obtenerMensajes error:', error.message || error);
     throw error;
   }
@@ -169,21 +175,29 @@ export const obtenerMensajes = async (token, chatId, pagina = 1, limite = 50) =>
  * @param {string|null} expiraEn
  * @returns {Promise<any>} mensaje enviado o payload
  */
-export const enviarMensaje = async (token, chatId, contenido, esTemporal = false, expiraEn = null) => {
+export const enviarMensaje = async (
+  token,
+  chatId,
+  contenido,
+  esTemporal = false,
+  expiraEn = null
+) => {
   if (!chatId) throw new Error('chatId requerido');
   if (contenido == null) throw new Error('contenido requerido');
 
   try {
-    const res = await fetch(`${API_URL}/api/chat/${encodeURIComponent(chatId)}/mensajes`, {
-      method: 'POST',
-      headers: buildHeaders(token, false),
-      body: JSON.stringify({ contenido, esTemporal, expiraEn }),
-    });
+    const res = await fetch(
+      `${API_URL}/api/chat/${encodeURIComponent(chatId)}/mensajes`,
+      {
+        method: 'POST',
+        headers: buildHeaders(token, false),
+        body: JSON.stringify({ contenido, esTemporal, expiraEn }),
+      }
+    );
 
     const body = await parseResponse(res);
     return body?.mensajeEnviado ?? body?.mensaje ?? body;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('enviarMensaje error:', error.message || error);
     throw error;
   }
@@ -197,7 +211,12 @@ export const enviarMensaje = async (token, chatId, contenido, esTemporal = false
  * @param {File[]} files
  * @returns {Promise<any>}
  */
-export const subirArchivosAMensaje = async (token, chatId, mensajeId, files = []) => {
+export const subirArchivosAMensaje = async (
+  token,
+  chatId,
+  mensajeId,
+  files = []
+) => {
   if (!chatId) throw new Error('chatId requerido');
   if (!mensajeId) throw new Error('mensajeId requerido');
 
@@ -216,7 +235,6 @@ export const subirArchivosAMensaje = async (token, chatId, mensajeId, files = []
 
     return await parseResponse(res);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('subirArchivosAMensaje error:', error.message || error);
     throw error;
   }
@@ -232,14 +250,16 @@ export const marcarMensajesLeidos = async (token, chatId) => {
   if (!chatId) throw new Error('chatId requerido');
 
   try {
-    const res = await fetch(`${API_URL}/api/chat/${encodeURIComponent(chatId)}/mensajes/leer`, {
-      method: 'PATCH',
-      headers: buildHeaders(token, false),
-    });
+    const res = await fetch(
+      `${API_URL}/api/chat/${encodeURIComponent(chatId)}/mensajes/leer`,
+      {
+        method: 'PATCH',
+        headers: buildHeaders(token, false),
+      }
+    );
 
     return await parseResponse(res);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('marcarMensajesLeidos error:', error.message || error);
     throw error;
   }
@@ -255,14 +275,16 @@ export const eliminarMensaje = async (token, mensajeId) => {
   if (!mensajeId) throw new Error('mensajeId requerido');
 
   try {
-    const res = await fetch(`${API_URL}/api/chat/mensajes/${encodeURIComponent(mensajeId)}`, {
-      method: 'DELETE',
-      headers: buildHeaders(token, false),
-    });
+    const res = await fetch(
+      `${API_URL}/api/chat/mensajes/${encodeURIComponent(mensajeId)}`,
+      {
+        method: 'DELETE',
+        headers: buildHeaders(token, false),
+      }
+    );
 
     return await parseResponse(res);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('eliminarMensaje error:', error.message || error);
     throw error;
   }
@@ -278,14 +300,16 @@ export const eliminarChat = async (token, chatId) => {
   if (!chatId) throw new Error('chatId requerido');
 
   try {
-    const res = await fetch(`${API_URL}/api/chat/${encodeURIComponent(chatId)}`, {
-      method: 'DELETE',
-      headers: buildHeaders(token, false),
-    });
+    const res = await fetch(
+      `${API_URL}/api/chat/${encodeURIComponent(chatId)}`,
+      {
+        method: 'DELETE',
+        headers: buildHeaders(token, false),
+      }
+    );
 
     return await parseResponse(res);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('eliminarChat error:', error.message || error);
     throw error;
   }

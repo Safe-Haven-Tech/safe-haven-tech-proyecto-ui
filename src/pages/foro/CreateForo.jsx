@@ -18,7 +18,7 @@ const TOPICOS_FORO = [
   'prevención',
   'orientación profesional',
   'comunidad y redes de apoyo',
-  'otros'
+  'otros',
 ];
 
 const CrearForo = () => {
@@ -29,7 +29,7 @@ const CrearForo = () => {
   const [enviando, setEnviando] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     if (!contenido.trim() || !topico) {
@@ -49,12 +49,14 @@ const CrearForo = () => {
           contenido,
           topico,
           anonimo,
-          tipo: 'foro'
+          tipo: 'foro',
         }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || data.detalles || 'Error al crear publicación');
+        throw new Error(
+          data.error || data.detalles || 'Error al crear publicación'
+        );
       }
       navigate('/foro');
     } catch (err) {
@@ -70,16 +72,26 @@ const CrearForo = () => {
         <div className={styles.crearForoWrapper}>
           <div className={styles.crearForoCard}>
             <div className={styles.crearForoHeader}>
-              <span className={styles.crearForoIcon} role="img" aria-label="Crear tema"></span>
+              <span
+                className={styles.crearForoIcon}
+                role="img"
+                aria-label="Crear tema"
+              ></span>
               <h2>Crear nuevo tema en el foro</h2>
               <p>
-                Comparte tu experiencia, pregunta o mensaje. Recuerda que este es un espacio seguro y de apoyo mutuo.
+                Comparte tu experiencia, pregunta o mensaje. Recuerda que este
+                es un espacio seguro y de apoyo mutuo.
               </p>
             </div>
             <div className={styles.crearForoInfoBox}>
-              <span role="img" aria-label="info" className={styles.crearForoInfoIcon}></span>
+              <span
+                role="img"
+                aria-label="info"
+                className={styles.crearForoInfoIcon}
+              ></span>
               <span>
-                Elige el tópico que mejor describa tu publicación para que más personas puedan encontrarte y apoyarte.
+                Elige el tópico que mejor describa tu publicación para que más
+                personas puedan encontrarte y apoyarte.
               </span>
             </div>
             <form onSubmit={handleSubmit} className={styles.crearForoForm}>
@@ -91,12 +103,14 @@ const CrearForo = () => {
                   id="topico"
                   className={styles.crearForoSelect}
                   value={topico}
-                  onChange={e => setTopico(e.target.value)}
+                  onChange={(e) => setTopico(e.target.value)}
                   required
                 >
                   <option value="">Selecciona un tópico...</option>
-                  {TOPICOS_FORO.map(t => (
-                    <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                  {TOPICOS_FORO.map((t) => (
+                    <option key={t} value={t}>
+                      {t.charAt(0).toUpperCase() + t.slice(1)}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -108,13 +122,15 @@ const CrearForo = () => {
                   id="contenido"
                   className={styles.crearForoTextarea}
                   value={contenido}
-                  onChange={e => setContenido(e.target.value)}
+                  onChange={(e) => setContenido(e.target.value)}
                   rows={7}
                   maxLength={5000}
                   required
                   placeholder="Comparte tu experiencia, pregunta o mensaje..."
                 />
-                <div className={styles.crearForoCharCount}>{contenido.length}/5000</div>
+                <div className={styles.crearForoCharCount}>
+                  {contenido.length}/5000
+                </div>
               </div>
               <div className={styles.crearForoAnonimoCheck}>
                 <input
@@ -122,7 +138,7 @@ const CrearForo = () => {
                   type="checkbox"
                   id="anonimo"
                   checked={anonimo}
-                  onChange={e => setAnonimo(e.target.checked)}
+                  onChange={(e) => setAnonimo(e.target.checked)}
                 />
                 <label className="form-check-label" htmlFor="anonimo">
                   Publicar como anónimo

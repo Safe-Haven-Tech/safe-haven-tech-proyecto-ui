@@ -36,7 +36,9 @@ export const useEditarPerfilValidation = (initialData = {}) => {
     return () => {
       mounted.current = false;
       // limpiar timers
-      Object.values(debounceTimers.current).forEach((t) => t && clearTimeout(t));
+      Object.values(debounceTimers.current).forEach(
+        (t) => t && clearTimeout(t)
+      );
     };
   }, []);
 
@@ -59,7 +61,8 @@ export const useEditarPerfilValidation = (initialData = {}) => {
       return `El nombre no puede superar los ${LIMITES.NOMBRE.MAX} caracteres`;
 
     const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
-    if (!regex.test(trimmed)) return 'El nombre solo puede contener letras, espacios y acentos';
+    if (!regex.test(trimmed))
+      return 'El nombre solo puede contener letras, espacios y acentos';
 
     return null;
   };
@@ -72,7 +75,8 @@ export const useEditarPerfilValidation = (initialData = {}) => {
     if (t.length > LIMITES.NICKNAME.MAX)
       return `El nickname no puede superar los ${LIMITES.NICKNAME.MAX} caracteres`;
     const regex = /^[a-zA-Z0-9_]+$/;
-    if (!regex.test(t)) return 'El nickname solo puede contener letras, números y guiones bajos (_)';
+    if (!regex.test(t))
+      return 'El nickname solo puede contener letras, números y guiones bajos (_)';
     return null;
   };
 
@@ -81,7 +85,8 @@ export const useEditarPerfilValidation = (initialData = {}) => {
     if (pronombres.length > LIMITES.PRONOMBRES.MAX)
       return `Los pronombres no pueden superar los ${LIMITES.PRONOMBRES.MAX} caracteres`;
     const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ/\s]+$/;
-    if (!regex.test(pronombres)) return 'Los pronombres solo pueden contener letras, espacios y barras (/)';
+    if (!regex.test(pronombres))
+      return 'Los pronombres solo pueden contener letras, espacios y barras (/)';
     return null;
   };
 
@@ -94,97 +99,104 @@ export const useEditarPerfilValidation = (initialData = {}) => {
 
   /* ---------- validación individual con debounce ---------- */
 
-  const validateField = useCallback(
-    async (fieldName, value) => {
-      // limpiar timer anterior
-      if (debounceTimers.current[fieldName]) {
-        clearTimeout(debounceTimers.current[fieldName]);
-      }
+  const validateField = useCallback(async (fieldName, value) => {
+    // limpiar timer anterior
+    if (debounceTimers.current[fieldName]) {
+      clearTimeout(debounceTimers.current[fieldName]);
+    }
 
-      // marcar validando
-      setFieldStates((prev) => ({ ...prev, [fieldName]: 'validating' }));
+    // marcar validando
+    setFieldStates((prev) => ({ ...prev, [fieldName]: 'validating' }));
 
-      return new Promise((resolve) => {
-        debounceTimers.current[fieldName] = setTimeout(async () => {
-          let error = null;
-          let isValid = true;
+    return new Promise((resolve) => {
+      debounceTimers.current[fieldName] = setTimeout(async () => {
+        let error = null;
+        let isValid = true;
 
-          try {
-            switch (fieldName) {
-              case 'nombreCompleto':
-                error = validateNombreCompleto(value);
-                isValid = !error;
-                break;
+        try {
+          switch (fieldName) {
+            case 'nombreCompleto':
+              error = validateNombreCompleto(value);
+              isValid = !error;
+              break;
 
-              case 'nombreUsuario': {
-                error = validateNickname(value);
-                if (!error) {
-                  // verificar disponibilidad solo si cambió respecto al original
-                  if (value !== originalNickname.current) {
-                    const reqId = ++nicknameRequestCounter.current;
-                    setValidatingNickname(true);
-                    try {
-                      const disponible = await verificarNickname(value);
-                      if (!mounted.current) return resolve({ isValid: false, error: 'Interrumpido' });
-                      // ignorar respuestas antiguas
-                      if (reqId !== nicknameRequestCounter.current) return resolve({ isValid: false, error: null });
-                      setNicknameDisponible(Boolean(disponible));
-                      if (!disponible) {
-                        error = 'Este nickname ya está en uso';
-                        isValid = false;
-                      } else {
-                        isValid = true;
-                      }
-                    } catch (err) {
-                      // eslint-disable-next-line no-console
-                      console.error('validateField verificarNickname error:', err?.message || err);
-                      error = 'Error al verificar disponibilidad del nickname';
+            case 'nombreUsuario': {
+              error = validateNickname(value);
+              if (!error) {
+                // verificar disponibilidad solo si cambió respecto al original
+                if (value !== originalNickname.current) {
+                  const reqId = ++nicknameRequestCounter.current;
+                  setValidatingNickname(true);
+                  try {
+                    const disponible = await verificarNickname(value);
+                    if (!mounted.current)
+                      return resolve({ isValid: false, error: 'Interrumpido' });
+                    // ignorar respuestas antiguas
+                    if (reqId !== nicknameRequestCounter.current)
+                      return resolve({ isValid: false, error: null });
+                    setNicknameDisponible(Boolean(disponible));
+                    if (!disponible) {
+                      error = 'Este nickname ya está en uso';
                       isValid = false;
-                    } finally {
-                      if (reqId === nicknameRequestCounter.current && mounted.current) setValidatingNickname(false);
+                    } else {
+                      isValid = true;
                     }
-                  } else {
-                    setNicknameDisponible(true);
-                    isValid = true;
+                  } catch (err) {
+                    console.error(
+                      'validateField verificarNickname error:',
+                      err?.message || err
+                    );
+                    error = 'Error al verificar disponibilidad del nickname';
+                    isValid = false;
+                  } finally {
+                    if (
+                      reqId === nicknameRequestCounter.current &&
+                      mounted.current
+                    )
+                      setValidatingNickname(false);
                   }
                 } else {
-                  isValid = false;
+                  setNicknameDisponible(true);
+                  isValid = true;
                 }
-                break;
+              } else {
+                isValid = false;
               }
-
-              case 'pronombres':
-                error = validatePronombres(value);
-                isValid = !error;
-                break;
-
-              case 'biografia':
-                error = validateBiografia(value);
-                isValid = !error;
-                break;
-
-              default:
-                isValid = true;
+              break;
             }
-          } catch (err) {
-            // eslint-disable-next-line no-console
-            console.error('validateField error:', err?.message || err);
-            error = 'Error de validación';
-            isValid = false;
-          }
 
-          // actualizar errores y estado del campo
-          if (mounted.current) {
-            setErrors((prev) => ({ ...prev, [fieldName]: error }));
-            setFieldStates((prev) => ({ ...prev, [fieldName]: isValid ? 'valid' : 'invalid' }));
-          }
+            case 'pronombres':
+              error = validatePronombres(value);
+              isValid = !error;
+              break;
 
-          resolve({ isValid, error });
-        }, 300);
-      });
-    },
-    []
-  );
+            case 'biografia':
+              error = validateBiografia(value);
+              isValid = !error;
+              break;
+
+            default:
+              isValid = true;
+          }
+        } catch (err) {
+          console.error('validateField error:', err?.message || err);
+          error = 'Error de validación';
+          isValid = false;
+        }
+
+        // actualizar errores y estado del campo
+        if (mounted.current) {
+          setErrors((prev) => ({ ...prev, [fieldName]: error }));
+          setFieldStates((prev) => ({
+            ...prev,
+            [fieldName]: isValid ? 'valid' : 'invalid',
+          }));
+        }
+
+        resolve({ isValid, error });
+      }, 300);
+    });
+  }, []);
 
   /* ---------- helpers para UI ---------- */
 
@@ -204,7 +216,10 @@ export const useEditarPerfilValidation = (initialData = {}) => {
 
     const nnErr = validateNickname(formData.nombreUsuario);
     if (nnErr) newErrors.nombreUsuario = nnErr;
-    else if (!nicknameDisponible && formData.nombreUsuario !== originalNickname.current)
+    else if (
+      !nicknameDisponible &&
+      formData.nombreUsuario !== originalNickname.current
+    )
       newErrors.nombreUsuario = 'Este nickname ya está en uso';
 
     if (formData.pronombres) {
@@ -232,11 +247,15 @@ export const useEditarPerfilValidation = (initialData = {}) => {
   const getBiografiaHelperText = useCallback(() => {
     const length = formData.biografia?.length || 0;
     const remaining = LIMITES.BIOGRAFIA.MAX - length;
-    return remaining < 20 ? `${remaining} caracteres restantes` : `${length}/${LIMITES.BIOGRAFIA.MAX} caracteres`;
+    return remaining < 20
+      ? `${remaining} caracteres restantes`
+      : `${length}/${LIMITES.BIOGRAFIA.MAX} caracteres`;
   }, [formData.biografia]);
 
   const hasChanges = useCallback(() => {
-    return Object.keys(formData).some((key) => formData[key] !== originalData.current[key]);
+    return Object.keys(formData).some(
+      (key) => formData[key] !== originalData.current[key]
+    );
   }, [formData]);
 
   /* ---------- efecto para estado general del formulario ---------- */
@@ -244,8 +263,20 @@ export const useEditarPerfilValidation = (initialData = {}) => {
   useEffect(() => {
     const hasErrors = Object.values(errors).some((e) => e != null);
     const hasRequired = formData.nombreCompleto && formData.nombreUsuario;
-    setIsFormValid(!hasErrors && hasRequired && !validatingNickname && (formData.nombreUsuario === originalNickname.current || nicknameDisponible));
-  }, [errors, formData.nombreCompleto, formData.nombreUsuario, validatingNickname, nicknameDisponible]);
+    setIsFormValid(
+      !hasErrors &&
+        hasRequired &&
+        !validatingNickname &&
+        (formData.nombreUsuario === originalNickname.current ||
+          nicknameDisponible)
+    );
+  }, [
+    errors,
+    formData.nombreCompleto,
+    formData.nombreUsuario,
+    validatingNickname,
+    nicknameDisponible,
+  ]);
 
   return {
     // datos y setters

@@ -1,4 +1,3 @@
-
 /**
  * Servicios para gestión y normalización de denuncias (moderación).
  * - Entorno: Vite (import.meta.env.VITE_API_URL).
@@ -7,7 +6,9 @@
  * - Mensajes de log concisos y manejo consistente de parsing.
  */
 
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+const API_URL = (
+  import.meta.env.VITE_API_URL || 'http://localhost:3000'
+).replace(/\/$/, '');
 
 /**
  * Construye headers para fetch. Si no se suministra token, intenta leer de localStorage.
@@ -61,14 +62,18 @@ const fetchTargetByType = async (token, tipo, id) => {
   if (!path) return null;
 
   try {
-    const res = await fetch(`${API_URL}${path}`, { headers: buildHeaders(token) });
+    const res = await fetch(`${API_URL}${path}`, {
+      headers: buildHeaders(token),
+    });
     if (!res.ok) return null;
     const body = await parseResponse(res);
     // Normalizar posibles formas de la respuesta
-    return body?.publicacion ?? body?.comentario ?? body?.usuario ?? body ?? null;
+    return (
+      body?.publicacion ?? body?.comentario ?? body?.usuario ?? body ?? null
+    );
   } catch (err) {
     // Registro mínimo
-    // eslint-disable-next-line no-console
+
     console.error('fetchTargetByType error:', err.message || err);
     return null;
   }
@@ -86,22 +91,28 @@ export async function normalizeDenuncia(raw, token = null) {
   const doc = raw.denuncia ?? raw;
 
   const tipo = doc.tipoDenuncia ?? doc.tipo ?? null;
-  const publicacionId = doc.publicacionId ?? doc.objetivo?.publicacionId ?? null;
+  const publicacionId =
+    doc.publicacionId ?? doc.objetivo?.publicacionId ?? null;
   const comentarioId = doc.comentarioId ?? doc.objetivo?.comentarioId ?? null;
   const usuarioDenunciadoId =
-    doc.usuarioDenunciadoId ?? doc.objetivo?.usuarioDenunciadoId ?? doc.objetivo ?? null;
+    doc.usuarioDenunciadoId ??
+    doc.objetivo?.usuarioDenunciadoId ??
+    doc.objetivo ??
+    null;
 
   let objetivo = null;
 
   try {
     if (tipo === 'publicacion' && publicacionId) {
-      objetivo = typeof publicacionId === 'string'
-        ? await fetchTargetByType(token, 'publicacion', publicacionId)
-        : publicacionId;
+      objetivo =
+        typeof publicacionId === 'string'
+          ? await fetchTargetByType(token, 'publicacion', publicacionId)
+          : publicacionId;
     } else if (tipo === 'comentario' && comentarioId) {
-      objetivo = typeof comentarioId === 'string'
-        ? await fetchTargetByType(token, 'comentario', comentarioId)
-        : comentarioId;
+      objetivo =
+        typeof comentarioId === 'string'
+          ? await fetchTargetByType(token, 'comentario', comentarioId)
+          : comentarioId;
 
       // Si el comentario existe y su autor es solo un id, intentar poblar usuario del comentario
       if (objetivo && typeof objetivo === 'object') {
@@ -116,12 +127,12 @@ export async function normalizeDenuncia(raw, token = null) {
         }
       }
     } else if (tipo === 'usuario' && usuarioDenunciadoId) {
-      objetivo = typeof usuarioDenunciadoId === 'string'
-        ? await fetchTargetByType(token, 'usuario', usuarioDenunciadoId)
-        : usuarioDenunciadoId;
+      objetivo =
+        typeof usuarioDenunciadoId === 'string'
+          ? await fetchTargetByType(token, 'usuario', usuarioDenunciadoId)
+          : usuarioDenunciadoId;
     }
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error('normalizeDenuncia fetch error:', err.message || err);
     // continuar con lo que se tenga
   }
@@ -138,7 +149,8 @@ export async function normalizeDenuncia(raw, token = null) {
     objetivo, // objeto poblado si fue posible, o null
     publicacionId: tipo === 'publicacion' ? (objetivo ?? publicacionId) : null,
     comentarioId: tipo === 'comentario' ? (objetivo ?? comentarioId) : null,
-    usuarioDenunciadoId: tipo === 'usuario' ? (objetivo ?? usuarioDenunciadoId) : null,
+    usuarioDenunciadoId:
+      tipo === 'usuario' ? (objetivo ?? usuarioDenunciadoId) : null,
     usuarioId: autor,
     evidencia: doc.evidencia ?? doc.archivos ?? [],
     raw: doc,
@@ -161,7 +173,9 @@ export async function fetchDenuncias(tipo = '', tokenParam = null) {
 
     if (!res.ok) {
       const data = await parseResponse(res).catch(() => ({}));
-      throw new Error(data?.detalles ?? data?.error ?? 'Error al obtener denuncias');
+      throw new Error(
+        data?.detalles ?? data?.error ?? 'Error al obtener denuncias'
+      );
     }
 
     const payload = await parseResponse(res);
@@ -171,16 +185,18 @@ export async function fetchDenuncias(tipo = '', tokenParam = null) {
     else if (Array.isArray(payload.data)) lista = payload.data;
     else if (Array.isArray(payload.docs)) lista = payload.docs;
     else if (Array.isArray(payload.denuncias)) lista = payload.denuncias;
-    else if (payload && payload.denuncia && !Array.isArray(payload.denuncia)) lista = [payload.denuncia];
+    else if (payload && payload.denuncia && !Array.isArray(payload.denuncia))
+      lista = [payload.denuncia];
     else {
       const maybe = payload.denuncia ?? payload;
       if (maybe && maybe._id) lista = [maybe];
     }
 
-    const normalized = await Promise.all(lista.map((it) => normalizeDenuncia(it, token)));
+    const normalized = await Promise.all(
+      lista.map((it) => normalizeDenuncia(it, token))
+    );
     return normalized.filter(Boolean);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('fetchDenuncias error:', error.message || error);
     throw error;
   }
@@ -201,13 +217,14 @@ export async function fetchDenunciaPorId(id, tokenParam = null) {
 
     if (!res.ok) {
       const data = await parseResponse(res).catch(() => ({}));
-      throw new Error(data?.detalles ?? data?.error ?? 'Error al obtener la denuncia');
+      throw new Error(
+        data?.detalles ?? data?.error ?? 'Error al obtener la denuncia'
+      );
     }
 
     const payload = await parseResponse(res);
     return await normalizeDenuncia(payload, token);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('fetchDenunciaPorId error:', error.message || error);
     throw error;
   }
@@ -235,12 +252,13 @@ export async function accionDenuncia(id, body = {}, tokenParam = null) {
 
     if (!res.ok) {
       const data = await parseResponse(res).catch(() => ({}));
-      throw new Error(data?.detalles ?? data?.error ?? 'Error al ejecutar acción');
+      throw new Error(
+        data?.detalles ?? data?.error ?? 'Error al ejecutar acción'
+      );
     }
 
     return await parseResponse(res);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('accionDenuncia error:', error.message || error);
     throw error;
   }

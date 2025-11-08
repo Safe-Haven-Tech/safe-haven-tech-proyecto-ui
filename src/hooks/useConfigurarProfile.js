@@ -68,8 +68,10 @@ export const useConfigurarPerfil = () => {
           setVisibilidadPerfil(usuarioData.visibilidadPerfil || 'publico');
         }
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('useConfigurarPerfil cargarUsuario error:', err?.message || err);
+        console.error(
+          'useConfigurarPerfil cargarUsuario error:',
+          err?.message || err
+        );
         if (mounted) setError('No se pudo cargar la configuración del usuario');
       }
     };
@@ -128,12 +130,18 @@ export const useConfigurarPerfil = () => {
       // mostrar mensaje claro
       const msg = err?.message || 'Error al guardar configuración';
       setError(msg);
-      // eslint-disable-next-line no-console
+
       console.error('handleGuardar configurarPerfil error:', msg);
     } finally {
       setCargando(false);
     }
-  }, [contraseña, anonimo, visibilidadPerfil, validarContraseña, actualizarUsuario]);
+  }, [
+    contraseña,
+    anonimo,
+    visibilidadPerfil,
+    validarContraseña,
+    actualizarUsuario,
+  ]);
 
   // Cambiar contraseña (modal)
   const handleChangePassword = useCallback(async () => {
@@ -161,7 +169,8 @@ export const useConfigurarPerfil = () => {
       const data = await cambiarContraseña(currentPassword, newPassword, token);
 
       if (data?.accessToken) localStorage.setItem('token', data.accessToken);
-      if (data?.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+      if (data?.refreshToken)
+        localStorage.setItem('refreshToken', data.refreshToken);
       if (data?.usuario && actualizarUsuario) actualizarUsuario(data.usuario);
 
       setPasswordSuccess('Contraseña cambiada exitosamente');
@@ -171,7 +180,7 @@ export const useConfigurarPerfil = () => {
     } catch (err) {
       const msg = err?.message || 'Error al cambiar contraseña';
       setPasswordError(msg);
-      // eslint-disable-next-line no-console
+
       console.error('handleChangePassword error:', msg);
     } finally {
       setChangingPassword(false);
@@ -209,7 +218,7 @@ export const useConfigurarPerfil = () => {
     } catch (err) {
       const msg = err?.message || 'Error al eliminar la cuenta';
       setDeleteError(msg);
-      // eslint-disable-next-line no-console
+
       console.error('handleDeleteAccount error:', msg);
     } finally {
       setIsDeleting(false);

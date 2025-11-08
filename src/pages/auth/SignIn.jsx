@@ -27,7 +27,6 @@ export default function SignInPage() {
   // Validación del formulario
   const isFormValid = useMemo(() => email && password, [email, password]);
 
-  // Manejo de bloqueo temporal
   React.useEffect(() => {
     if (lockoutTime > 0) {
       cleanupTimeoutRef.current = setTimeout(() => {
@@ -163,10 +162,8 @@ export default function SignInPage() {
       className={`d-flex align-items-center justify-content-center ${styles.signInContainer}`}
       style={{ backgroundImage: `url(${background})` }}
     >
-      {/* Overlay mejorado */}
       <div className={styles.overlay}></div>
 
-      {/* Contenedor principal */}
       <div
         className={`container-fluid position-relative p-0 h-100 ${styles.contentContainer}`}
       >

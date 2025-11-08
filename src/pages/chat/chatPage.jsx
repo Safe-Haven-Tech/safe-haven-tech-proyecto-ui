@@ -26,7 +26,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     loadChats();
-    const interval = setInterval(loadChats, 8000); 
+    const interval = setInterval(loadChats, 8000);
     return () => clearInterval(interval);
   }, [loadChats]);
 
@@ -59,7 +59,7 @@ const ChatPage = () => {
                 onCreateChat={handleCreateChat}
                 currentUserId={usuario?._id || usuario?.id || usuario}
                 selectedChatId={selectedChat?._id}
-                token={token} 
+                token={token}
               />
             </div>
           </div>
@@ -69,12 +69,18 @@ const ChatPage = () => {
           <div className="card h-100">
             <div className="card-body d-flex flex-column">
               {selectedChat ? (
-                <ChatWindow chat={selectedChat} onClose={() => setSelectedChat(null)} onRefreshChats={loadChats} />
+                <ChatWindow
+                  chat={selectedChat}
+                  onClose={() => setSelectedChat(null)}
+                  onRefreshChats={loadChats}
+                />
               ) : (
                 <div className="d-flex align-items-center justify-content-center h-100">
                   <div className="text-center">
                     <h5>Selecciona un chat</h5>
-                    <p className="text-muted">O crea un chat nuevo con un usuario.</p>
+                    <p className="text-muted">
+                      O crea un chat nuevo con un usuario.
+                    </p>
                   </div>
                 </div>
               )}

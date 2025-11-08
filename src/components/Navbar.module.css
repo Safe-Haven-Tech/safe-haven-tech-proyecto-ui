@@ -1,10 +1,3 @@
-/* ==================== NAVBAR RESPONSIVE CON ESTILO ORIGINAL ==================== */
-
-/* Navbar principal */
-.navbar {
-  /* Los estilos inline del componente original se mantienen */
-}
-
 /* ==================== MOBILE CONTROLS ==================== */
 
 .mobileControls {
@@ -28,12 +21,12 @@
   align-items: center;
   gap: 4px;
   padding: 8px;
-  border-radius: 6px; /* ORIGINAL: border radius como los botones */
-  transition: background-color 0.3s ease; /* ORIGINAL: solo fondo cambia */
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
 }
 
 .hamburgerButton:hover {
-  background-color: #2d5016; /* ORIGINAL: mismo hover que otros botones */
+  background-color: #2d5016;
 }
 
 .hamburgerLine {
@@ -46,7 +39,7 @@
 }
 
 .hamburgerButton:hover .hamburgerLine {
-  background: #ffffff; /* ORIGINAL: líneas blancas en hover */
+  background: #ffffff;
 }
 
 .hamburgerButton.active .hamburgerLine:nth-child(1) {
@@ -65,7 +58,7 @@
 
 .mobileMenuOverlay {
   position: fixed;
-  top: 80px; /* ORIGINAL: altura del navbar */
+  top: 80px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -83,14 +76,14 @@
 }
 
 .mobileMenuContent {
-  background: #a9c5a0; /* ORIGINAL: mismo color que navbar */
+  background: #a9c5a0;
   margin: 15px;
-  border-radius: 8px; /* ORIGINAL: mismo border radius que logo */
+  border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* ORIGINAL: misma sombra que navbar */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transform: translateY(-20px);
   transition: transform 0.3s ease;
-  font-family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"; /* ORIGINAL */
+  font-family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
 }
 
 .mobileMenuOverlay.open .mobileMenuContent {
@@ -105,23 +98,23 @@
 }
 
 .mobileMenuItem {
-  background: transparent; /* ORIGINAL */
-  color: #000; /* ORIGINAL */
+  background: transparent;
+  color: #000;
   border: none;
-  padding: 10px 18px; /* ORIGINAL: mismo padding que NavButton */
-  font-size: 16px; /* ORIGINAL */
-  font-weight: 600; /* ORIGINAL */
+  padding: 10px 18px;
+  font-size: 16px;
+  font-weight: 600;
   text-align: left;
-  border-radius: 6px; /* ORIGINAL */
-  transition: background-color 0.3s ease; /* ORIGINAL: solo fondo cambia */
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
   cursor: pointer;
   text-decoration: none;
   display: block;
 }
 
 .mobileMenuItem:hover {
-  color: #fff; /* ORIGINAL */
-  background-color: #2d5016; /* ORIGINAL */
+  color: #fff;
+  background-color: #2d5016;
 }
 
 .mobileAuthSection {
@@ -135,47 +128,47 @@
 .mobileProfileButton,
 .mobileLoginButton,
 .mobileRegisterButton {
-  padding: 10px 18px; /* ORIGINAL */
-  border-radius: 6px; /* ORIGINAL */
-  font-size: 16px; /* ORIGINAL */
-  font-weight: 600; /* ORIGINAL */
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
   text-align: center;
   text-decoration: none;
-  transition: background-color 0.3s ease; /* ORIGINAL */
+  transition: background-color 0.3s ease;
   cursor: pointer;
   border: none;
   display: block;
 }
 
 .mobileProfileButton {
-  background-color: #2d5016; /* ORIGINAL */
-  color: #ffffff; /* ORIGINAL */
+  background-color: #2d5016;
+  color: #ffffff;
 }
 
 .mobileProfileButton:hover {
-  background-color: #1f3a0f; /* ORIGINAL */
-  color: #ffffff; /* ORIGINAL */
+  background-color: #1f3a0f;
+  color: #ffffff;
 }
 
 .mobileLoginButton {
-  background-color: transparent; /* ORIGINAL */
-  color: #2d5016; /* ORIGINAL */
-  border: 2px solid #2d5016; /* ORIGINAL */
+  background-color: transparent;
+  color: #2d5016;
+  border: 2px solid #2d5016;
 }
 
 .mobileLoginButton:hover {
-  background-color: #2d5016; /* ORIGINAL */
-  color: #ffffff; /* ORIGINAL */
+  background-color: #2d5016;
+  color: #ffffff;
 }
 
 .mobileRegisterButton {
-  background-color: #2d5016; /* ORIGINAL */
-  color: #ffffff; /* ORIGINAL */
+  background-color: #2d5016;
+  color: #ffffff;
 }
 
 .mobileRegisterButton:hover {
-  background-color: #1f3a0f; /* ORIGINAL */
-  color: #ffffff; /* ORIGINAL */
+  background-color: #1f3a0f;
+  color: #ffffff;
 }
 
 /* ==================== RESPONSIVE BREAKPOINTS ==================== */
@@ -230,12 +223,12 @@
 /* ==================== BOTÓN ADMIN MÓVIL ==================== */
 
 .mobileAdminButton {
-  background-color: #dc3545; /* Rojo para admin */
+  background-color: #dc3545;
   color: #ffffff;
   padding: 10px 18px;
   border-radius: 6px;
   font-size: 16px;
-  font-weight: 700; /* Más bold para destacar */
+  font-weight: 700;
   text-align: center;
   text-decoration: none;
   transition: background-color 0.3s ease;
@@ -246,11 +239,10 @@
 }
 
 .mobileAdminButton:hover {
-  background-color: #c82333; /* Rojo más oscuro */
+  background-color: #c82333;
   color: #ffffff;
 }
 
-/* Asegurar que el botón admin aparezca primero */
 .mobileAuthSection {
   display: flex;
   flex-direction: column;
@@ -260,5 +252,5 @@
 }
 
 .mobileAuthSection .mobileAdminButton {
-  order: -1; /* Admin aparece primero */
+  order: -1;
 }

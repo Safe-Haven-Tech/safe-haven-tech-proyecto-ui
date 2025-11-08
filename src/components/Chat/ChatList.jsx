@@ -12,7 +12,6 @@ const getId = (p) => {
   return undefined;
 };
 
-// debounce hook
 const useDebouncedValue = (value, delay = 300) => {
   const [deb, setDeb] = useState(value);
   useEffect(() => {
@@ -22,14 +21,17 @@ const useDebouncedValue = (value, delay = 300) => {
   return deb;
 };
 
-const truncate = (str = '', max = 60) => (str.length > max ? str.slice(0, max - 1) + '…' : str);
+const truncate = (str = '', max = 60) =>
+  str.length > max ? str.slice(0, max - 1) + '…' : str;
 
 const formatTime = (iso) => {
   if (!iso) return '';
   const d = new Date(iso);
   const now = new Date();
   const sameDay = d.toDateString() === now.toDateString();
-  return sameDay ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : d.toLocaleDateString();
+  return sameDay
+    ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : d.toLocaleDateString();
 };
 
 const ChatList = ({
@@ -39,12 +41,11 @@ const ChatList = ({
   onCreateChat = () => {},
   currentUserId,
   selectedChatId = null,
-  token // required to call obtenerConexiones
+  token,
 }) => {
   const [query, setQuery] = useState('');
   const myId = getId(currentUserId);
 
-  // modal state for add user
   const [showAddModal, setShowAddModal] = useState(false);
   const [connQuery, setConnQuery] = useState('');
   const debConnQuery = useDebouncedValue(connQuery, 350);
@@ -61,7 +62,11 @@ const ChatList = ({
     setConnLoading(true);
     setConnError(null);
     try {
-      const list = await obtenerConexiones(token, { type: 'both', query: q, limit: 100 });
+      const list = await obtenerConexiones(token, {
+        type: 'both',
+        query: q,
+        limit: 100,
+      });
       setConnections(list || []);
     } catch (err) {
       console.error('Error cargando conexiones:', err);
@@ -74,7 +79,6 @@ const ChatList = ({
 
   useEffect(() => {
     if (!showAddModal) return;
-    // load on open and on query change (debounced)
     loadConnections(debConnQuery);
     // eslint-disable-next-line
   }, [showAddModal, debConnQuery]);
@@ -82,11 +86,21 @@ const ChatList = ({
   const filtered = useMemo(() => {
     const q = (query || '').trim().toLowerCase();
     if (!q) return chats;
-    return chats.filter(c => {
-      const participantes = Array.isArray(c.participantes) ? c.participantes : [];
-      const other = participantes.find(p => getId(p) !== myId) || participantes[0] || {};
-      const nombre = (other.nombreCompleto || other.nombreUsuario || '').toLowerCase();
-      const ultimo = (c.ultimoMensaje && (c.ultimoMensaje.contenido || c.ultimoMensaje)) ? String(c.ultimoMensaje.contenido || c.ultimoMensaje).toLowerCase() : '';
+    return chats.filter((c) => {
+      const participantes = Array.isArray(c.participantes)
+        ? c.participantes
+        : [];
+      const other =
+        participantes.find((p) => getId(p) !== myId) || participantes[0] || {};
+      const nombre = (
+        other.nombreCompleto ||
+        other.nombreUsuario ||
+        ''
+      ).toLowerCase();
+      const ultimo =
+        c.ultimoMensaje && (c.ultimoMensaje.contenido || c.ultimoMensaje)
+          ? String(c.ultimoMensaje.contenido || c.ultimoMensaje).toLowerCase()
+          : '';
       return nombre.includes(q) || ultimo.includes(q);
     });
   }, [chats, query, myId]);
@@ -119,12 +133,21 @@ const ChatList = ({
         </button>
       </div>
 
-      {!loading && filtered.length === 0 && <div className="text-center text-muted py-3">No tienes conversaciones</div>}
+      {!loading && filtered.length === 0 && (
+        <div className="text-center text-muted py-3">
+          No tienes conversaciones
+        </div>
+      )}
 
       <ul className={`${styles.list} list-group list-group-flush`}>
-        {filtered.map(chat => {
-          const participantes = Array.isArray(chat.participantes) ? chat.participantes : [];
-          const other = participantes.find(p => getId(p) !== myId) || participantes[0] || {};
+        {filtered.map((chat) => {
+          const participantes = Array.isArray(chat.participantes)
+            ? chat.participantes
+            : [];
+          const other =
+            participantes.find((p) => getId(p) !== myId) ||
+            participantes[0] ||
+            {};
           const last = chat.ultimoMensaje || {};
           const lastContent = last.contenido || last || '';
           const lastDate = last.fecha || last.date || last.createdAt || null;
@@ -142,20 +165,31 @@ const ChatList = ({
                 <img
                   src={other?.fotoPerfil || avatar}
                   alt=""
-                  width="44"
-                  height="44"
+                  width="36"
+                  height="36"
                   className={styles.avatar}
                 />
                 <div className={styles.meta}>
                   <div className={styles.rowTop}>
-                    <div className={styles.name}>{other?.nombreCompleto || other?.nombreUsuario || 'Usuario'}</div>
+                    <div className={styles.name}>
+                      {other?.nombreCompleto ||
+                        other?.nombreUsuario ||
+                        'Usuario'}
+                    </div>
                     <div className={styles.time}>{formatTime(lastDate)}</div>
                   </div>
 
                   <div className="d-flex align-items-center">
-                    <div className={styles.preview}>{truncate(String(lastContent || 'Sin mensajes'), 80)}</div>
+                    <div className={styles.preview}>
+                      {truncate(String(lastContent || 'Sin mensajes'), 80)}
+                    </div>
                     {unread > 0 && (
-                      <span className={styles.unreadBadge} title={`${unread} sin leer`}>{unread}</span>
+                      <span
+                        className={styles.unreadBadge}
+                        title={`${unread} sin leer`}
+                      >
+                        {unread}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -164,7 +198,10 @@ const ChatList = ({
               <div className="text-end ms-2">
                 <button
                   className="btn btn-sm btn-outline-primary"
-                  onClick={(e) => { e.stopPropagation(); onOpen(chat); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpen(chat);
+                  }}
                 >
                   Abrir
                 </button>
@@ -175,12 +212,22 @@ const ChatList = ({
       </ul>
 
       {showAddModal && (
-        <div className="modal d-block" tabIndex="-1" role="dialog" style={{ background: 'rgba(0,0,0,0.4)' }}>
+        <div
+          className="modal d-block"
+          tabIndex="-1"
+          role="dialog"
+          style={{ background: 'rgba(0,0,0,0.4)' }}
+        >
           <div className="modal-dialog modal-sm" role="document">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Seleccionar usuario</h5>
-                <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setShowAddModal(false)}></button>
+                <button
+                  type="button"
+                  className="btn-close"
+                  aria-label="Cerrar"
+                  onClick={() => setShowAddModal(false)}
+                ></button>
               </div>
               <div className="modal-body">
                 <div className="mb-2">
@@ -192,33 +239,64 @@ const ChatList = ({
                   />
                 </div>
 
-                {connLoading && <div className="text-center text-muted py-2">Cargando...</div>}
-                {connError && <div className="text-danger small">{connError}</div>}
-                {!connLoading && connections.length === 0 && <div className="text-center text-muted py-2">No se encontraron usuarios</div>}
+                {connLoading && (
+                  <div className="text-center text-muted py-2">Cargando...</div>
+                )}
+                {connError && (
+                  <div className="text-danger small">{connError}</div>
+                )}
+                {!connLoading && connections.length === 0 && (
+                  <div className="text-center text-muted py-2">
+                    No se encontraron usuarios
+                  </div>
+                )}
 
                 <ul className="list-group">
-                  {connections.map(u => (
+                  {connections.map((u) => (
                     <li
                       key={u._id || u.id}
                       className="list-group-item d-flex align-items-center justify-content-between"
                       style={{ cursor: 'pointer' }}
                     >
-                      <div className="d-flex align-items-center" onClick={() => handleSelectConnection(u)}>
-                        <img src={u.fotoPerfil || avatar} alt="" width="40" height="40" className="rounded me-2" />
+                      <div
+                        className="d-flex align-items-center"
+                        onClick={() => handleSelectConnection(u)}
+                      >
+                        <img
+                          src={u.fotoPerfil || avatar}
+                          alt=""
+                          width="30"
+                          height="30"
+                          className="rounded me-2"
+                        />
                         <div>
-                          <div className="fw-bold small">{u.nombreCompleto || u.nombreUsuario}</div>
-                          <div className="small text-muted">@{u.nombreUsuario}</div>
+                          <div className="fw-bold small">
+                            {u.nombreCompleto || u.nombreUsuario}
+                          </div>
+                          <div className="small text-muted">
+                            @{u.nombreUsuario}
+                          </div>
                         </div>
                       </div>
                       <div>
-                        <button className="btn btn-sm btn-primary" onClick={() => handleSelectConnection(u)}>Chatear</button>
+                        <button
+                          className="btn btn-sm btn-primary"
+                          onClick={() => handleSelectConnection(u)}
+                        >
+                          Chatear
+                        </button>
                       </div>
                     </li>
                   ))}
                 </ul>
               </div>
               <div className="modal-footer">
-                <button className="btn btn-secondary btn-sm" onClick={() => setShowAddModal(false)}>Cerrar</button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setShowAddModal(false)}
+                >
+                  Cerrar
+                </button>
               </div>
             </div>
           </div>

@@ -28,7 +28,7 @@ export default function ChatShortcut() {
         zIndex: 2000,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
       }}
     >
       💬

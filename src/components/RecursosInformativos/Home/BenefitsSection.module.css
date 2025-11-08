@@ -1,13 +1,12 @@
-/* 🎯 SECCIÓN PRINCIPAL - SOLO CONTAINER MORADO SIN BOOTSTRAP */
 .benefitsSection {
   border-radius: 1.5rem;
   background: #faf8ff;
   box-shadow: 0 6px 18px rgba(90, 78, 124, 0.08);
   padding: 1.5rem;
-  margin: 2rem auto 1rem auto; /* 🎯 AGREGADO: auto para centrar */
-  max-width: 1200px; /* 🎯 AGREGADO: max-width para control de tamaño */
-  width: 95%; /* 🎯 AGREGADO: ancho responsivo */
-  text-align: center; /* 🎯 AGREGADO: centrar texto */
+  margin: 2rem auto 1rem auto;
+  max-width: 1200px;
+  width: 95%;
+  text-align: center;
 }
 
 @media (min-width: 576px) {
@@ -36,7 +35,7 @@
 
 @media (min-width: 1200px) {
   .benefitsSection {
-    width: 1200px; /* 🎯 FIJO: ancho máximo en pantallas grandes */
+    width: 1200px;
   }
 }
 
@@ -96,13 +95,12 @@
   }
 }
 
-/* 🎯 CARDS SIN BOOTSTRAP - SOLO CUSTOM STYLES */
 .benefitCard {
   border-radius: 2rem;
   background: rgba(255, 255, 255, 0.85);
   box-shadow: 0 4px 15px rgba(90, 78, 124, 0.08);
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  border: 1px solid rgba(255, 255, 255, 0.6); /* 🎯 MOVIDO: border definido aquí */
+  border: 1px solid rgba(255, 255, 255, 0.6);
   padding: 1.5rem;
   height: 100%;
   display: flex;
@@ -112,7 +110,6 @@
   backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
-  /* 🎯 REMOVIDO: dependencias de Bootstrap */
 }
 
 @media (min-width: 576px) {

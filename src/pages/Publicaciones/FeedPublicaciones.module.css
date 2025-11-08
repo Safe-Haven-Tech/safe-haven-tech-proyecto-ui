@@ -11,7 +11,7 @@
 .card {
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 2px 16px rgba(96,60,126,0.10);
+  box-shadow: 0 2px 16px rgba(96, 60, 126, 0.1);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -19,7 +19,7 @@
 }
 
 .card:hover {
-  box-shadow: 0 4px 24px rgba(96,60,126,0.18);
+  box-shadow: 0 4px 24px rgba(96, 60, 126, 0.18);
 }
 
 .cardImageContainer {
@@ -87,7 +87,8 @@
   margin-top: 12px;
 }
 
-.cardLike, .cardComment {
+.cardLike,
+.cardComment {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -98,7 +99,8 @@
   transition: color 0.2s;
 }
 
-.cardLike:hover, .cardComment:hover {
+.cardLike:hover,
+.cardComment:hover {
   color: #8e44ad;
 }
 
@@ -132,7 +134,9 @@
   .card {
     border-radius: 12px;
   }
-  .cardHeader, .cardContenido, .cardActions {
+  .cardHeader,
+  .cardContenido,
+  .cardActions {
     padding-left: 10px;
     padding-right: 10px;
   }
@@ -143,7 +147,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(96,60,126,0.7);
+  background: rgba(96, 60, 126, 0.7);
   color: #fff;
   border: none;
   border-radius: 50%;
@@ -275,16 +279,14 @@
   background: #f7f5fb;
 }
 
-
-
 .cardMenuWrapper {
   position: relative;
   margin-left: 10px;
   display: inline-block;
-  
 }
 
-.cardEditBtn, .cardDeleteBtn {
+.cardEditBtn,
+.cardDeleteBtn {
   background: none;
   border: none;
   color: #603c7e;
@@ -293,7 +295,9 @@
   padding: 10px 18px 10px 16px;
   cursor: pointer;
   border-radius: 6px;
-  transition: background 0.18s, color 0.18s;
+  transition:
+    background 0.18s,
+    color 0.18s;
   width: 100%;
   display: flex;
   align-items: center;
@@ -321,19 +325,22 @@
   border-radius: 50%;
   width: 60px;
   height: 60px;
-  aspect-ratio: 1 / 1;      /* Asegura círculo perfecto */
-  box-shadow: 0 4px 18px rgba(96,60,126,0.18);
+  aspect-ratio: 1 / 1; /* Asegura círculo perfecto */
+  box-shadow: 0 4px 18px rgba(96, 60, 126, 0.18);
   font-size: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
-  padding: 0;               /* Elimina padding extra */
+  transition:
+    background 0.18s,
+    box-shadow 0.18s,
+    transform 0.12s;
+  padding: 0; /* Elimina padding extra */
 }
 .fabCrearPost:hover {
   background: linear-gradient(90deg, #603c7e 60%, #8e44ad 100%);
-  box-shadow: 0 6px 28px rgba(96,60,126,0.28);
+  box-shadow: 0 6px 28px rgba(96, 60, 126, 0.28);
   transform: scale(1.07);
 }
 @media (max-width: 700px) {

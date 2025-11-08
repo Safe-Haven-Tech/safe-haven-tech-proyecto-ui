@@ -1,4 +1,3 @@
-
 /**
  * Cliente HTTP para operaciones sobre publicaciones.
  * Entorno: Vite (import.meta.env.VITE_API_URL).
@@ -46,7 +45,10 @@ const parseResponse = async (res) => {
  * @param {string} [defaultMessage]
  * @throws {Error}
  */
-const handleErrorResponse = async (res, defaultMessage = 'Error en la petición') => {
+const handleErrorResponse = async (
+  res,
+  defaultMessage = 'Error en la petición'
+) => {
   const body = await parseResponse(res).catch(() => null);
   const message =
     (body && (body.detalles || body.error || body.message)) ||
@@ -72,7 +74,7 @@ export const fetchPublicaciones = async ({
   limite = 10,
   tipo = '',
   busqueda = '',
-  topico = ''
+  topico = '',
 } = {}) => {
   try {
     const params = new URLSearchParams();
@@ -85,10 +87,11 @@ export const fetchPublicaciones = async ({
     const url = `${API_URL}/api/publicaciones?${params.toString()}`;
     const token = getToken();
     const res = await fetch(url, {
-      headers: buildHeaders(token, false)
+      headers: buildHeaders(token, false),
     });
 
-    if (!res.ok) await handleErrorResponse(res, 'Error al obtener publicaciones');
+    if (!res.ok)
+      await handleErrorResponse(res, 'Error al obtener publicaciones');
 
     return (await parseResponse(res)) || {};
   } catch (error) {
@@ -104,7 +107,9 @@ export const fetchPublicaciones = async ({
  */
 export const fetchPublicacionesPerfil = async (opciones = {}) => {
   const data = await fetchPublicaciones({ ...opciones, tipo: 'perfil' });
-  const publicaciones = Array.isArray(data.publicaciones) ? data.publicaciones : [];
+  const publicaciones = Array.isArray(data.publicaciones)
+    ? data.publicaciones
+    : [];
   const publicacionesPerfil = publicaciones.filter((p) => p.tipo === 'perfil');
   return { ...data, publicaciones: publicacionesPerfil };
 };
@@ -120,14 +125,14 @@ export const fetchPublicacionPorId = async (id) => {
     const url = `${API_URL}/api/publicaciones/${encodeURIComponent(id)}`;
     const token = getToken();
     const res = await fetch(url, {
-      headers: buildHeaders(token, false)
+      headers: buildHeaders(token, false),
     });
 
-    if (!res.ok) await handleErrorResponse(res, 'Error al obtener la publicación');
+    if (!res.ok)
+      await handleErrorResponse(res, 'Error al obtener la publicación');
 
     return (await parseResponse(res)) || {};
   } catch (error) {
-    
     console.error('fetchPublicacionPorId:', error);
     throw error;
   }
@@ -145,14 +150,13 @@ export const likePublicacion = async (id, token) => {
     const url = `${API_URL}/api/publicaciones/${encodeURIComponent(id)}/like`;
     const res = await fetch(url, {
       method: 'POST',
-      headers: buildHeaders(token, false)
+      headers: buildHeaders(token, false),
     });
 
     if (!res.ok) await handleErrorResponse(res, 'Error al dar like');
 
     return (await parseResponse(res)) || {};
   } catch (error) {
-   
     console.error('likePublicacion:', error);
     throw error;
   }
@@ -170,14 +174,13 @@ export const unlikePublicacion = async (id, token) => {
     const url = `${API_URL}/api/publicaciones/${encodeURIComponent(id)}/like`;
     const res = await fetch(url, {
       method: 'DELETE',
-      headers: buildHeaders(token, false)
+      headers: buildHeaders(token, false),
     });
 
     if (!res.ok) await handleErrorResponse(res, 'Error al quitar like');
 
     return (await parseResponse(res)) || {};
   } catch (error) {
-    
     console.error('unlikePublicacion:', error);
     throw error;
   }
@@ -197,14 +200,13 @@ export const comentarPublicacion = async (id, contenido, token) => {
     const res = await fetch(url, {
       method: 'POST',
       headers: buildHeaders(token, true),
-      body: JSON.stringify({ contenido })
+      body: JSON.stringify({ contenido }),
     });
 
     if (!res.ok) await handleErrorResponse(res, 'Error al comentar');
 
     return (await parseResponse(res)) || {};
   } catch (error) {
-    
     console.error('comentarPublicacion:', error);
     throw error;
   }
@@ -217,7 +219,11 @@ export const comentarPublicacion = async (id, contenido, token) => {
  * @param {string} token
  * @returns {Promise<any>}
  */
-export const eliminarComentario = async (publicacionId, comentarioId, token) => {
+export const eliminarComentario = async (
+  publicacionId,
+  comentarioId,
+  token
+) => {
   if (!publicacionId) throw new Error('ID de publicación requerido');
   if (!comentarioId) throw new Error('ID de comentario requerido');
   try {
@@ -226,14 +232,14 @@ export const eliminarComentario = async (publicacionId, comentarioId, token) => 
     )}`;
     const res = await fetch(url, {
       method: 'DELETE',
-      headers: buildHeaders(token, false)
+      headers: buildHeaders(token, false),
     });
 
-    if (!res.ok) await handleErrorResponse(res, 'Error al eliminar el comentario');
+    if (!res.ok)
+      await handleErrorResponse(res, 'Error al eliminar el comentario');
 
     return (await parseResponse(res)) || {};
   } catch (error) {
-    
     console.error('eliminarComentario:', error);
     throw error;
   }
@@ -248,16 +254,19 @@ export const eliminarComentario = async (publicacionId, comentarioId, token) => 
 export async function deletePublicacion(id, token) {
   if (!id) throw new Error('ID de publicación requerido');
   try {
-    const res = await fetch(`${API_URL}/api/publicaciones/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: buildHeaders(token, false)
-    });
+    const res = await fetch(
+      `${API_URL}/api/publicaciones/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+        headers: buildHeaders(token, false),
+      }
+    );
 
-    if (!res.ok) await handleErrorResponse(res, 'Error al eliminar publicación');
+    if (!res.ok)
+      await handleErrorResponse(res, 'Error al eliminar publicación');
 
     return true;
   } catch (error) {
-    
     console.error('deletePublicacion:', error);
     throw error;
   }
@@ -270,7 +279,11 @@ export async function deletePublicacion(id, token) {
  * @param {string} descripcion
  * @returns {Promise<any>}
  */
-export const denunciarPublicacion = async (publicacionId, motivo, descripcion) => {
+export const denunciarPublicacion = async (
+  publicacionId,
+  motivo,
+  descripcion
+) => {
   if (!publicacionId) throw new Error('ID de publicación requerido');
   try {
     const token = getToken();
@@ -278,14 +291,14 @@ export const denunciarPublicacion = async (publicacionId, motivo, descripcion) =
     const res = await fetch(url, {
       method: 'POST',
       headers: buildHeaders(token, true),
-      body: JSON.stringify({ motivo, descripcion })
+      body: JSON.stringify({ motivo, descripcion }),
     });
 
-    if (!res.ok) await handleErrorResponse(res, 'Error al denunciar publicación');
+    if (!res.ok)
+      await handleErrorResponse(res, 'Error al denunciar publicación');
 
     return (await parseResponse(res)) || {};
   } catch (error) {
-  
     console.error('denunciarPublicacion:', error);
     throw error;
   }
@@ -298,7 +311,11 @@ export const denunciarPublicacion = async (publicacionId, motivo, descripcion) =
  * @param {string} descripcion
  * @returns {Promise<any>}
  */
-export const denunciarComentario = async (comentarioId, motivo, descripcion = '') => {
+export const denunciarComentario = async (
+  comentarioId,
+  motivo,
+  descripcion = ''
+) => {
   if (!comentarioId) throw new Error('ID de comentario requerido');
   try {
     const token = getToken();
@@ -306,14 +323,14 @@ export const denunciarComentario = async (comentarioId, motivo, descripcion = ''
     const res = await fetch(url, {
       method: 'POST',
       headers: buildHeaders(token, true),
-      body: JSON.stringify({ motivo, descripcion })
+      body: JSON.stringify({ motivo, descripcion }),
     });
 
-    if (!res.ok) await handleErrorResponse(res, 'Error al denunciar comentario');
+    if (!res.ok)
+      await handleErrorResponse(res, 'Error al denunciar comentario');
 
     return (await parseResponse(res)) || {};
   } catch (error) {
-   
     console.error('denunciarComentario:', error);
     throw error;
   }

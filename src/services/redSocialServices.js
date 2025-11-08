@@ -1,4 +1,3 @@
-
 /**
  * Servicios relacionados con funcionalidades de red social.
  * Entorno: Vite (import.meta.env.VITE_API_URL).
@@ -55,8 +54,7 @@ const parseResponse = async (res) => {
 const throwErrorFromResponse = async (res, defaultMessage) => {
   const body = await parseResponse(res).catch(() => null);
   const detail =
-    body &&
-    (body.error || body.message || body.mensaje || body.detalles)
+    body && (body.error || body.message || body.mensaje || body.detalles)
       ? body.error || body.message || body.mensaje || body.detalles
       : defaultMessage || `HTTP ${res.status}`;
   const err = new Error(detail);
@@ -72,10 +70,13 @@ const throwErrorFromResponse = async (res, defaultMessage) => {
 export async function seguirUsuario(usuarioId) {
   const token = getStoredToken();
   try {
-    const res = await fetch(`${API_URL}/api/red-social/seguir/${encodeURIComponent(usuarioId)}`, {
-      method: 'POST',
-      headers: buildHeaders(token, false),
-    });
+    const res = await fetch(
+      `${API_URL}/api/red-social/seguir/${encodeURIComponent(usuarioId)}`,
+      {
+        method: 'POST',
+        headers: buildHeaders(token, false),
+      }
+    );
     if (!res.ok) await throwErrorFromResponse(res, 'Error al seguir usuario');
     return await parseResponse(res);
   } catch (error) {
@@ -87,11 +88,15 @@ export async function seguirUsuario(usuarioId) {
 export async function dejarDeSeguirUsuario(usuarioId) {
   const token = getStoredToken();
   try {
-    const res = await fetch(`${API_URL}/api/red-social/seguir/${encodeURIComponent(usuarioId)}`, {
-      method: 'DELETE',
-      headers: buildHeaders(token, false),
-    });
-    if (!res.ok) await throwErrorFromResponse(res, 'Error al dejar de seguir usuario');
+    const res = await fetch(
+      `${API_URL}/api/red-social/seguir/${encodeURIComponent(usuarioId)}`,
+      {
+        method: 'DELETE',
+        headers: buildHeaders(token, false),
+      }
+    );
+    if (!res.ok)
+      await throwErrorFromResponse(res, 'Error al dejar de seguir usuario');
     return await parseResponse(res);
   } catch (error) {
     console.error('dejarDeSeguirUsuario:', error);
@@ -102,10 +107,14 @@ export async function dejarDeSeguirUsuario(usuarioId) {
 export async function obtenerSeguidores(usuarioId) {
   const token = getStoredToken();
   try {
-    const res = await fetch(`${API_URL}/api/red-social/seguidores/${encodeURIComponent(usuarioId)}`, {
-      headers: buildHeaders(token, false),
-    });
-    if (!res.ok) await throwErrorFromResponse(res, 'Error al obtener seguidores');
+    const res = await fetch(
+      `${API_URL}/api/red-social/seguidores/${encodeURIComponent(usuarioId)}`,
+      {
+        headers: buildHeaders(token, false),
+      }
+    );
+    if (!res.ok)
+      await throwErrorFromResponse(res, 'Error al obtener seguidores');
     return await parseResponse(res);
   } catch (error) {
     console.error('obtenerSeguidores:', error);
@@ -116,11 +125,15 @@ export async function obtenerSeguidores(usuarioId) {
 export async function cancelarSolicitudSeguimiento(usuarioId) {
   const token = getStoredToken();
   try {
-    const res = await fetch(`${API_URL}/api/red-social/solicitud/${encodeURIComponent(usuarioId)}`, {
-      method: 'DELETE',
-      headers: buildHeaders(token, false),
-    });
-    if (!res.ok) await throwErrorFromResponse(res, 'Error al cancelar solicitud');
+    const res = await fetch(
+      `${API_URL}/api/red-social/solicitud/${encodeURIComponent(usuarioId)}`,
+      {
+        method: 'DELETE',
+        headers: buildHeaders(token, false),
+      }
+    );
+    if (!res.ok)
+      await throwErrorFromResponse(res, 'Error al cancelar solicitud');
     return await parseResponse(res);
   } catch (error) {
     console.error('cancelarSolicitudSeguimiento:', error);
@@ -134,7 +147,8 @@ export async function obtenerSolicitudesSeguidores() {
     const res = await fetch(`${API_URL}/api/red-social/solicitudes`, {
       headers: buildHeaders(token, false),
     });
-    if (!res.ok) await throwErrorFromResponse(res, 'Error al obtener solicitudes');
+    if (!res.ok)
+      await throwErrorFromResponse(res, 'Error al obtener solicitudes');
     const parsed = await parseResponse(res);
     return parsed?.solicitudes ?? parsed ?? [];
   } catch (error) {
@@ -153,7 +167,8 @@ export async function aceptarSolicitudSeguimiento(solicitanteId) {
         headers: buildHeaders(token, false),
       }
     );
-    if (!res.ok) await throwErrorFromResponse(res, 'Error al aceptar solicitud');
+    if (!res.ok)
+      await throwErrorFromResponse(res, 'Error al aceptar solicitud');
     return await parseResponse(res);
   } catch (error) {
     console.error('aceptarSolicitudSeguimiento:', error);
@@ -171,7 +186,8 @@ export async function rechazarSolicitudSeguimiento(solicitanteId) {
         headers: buildHeaders(token, false),
       }
     );
-    if (!res.ok) await throwErrorFromResponse(res, 'Error al rechazar solicitud');
+    if (!res.ok)
+      await throwErrorFromResponse(res, 'Error al rechazar solicitud');
     return await parseResponse(res);
   } catch (error) {
     console.error('rechazarSolicitudSeguimiento:', error);
@@ -188,14 +204,14 @@ export async function obtenerNotificaciones(page = 1, perPage = 20) {
     const res = await fetch(url, {
       headers: buildHeaders(token, false),
     });
-    if (!res.ok) await throwErrorFromResponse(res, 'Error al obtener notificaciones');
+    if (!res.ok)
+      await throwErrorFromResponse(res, 'Error al obtener notificaciones');
     const json = await parseResponse(res);
-    const items = json?.notificaciones ?? json?.data ?? (Array.isArray(json) ? json : []);
-    const meta =
-      json?.meta ??
-      {
-        noLeidas: Array.isArray(items) ? items.filter((n) => !n.leida).length : 0,
-      };
+    const items =
+      json?.notificaciones ?? json?.data ?? (Array.isArray(json) ? json : []);
+    const meta = json?.meta ?? {
+      noLeidas: Array.isArray(items) ? items.filter((n) => !n.leida).length : 0,
+    };
     return { notificaciones: items, meta };
   } catch (error) {
     console.error('obtenerNotificaciones:', error);
@@ -213,7 +229,11 @@ export async function marcarNotificacionLeida(notificacionId) {
         headers: buildHeaders(token, true),
       }
     );
-    if (!res.ok) await throwErrorFromResponse(res, 'Error marcando notificación como leída');
+    if (!res.ok)
+      await throwErrorFromResponse(
+        res,
+        'Error marcando notificación como leída'
+      );
     return await parseResponse(res);
   } catch (error) {
     console.error('marcarNotificacionLeida:', error);
@@ -224,11 +244,18 @@ export async function marcarNotificacionLeida(notificacionId) {
 export async function marcarTodasNotificacionesLeidas() {
   const token = getStoredToken();
   try {
-    const res = await fetch(`${API_URL}/api/red-social/notificaciones/leer-todas`, {
-      method: 'PATCH',
-      headers: buildHeaders(token, true),
-    });
-    if (!res.ok) await throwErrorFromResponse(res, 'Error marcando todas las notificaciones como leídas');
+    const res = await fetch(
+      `${API_URL}/api/red-social/notificaciones/leer-todas`,
+      {
+        method: 'PATCH',
+        headers: buildHeaders(token, true),
+      }
+    );
+    if (!res.ok)
+      await throwErrorFromResponse(
+        res,
+        'Error marcando todas las notificaciones como leídas'
+      );
     return await parseResponse(res);
   } catch (error) {
     console.error('marcarTodasNotificacionesLeidas:', error);

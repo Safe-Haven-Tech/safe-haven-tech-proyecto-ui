@@ -253,7 +253,6 @@ const RegisterForm = React.memo(
           className={styles.registerForm}
           autoComplete="off"
         >
-          {/* Campos ocultos para prevenir autocompletado */}
           <input
             type="text"
             name="fake-username"

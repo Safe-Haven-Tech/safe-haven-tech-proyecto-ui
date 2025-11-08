@@ -3,12 +3,16 @@ import * as validators from '../utils/validators';
 import { checkNicknameAvailability } from '../services/validationService';
 
 /**
- * Hook para validación de formularios de registro/edición.
- * - Debounce para validación por campo.
- * - Validación async para nickname con cancelación de peticiones previas.
- * - Provee estado de errores, validación por campo y helpers de interacción (blur).
+ * useFormValidator
+ * - Hook de validación de formularios con debounce y validación async para nickname.
+ * - Provee helpers: setField, handleChange, handleBlur, validateForm y resetForm.
  */
-export const useFormValidation = (initialData = {}) => {
+export const useFormValidator = (
+  initialData = {},
+  opts = { debounce: 300 }
+) => {
+  const { debounce = 300 } = opts;
+
   const [formData, setFormData] = useState(initialData);
   const [validationErrors, setValidationErrors] = useState({});
   const [fieldValidation, setFieldValidation] = useState({});
@@ -16,82 +20,118 @@ export const useFormValidation = (initialData = {}) => {
   const [nicknameAvailable, setNicknameAvailable] = useState(true);
   const [touchedFields, setTouchedFields] = useState({});
 
-  const nicknameRequestRef = useRef({ currentToken: 0 });
+  const nicknameReqRef = useRef({ token: 0 });
 
   const handleFieldBlur = useCallback((fieldName) => {
-    setTouchedFields((prev) => ({ ...prev, [fieldName]: true }));
+    setTouchedFields((s) => ({ ...s, [fieldName]: true }));
   }, []);
 
-  // Helper para validar campos sin bloquear el submit
-  const validateFieldSync = useCallback((name, value) => {
-    switch (name) {
-      case 'nombreUsuario':
-        return validators.validateName(value) ? null : 'Nombre inválido';
-      case 'email':
-        return validators.validateEmail(value) ? null : 'Email inválido';
-      case 'password':
-        return validators.validatePassword(value) ? null : 'Contraseña inválida';
-      case 'confirmPassword':
-        return value === formData.password ? null : 'Contraseñas no coinciden';
-      case 'nickname':
-        return validators.validateNickname(value) ? null : 'Nickname inválido';
-      default:
-        return null;
-    }
-  }, [formData.password]);
+  const setField = useCallback((name, value) => {
+    setFormData((f) => ({ ...f, [name]: value }));
+    // reset previous error for the field while user types
+    setValidationErrors((e) => {
+      const next = { ...e };
+      delete next[name];
+      return next;
+    });
+    setFieldValidation((fv) => ({ ...fv, [name]: undefined }));
+  }, []);
 
-  // Debounced / incremental validation (including async nickname check)
+  const handleChange = useCallback(
+    (e) => {
+      const { name, value, type, checked, files } = e.target;
+      const val = type === 'checkbox' ? checked : files ? files : value;
+      setField(name, val);
+    },
+    [setField]
+  );
+
+  const validateFieldSync = useCallback(
+    (name, value) => {
+      switch (name) {
+        case 'nombreUsuario':
+          return validators.validateName(value) ? null : 'Nombre inválido';
+        case 'email':
+          return validators.validateEmail(value) ? null : 'Email inválido';
+        case 'password':
+          return validators.validatePassword(value)
+            ? null
+            : 'Contraseña inválida';
+        case 'confirmPassword':
+          return value === formData.password
+            ? null
+            : 'Contraseñas no coinciden';
+        case 'nickname':
+          return validators.validateNickname(value)
+            ? null
+            : 'Nickname inválido';
+        default:
+          return null;
+      }
+    },
+    [formData.password]
+  );
+
+  // Debounced validation (sync + async nickname)
   useEffect(() => {
-    const debounced = setTimeout(() => {
+    const timer = setTimeout(() => {
       const updates = {};
-      let updateNeeded = false;
+      let needsUpdate = false;
 
-      // Validar campos que han sido touchados
       Object.keys(touchedFields).forEach((field) => {
         if (!touchedFields[field]) return;
-        const value = formData[field];
-        const err = validateFieldSync(field, value);
+        const val = formData[field];
+        const err = validateFieldSync(field, val);
         updates[field] = err ? 'invalid' : 'valid';
-        updateNeeded = true;
+        needsUpdate = true;
       });
 
-      // Nickname async validation (si fue tocado y pasa la validación básica)
+      if (needsUpdate) {
+        setFieldValidation((prev) => ({ ...prev, ...updates }));
+      }
+
+      // Async nickname validation
       const nick = formData.nickname;
-      if (touchedFields.nickname && nick && !validateFieldSync('nickname', nick)) {
-        const token = ++nicknameRequestRef.currentToken;
+      if (
+        touchedFields.nickname &&
+        nick &&
+        !validateFieldSync('nickname', nick)
+      ) {
+        const token = ++nicknameReqRef.current.token;
         setValidatingNickname(true);
-        // lanzar async check (no await aquí para no bloquear)
         (async () => {
           try {
             const disponible = await checkNicknameAvailability(nick);
-            // ignorar si ya vino una petición más reciente
-            if (token !== nicknameRequestRef.currentToken) return;
+            if (token !== nicknameReqRef.current.token) return;
             setNicknameAvailable(Boolean(disponible));
-            setFieldValidation((prev) => ({ ...prev, nickname: disponible ? 'valid' : 'invalid' }));
-          } catch (err) {
-            if (token !== nicknameRequestRef.currentToken) return;
+            setFieldValidation((prev) => ({
+              ...prev,
+              nickname: disponible ? 'valid' : 'invalid',
+            }));
+          } catch {
+            if (token !== nicknameReqRef.current.token) return;
             setNicknameAvailable(false);
             setFieldValidation((prev) => ({ ...prev, nickname: 'invalid' }));
           } finally {
-            if (token === nicknameRequestRef.currentToken) setValidatingNickname(false);
+            if (token === nicknameReqRef.current.token)
+              setValidatingNickname(false);
           }
         })();
       }
+    }, debounce);
 
-      if (updateNeeded) {
-        setFieldValidation((prev) => ({ ...prev, ...updates }));
-      }
-    }, 300);
+    return () => clearTimeout(timer);
+  }, [formData, touchedFields, debounce, validateFieldSync]);
 
-    return () => clearTimeout(debounced);
-  }, [formData, touchedFields, validateFieldSync]);
-
-  // Validación completa al enviar
+  // Full form validation (synchronous + relies on nicknameAvailable for async)
   const validateForm = useCallback(() => {
     const errors = {};
 
     // nombreUsuario
-    if (!formData.nombreUsuario || !validators.validateName(formData.nombreUsuario)) {
+    if (
+      !formData.nombreUsuario ||
+      !validators.validateName(formData.nombreUsuario)
+    ) {
       errors.nombreUsuario = 'Nombre inválido';
     }
 
@@ -115,7 +155,10 @@ export const useFormValidation = (initialData = {}) => {
     }
 
     // confirmPassword
-    if (!formData.confirmPassword || formData.password !== formData.confirmPassword) {
+    if (
+      !formData.confirmPassword ||
+      formData.password !== formData.confirmPassword
+    ) {
       errors.confirmPassword = 'Contraseñas no coinciden';
     }
 
@@ -123,17 +166,33 @@ export const useFormValidation = (initialData = {}) => {
     return Object.keys(errors).length === 0;
   }, [formData, nicknameAvailable]);
 
+  const resetForm = useCallback(
+    (newData = initialData) => {
+      setFormData(newData);
+      setValidationErrors({});
+      setFieldValidation({});
+      setTouchedFields({});
+      setNicknameAvailable(true);
+      setValidatingNickname(false);
+      nicknameReqRef.current.token = 0;
+    },
+    [initialData]
+  );
+
   return {
     formData,
     setFormData,
+    setField,
+    handleChange,
+    handleFieldBlur,
     validationErrors,
     fieldValidation,
     validatingNickname,
     nicknameAvailable,
-    validateForm,
-    handleFieldBlur,
     touchedFields,
+    validateForm,
+    resetForm,
   };
 };
 
-export default useFormValidation;
+export default useFormValidator;

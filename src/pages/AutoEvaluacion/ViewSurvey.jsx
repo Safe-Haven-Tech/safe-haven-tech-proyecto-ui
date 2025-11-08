@@ -20,7 +20,7 @@ export default function ViewSurvey() {
   const [error, setError] = useState(null);
   const [isCompleting, setIsCompleting] = useState(false);
 
-  // Estado para notificaciones tipo toast
+  // Estado para notificaciones
   const [notification, setNotification] = useState(null);
   const showNotification = (message, type = 'success', duration = 3000) => {
     setNotification({ message, type });
@@ -44,7 +44,6 @@ export default function ViewSurvey() {
         }
         setSurvey(encuesta);
 
-        // Inicializamos todas las respuestas en null
         const initialAnswers = {};
         encuesta.preguntas.forEach((pregunta) => {
           initialAnswers[pregunta.orden] = null;

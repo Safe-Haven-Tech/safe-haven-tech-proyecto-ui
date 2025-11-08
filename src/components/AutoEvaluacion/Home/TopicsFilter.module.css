@@ -38,12 +38,11 @@
   }
 }
 
-/* 🎯 NUEVO: Contenedor flexbox centrado (igual al original) */
 .topicsContainer {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.75rem; /* 🎯 Equivalente a gap-3 de Bootstrap */
+  gap: 0.75rem;
   align-items: center;
 }
 
@@ -53,64 +52,53 @@
   }
 }
 
-/* 🎯 NUEVO: Botones replicando exactamente el diseño original */
 .topicBtn {
   font-family: 'Poppins', sans-serif;
-  font-weight: 500; /* 🎯 IGUAL al original */
-  padding: 0.5rem 1rem; /* 🎯 EXACTO al original */
-  border-radius: 2rem; /* 🎯 EXACTO al original */
-  border: 1px solid #a17cca; /* 🎯 EXACTO al original */
-  background: #f7f5fb; /* 🎯 EXACTO al original */
-  color: #5a4e7c; /* 🎯 EXACTO al original */
-  transition: all 0.3s ease; /* 🎯 EXACTO al original */
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  border: 1px solid #a17cca;
+  background: #f7f5fb;
+  color: #5a4e7c;
+  transition: all 0.3s ease;
   cursor: pointer;
-  font-size: 0.9rem; /* 🎯 EXACTO al original */
+  font-size: 0.9rem;
   white-space: nowrap;
   text-align: center;
   position: relative;
-  /* 🎯 NUEVO: Estilos adicionales para consistencia */
   outline: none;
   text-decoration: none;
   display: inline-block;
 }
 
-/* Remueve estilos de botón por defecto */
 .topicBtn:focus {
   box-shadow: none;
   outline: none;
 }
 
-/* 🎯 NUEVO: Hover exacto al original */
 .topicBtn:hover {
-  transform: translateY(-3px); /* 🎯 EXACTO al original */
-  background: #e6e0f5; /* 🎯 EXACTO al original */
-  color: #5a4e7c; /* 🎯 Mantiene el color original */
-  border-color: #a17cca; /* 🎯 Mantiene el borde original */
-  text-decoration: none; /* 🎯 Sin subrayado */
+  transform: translateY(-3px);
+  background: #e6e0f5;
+  color: #5a4e7c;
+  border-color: #a17cca;
+  text-decoration: none;
 }
 
-/* 🎯 NUEVO: Estado activo exacto al original */
 .topicBtnActive {
-  background: linear-gradient(
-    90deg,
-    #5a4e7c,
-    #a17cca
-  ) !important; /* 🎯 EXACTO al original */
-  color: #fff !important; /* 🎯 EXACTO al original */
-  box-shadow: 0 4px 12px rgba(90, 78, 124, 0.3); /* 🎯 EXACTO al original */
-  border-color: transparent; /* 🎯 Para que no se vea el borde sobre el gradiente */
-  transform: none; /* 🎯 Sin transform por defecto cuando está activo */
+  background: linear-gradient(90deg, #5a4e7c, #a17cca) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(90, 78, 124, 0.3);
+  border-color: transparent;
+  transform: none;
 }
 
-/* 🎯 NUEVO: Hover del botón activo */
 .topicBtnActive:hover {
   background: linear-gradient(90deg, #5a4e7c, #a17cca) !important;
   color: #fff !important;
-  transform: translateY(-3px); /* 🎯 Mantiene el efecto hover */
-  box-shadow: 0 6px 15px rgba(90, 78, 124, 0.4); /* 🎯 Sombra más intensa en hover */
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(90, 78, 124, 0.4);
 }
 
-/* 🎯 NUEVO: Estados de interacción */
 .topicBtn:active {
   transform: translateY(-1px);
 }
@@ -119,7 +107,6 @@
   transform: translateY(-1px);
 }
 
-/* 🎯 NUEVO: Responsividad mejorada */
 @media (max-width: 576px) {
   .topicBtn {
     font-size: 0.85rem;
@@ -128,7 +115,7 @@
 
   .topicsContainer {
     gap: 0.5rem;
-    margin: 0 -0.5rem; /* Para compensar el padding en móvil */
+    margin: 0 -0.5rem;
   }
 }
 
@@ -139,7 +126,6 @@
   }
 }
 
-/* 🎯 NUEVO: Accesibilidad */
 @media (prefers-reduced-motion: reduce) {
   .topicBtn,
   .topicBtnActive {
@@ -154,7 +140,6 @@
   }
 }
 
-/* 🎯 NUEVO: Modo alto contraste */
 @media (prefers-contrast: high) {
   .topicBtn {
     border-width: 2px;
@@ -174,14 +159,12 @@
   }
 }
 
-/* 🎯 NUEVO: Modo oscuro */
 @media (prefers-color-scheme: dark) {
   .topicsSection {
     background: rgba(250, 248, 255, 0.95);
   }
 }
 
-/* 🎯 NUEVO: Animación de entrada sutil (opcional) */
 @keyframes fadeInUp {
   0% {
     opacity: 0;
@@ -222,7 +205,6 @@
   animation-delay: 0.4s;
 }
 
-/* Desactivar animación si el usuario lo prefiere */
 @media (prefers-reduced-motion: reduce) {
   .topicBtn {
     animation: none;

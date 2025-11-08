@@ -14,9 +14,8 @@
   overflow: hidden;
 }
 
-/* 🎨 ACTUALIZADO: Fondo menos transparente */
 .contentBox {
-  background: rgba(108, 117, 125, 0.4); /* Cambiado de 0.1 a 0.4 */
+  background: rgba(108, 117, 125, 0.4);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 24px;
@@ -35,10 +34,9 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Separador visual sutil en móvil */
 @media (max-width: 767px) {
   .contentBox {
-    background: rgba(108, 117, 125, 0.5); /* Cambiado de 0.15 a 0.5 */
+    background: rgba(108, 117, 125, 0.5);
     border-radius: 20px;
     padding: 2rem 1.5rem;
     max-width: 90%;
@@ -51,7 +49,7 @@
   }
 
   .contentBox {
-    background: rgba(108, 117, 125, 0.4); /* Cambiado de 0.1 a 0.4 */
+    background: rgba(108, 117, 125, 0.4);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     padding: 3rem 2.5rem;
@@ -66,7 +64,7 @@
   }
 
   .contentBox {
-    background: rgba(108, 117, 125, 0.35); /* Cambiado de 0.08 a 0.35 */
+    background: rgba(108, 117, 125, 0.35);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     padding: 3.5rem 3rem;
@@ -75,15 +73,13 @@
   }
 }
 
-/* Efecto glassmorphism mejorado en pantallas grandes */
 @media (min-width: 1200px) {
   .contentBox {
     background: linear-gradient(
       135deg,
       rgba(108, 117, 125, 0.3) 0%,
-      /* Cambiado de 0.06 a 0.3 */ rgba(90, 78, 124, 0.25) 50%,
-      /* Cambiado de 0.04 a 0.25 */ rgba(108, 117, 125, 0.35) 100%
-        /* Cambiado de 0.08 a 0.35 */
+      rgba(90, 78, 124, 0.25) 50%,
+      rgba(108, 117, 125, 0.35) 100%
     );
     border: 1px solid rgba(255, 255, 255, 0.25);
     padding: 4rem 3.5rem;
@@ -321,7 +317,7 @@
   }
 
   .contentBox {
-    background: rgba(108, 117, 125, 0.55); /* Cambiado de 0.18 a 0.55 */
+    background: rgba(108, 117, 125, 0.55);
     padding: 1.5rem 1.25rem;
     border-radius: 16px;
     max-width: 95%;
@@ -454,21 +450,20 @@
   }
 }
 
-/* 🎨 ACTUALIZADO: Soporte para navegadores más antiguos con 0.4 */
 @supports not (backdrop-filter: blur(10px)) {
   .contentBox {
-    background: rgba(108, 117, 125, 0.5); /* Cambiado de 0.25 a 0.5 */
+    background: rgba(108, 117, 125, 0.5);
   }
 
   @media (min-width: 768px) {
     .contentBox {
-      background: rgba(108, 117, 125, 0.45); /* Cambiado de 0.2 a 0.45 */
+      background: rgba(108, 117, 125, 0.45);
     }
   }
 
   @media (min-width: 992px) {
     .contentBox {
-      background: rgba(108, 117, 125, 0.4); /* Cambiado de 0.18 a 0.4 */
+      background: rgba(108, 117, 125, 0.4);
     }
   }
 }

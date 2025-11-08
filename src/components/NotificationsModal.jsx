@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { obtenerNotificaciones, marcarNotificacionLeida, marcarTodasNotificacionesLeidas } from '../services/redSocialServices';
+import {
+  obtenerNotificaciones,
+  marcarNotificacionLeida,
+  marcarTodasNotificacionesLeidas,
+} from '../services/redSocialServices';
 
 export default function NotificationsModal({ open, onClose, onUpdateBadge }) {
   const { usuario } = useAuth();
@@ -21,7 +25,9 @@ export default function NotificationsModal({ open, onClose, onUpdateBadge }) {
         if (!mounted) return;
         const items = res.notificaciones || [];
         setNotifs(items);
-        const noLeidas = (res.meta && (res.meta.noLeidas ?? res.meta.unreadCount)) ?? items.filter(i => !i.leida).length;
+        const noLeidas =
+          (res.meta && (res.meta.noLeidas ?? res.meta.unreadCount)) ??
+          items.filter((i) => !i.leida).length;
         setUnreadCount(noLeidas);
         if (onUpdateBadge) onUpdateBadge(noLeidas);
       } catch (e) {
@@ -31,15 +37,21 @@ export default function NotificationsModal({ open, onClose, onUpdateBadge }) {
       }
     };
     load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [open]);
 
   const handleOpenNotification = async (n) => {
     try {
       if (!n.leida) {
         await marcarNotificacionLeida(n._id || n.id);
-        setNotifs(prev => prev.map(x => (x._id === n._id || x.id === n.id ? { ...x, leida: true } : x)));
-        setUnreadCount(c => Math.max(0, c - 1));
+        setNotifs((prev) =>
+          prev.map((x) =>
+            x._id === n._id || x.id === n.id ? { ...x, leida: true } : x
+          )
+        );
+        setUnreadCount((c) => Math.max(0, c - 1));
         if (onUpdateBadge) onUpdateBadge(Math.max(0, unreadCount - 1));
       }
     } catch (e) {
@@ -62,14 +74,13 @@ export default function NotificationsModal({ open, onClose, onUpdateBadge }) {
       return navigate(`/chat/${n.referencia}`);
     }
 
-    // fallback: cerrar modal
     onClose?.();
   };
 
   const handleMarkAll = async () => {
     try {
       await marcarTodasNotificacionesLeidas();
-      setNotifs(prev => prev.map(n => ({ ...n, leida: true })));
+      setNotifs((prev) => prev.map((n) => ({ ...n, leida: true })));
       setUnreadCount(0);
       if (onUpdateBadge) onUpdateBadge(0);
     } catch (e) {
@@ -80,51 +91,102 @@ export default function NotificationsModal({ open, onClose, onUpdateBadge }) {
   if (!open || !usuario) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      right: 16,
-      bottom: 90,
-      width: 360,
-      maxHeight: '60vh',
-      zIndex: 2200,
-      boxShadow: '0 6px 20px rgba(0,0,0,0.18)',
-      borderRadius: 8,
-      background: '#fff',
-      overflow: 'hidden',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
-      <div style={{ padding: '0.6rem 0.8rem', borderBottom: '1px solid rgba(0,0,0,0.06)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+    <div
+      style={{
+        position: 'fixed',
+        right: 16,
+        bottom: 90,
+        width: 360,
+        maxHeight: '60vh',
+        zIndex: 2200,
+        boxShadow: '0 6px 20px rgba(0,0,0,0.18)',
+        borderRadius: 8,
+        background: '#fff',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div
+        style={{
+          padding: '0.6rem 0.8rem',
+          borderBottom: '1px solid rgba(0,0,0,0.06)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <strong>Notificaciones</strong>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <button className="btn btn-sm btn-link" onClick={handleMarkAll}>Marcar todas</button>
-          <button className="btn btn-sm btn-light" onClick={onClose}>Cerrar</button>
+          <button className="btn btn-sm btn-link" onClick={handleMarkAll}>
+            Marcar todas
+          </button>
+          <button className="btn btn-sm btn-light" onClick={onClose}>
+            Cerrar
+          </button>
         </div>
       </div>
 
       <div style={{ overflowY: 'auto', flex: 1 }}>
-        {loading && <div className="p-3 text-center text-muted">Cargando...</div>}
-        {!loading && notifs.length === 0 && <div className="p-3 text-muted">Sin notificaciones</div>}
-        {!loading && notifs.map((n, i) => (
-          <div key={n._id || n.id || i}
-            onClick={() => handleOpenNotification(n)}
-            style={{
-              padding: '0.6rem 0.8rem',
-              borderBottom: '1px solid rgba(0,0,0,0.04)',
-              cursor: 'pointer',
-              background: n.leida ? '#fff' : '#eef6ff'
-            }}>
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              <div style={{ width: 44, height: 44, borderRadius: 8, background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                {n.icon ? <img src={n.icon} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{fontSize:18}}>🔔</span>}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: n.leida ? 500 : 700 }}>{n.titulo || n.texto || n.mensaje || 'Notificación'}</div>
-                <div style={{ fontSize: 12, color: '#666' }}>{n.subtexto || (n.createdAt ? new Date(n.createdAt).toLocaleString() : '')}</div>
+        {loading && (
+          <div className="p-3 text-center text-muted">Cargando...</div>
+        )}
+        {!loading && notifs.length === 0 && (
+          <div className="p-3 text-muted">Sin notificaciones</div>
+        )}
+        {!loading &&
+          notifs.map((n, i) => (
+            <div
+              key={n._id || n.id || i}
+              onClick={() => handleOpenNotification(n)}
+              style={{
+                padding: '0.6rem 0.8rem',
+                borderBottom: '1px solid rgba(0,0,0,0.04)',
+                cursor: 'pointer',
+                background: n.leida ? '#fff' : '#eef6ff',
+              }}
+            >
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 8,
+                    background: '#f0f0f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {n.icon ? (
+                    <img
+                      src={n.icon}
+                      alt=""
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  ) : (
+                    <span style={{ fontSize: 18 }}>🔔</span>
+                  )}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: n.leida ? 500 : 700 }}>
+                    {n.titulo || n.texto || n.mensaje || 'Notificación'}
+                  </div>
+                  <div style={{ fontSize: 12, color: '#666' }}>
+                    {n.subtexto ||
+                      (n.createdAt
+                        ? new Date(n.createdAt).toLocaleString()
+                        : '')}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );

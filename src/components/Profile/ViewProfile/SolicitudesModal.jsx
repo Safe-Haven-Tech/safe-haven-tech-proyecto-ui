@@ -40,7 +40,9 @@ const SolicitudesModal = ({ show, onClose }) => {
       <div className={styles.modalContent}>
         <div className={styles.header}>
           Solicitudes de seguidores
-          <button className={styles.closeButton} onClick={onClose}>×</button>
+          <button className={styles.closeButton} onClick={onClose}>
+            ×
+          </button>
         </div>
         {loading ? (
           <div className={styles.loading}>Cargando...</div>

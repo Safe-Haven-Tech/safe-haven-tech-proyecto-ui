@@ -1,8 +1,10 @@
-
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './FeedPublicaciones.module.css';
-import { fetchPublicaciones, deletePublicacion } from '../../services/publicacionesService';
+import {
+  fetchPublicaciones,
+  deletePublicacion,
+} from '../../services/publicacionesService';
 import PublicacionCard from '../../components/Publicaciones/PublicacionCard';
 
 /**
@@ -31,7 +33,7 @@ const Toast = ({ message, show, onClose, timeout = 3500 }) => {
         borderRadius: 10,
         boxShadow: '0 6px 18px rgba(0,0,0,0.12)',
         zIndex: 1200,
-        fontWeight: 600
+        fontWeight: 600,
       }}
     >
       {message}
@@ -87,15 +89,20 @@ const FeedPublicaciones = () => {
 
       try {
         // El servicio puede o no respetar signal; la llamada queda protegida por abort/flag.
-        const data = await fetchPublicaciones({ pagina, limite: LIMITE_POR_PAGINA, tipo: 'perfil', signal: controller.signal });
+        const data = await fetchPublicaciones({
+          pagina,
+          limite: LIMITE_POR_PAGINA,
+          tipo: 'perfil',
+          signal: controller.signal,
+        });
         if (!isMountedRef.current) return;
         const nuevas = data.publicaciones || [];
-        setPublicaciones(prev => {
-          const ids = new Set(prev.map(p => p._id));
-          const unicas = nuevas.filter(p => !ids.has(p._id));
+        setPublicaciones((prev) => {
+          const ids = new Set(prev.map((p) => p._id));
+          const unicas = nuevas.filter((p) => !ids.has(p._id));
           return [...prev, ...unicas];
         });
-        setHasMore((nuevas.length === LIMITE_POR_PAGINA));
+        setHasMore(nuevas.length === LIMITE_POR_PAGINA);
       } catch (err) {
         if (!isMountedRef.current) return;
         if (err.name === 'AbortError') {
@@ -134,7 +141,7 @@ const FeedPublicaciones = () => {
 
       observer.current = new window.IntersectionObserver((entries) => {
         if (entries[0]?.isIntersecting && hasMore) {
-          setPagina(prev => prev + 1);
+          setPagina((prev) => prev + 1);
         }
       });
 
@@ -153,7 +160,7 @@ const FeedPublicaciones = () => {
     const token = localStorage.getItem('token');
     const prev = publicaciones;
     // Optimista: actualiza UI inmediatamente
-    setPublicaciones((p) => p.filter(item => item._id !== id));
+    setPublicaciones((p) => p.filter((item) => item._id !== id));
 
     try {
       await deletePublicacion(id, token);
@@ -162,7 +169,10 @@ const FeedPublicaciones = () => {
       // Restaurar estado previo en caso de error
       if (isMountedRef.current) {
         setPublicaciones(prev);
-        setToast({ show: true, message: err?.message || 'Error al eliminar publicación' });
+        setToast({
+          show: true,
+          message: err?.message || 'Error al eliminar publicación',
+        });
       }
     }
   };
@@ -190,7 +200,9 @@ const FeedPublicaciones = () => {
 
       {loading && <div className={styles.loading}>Cargando...</div>}
       {error && <div className={styles.error}>{error}</div>}
-      {!hasMore && !loading && <div className={styles.endMessage}>No hay más publicaciones.</div>}
+      {!hasMore && !loading && (
+        <div className={styles.endMessage}>No hay más publicaciones.</div>
+      )}
 
       <Toast
         message={toast.message}

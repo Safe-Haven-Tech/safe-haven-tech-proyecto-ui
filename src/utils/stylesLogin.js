@@ -118,4 +118,3 @@ export const styles = {
     padding: '24px',
   },
 };
-

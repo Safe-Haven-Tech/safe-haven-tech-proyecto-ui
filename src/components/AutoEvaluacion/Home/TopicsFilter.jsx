@@ -1,9 +1,7 @@
-/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\components\AutoEvaluacion\Home\TopicsFilter.jsx */
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './TopicsFilter.module.css';
 
-// Agregamos "Todas" como primera opción
 const topics = [
   'Todas',
   'Bienestar emocional',
@@ -21,7 +19,6 @@ const topics = [
 ];
 
 export default function TopicsFilter({ onSelect }) {
-  // Por defecto seleccionamos "Todas"
   const [selectedTopic, setSelectedTopic] = useState('Todas');
 
   const handleClick = (topic) => {

@@ -28,27 +28,33 @@ export const actualizarPerfil = async (usuarioId, datosUsuario) => {
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   try {
-    const res = await fetch(`${API_URL}/api/usuarios/${encodeURIComponent(usuarioId)}`, {
-      method: 'PUT',
-      headers,
-      body: isForm ? datosUsuario : JSON.stringify(datosUsuario),
-    });
+    const res = await fetch(
+      `${API_URL}/api/usuarios/${encodeURIComponent(usuarioId)}`,
+      {
+        method: 'PUT',
+        headers,
+        body: isForm ? datosUsuario : JSON.stringify(datosUsuario),
+      }
+    );
 
     const payload = await parseResponse(res);
 
     if (!res.ok) {
-      const msg = (payload && (payload.detalles || payload.message || payload.error)) || `Error ${res.status}`;
+      const msg =
+        (payload && (payload.detalles || payload.message || payload.error)) ||
+        `Error ${res.status}`;
       throw new Error(msg);
     }
 
     // Guardar tokens si el backend devuelve nuevos
-    if (payload?.accessToken) localStorage.setItem('token', payload.accessToken);
-    if (payload?.refreshToken) localStorage.setItem('refreshToken', payload.refreshToken);
+    if (payload?.accessToken)
+      localStorage.setItem('token', payload.accessToken);
+    if (payload?.refreshToken)
+      localStorage.setItem('refreshToken', payload.refreshToken);
     if (payload?.nuevoToken) localStorage.setItem('token', payload.nuevoToken);
 
     return payload;
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error('actualizarPerfil error:', err.message || err);
     throw err;
   }

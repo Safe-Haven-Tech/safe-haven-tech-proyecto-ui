@@ -1,11 +1,10 @@
-/* Contenedor principal - MÁS ANCHO */
 .loginFormContainer {
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 1rem 0.75rem;
-  max-width: 480px; /* 🎯 NUEVO: Más ancho que antes */
+  max-width: 480px;
   width: 100%;
   margin: 0 auto;
 }
@@ -13,20 +12,20 @@
 @media (min-width: 576px) {
   .loginFormContainer {
     padding: 1.5rem;
-    max-width: 520px; /* 🎯 AUMENTADO */
+    max-width: 520px;
   }
 }
 
 @media (min-width: 768px) {
   .loginFormContainer {
     padding: 2rem 1.5rem;
-    max-width: 580px; /* 🎯 AUMENTADO */
+    max-width: 580px;
   }
 }
 
 @media (min-width: 992px) {
   .loginFormContainer {
-    max-width: 620px; /* 🎯 NUEVO: Aún más ancho en desktop */
+    max-width: 620px;
     padding: 2.5rem 2rem;
   }
 }
@@ -90,8 +89,7 @@
 .formTitle {
   font-weight: bold;
   margin-bottom: 0.5rem;
-  background: linear-gradient(90deg, #2d5a27, #4caf50); /* 🎨 CAMBIO: Verde */
-  -webkit-background-clip: text;
+  background: linear-gradient(90deg, #2d5a27, #4caf50);
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-size: clamp(1.5rem, 4vw, 2rem);
@@ -182,7 +180,7 @@
   background: rgba(255, 255, 255, 0.95);
   box-shadow:
     0 0 0 3px rgba(76, 175, 80, 0.15),
-    0 4px 12px rgba(0, 0, 0, 0.1); /* 🎨 CAMBIO: Verde */
+    0 4px 12px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
 
@@ -229,11 +227,11 @@
 }
 
 .passwordToggle:hover {
-  color: #4caf50; /* 🎨 CAMBIO: Verde */
+  color: #4caf50;
 }
 
 .passwordToggle:focus {
-  outline: 2px solid rgba(76, 175, 80, 0.5); /* 🎨 CAMBIO: Verde */
+  outline: 2px solid rgba(76, 175, 80, 0.5);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -306,7 +304,7 @@
   font-weight: 600;
   padding: 0.875rem;
   margin-bottom: 1.5rem;
-  background: linear-gradient(135deg, #2d5a27, #4caf50); /* 🎨 CAMBIO: Verde */
+  background: linear-gradient(135deg, #2d5a27, #4caf50);
   color: white;
   border: none;
   border-radius: 12px;
@@ -315,7 +313,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3); /* 🎨 CAMBIO: Verde */
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 @media (min-width: 576px) {
@@ -326,13 +324,13 @@
 
 .submitButton:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); /* 🎨 CAMBIO: Verde */
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
 }
 
 @media (min-width: 768px) {
   .submitButton:hover:not(:disabled) {
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.45); /* 🎨 CAMBIO: Verde */
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.45);
   }
 }
 
@@ -396,14 +394,14 @@
 /* Links - VERDE */
 .footerLink {
   font-weight: 600;
-  color: #2d5a27; /* 🎨 CAMBIO: Verde oscuro */
+  color: #2d5a27;
   text-decoration: none;
   transition: all 0.2s ease;
   position: relative;
 }
 
 .footerLink:hover {
-  color: #4caf50; /* 🎨 CAMBIO: Verde claro */
+  color: #4caf50;
   text-decoration: none;
 }
 
@@ -414,7 +412,7 @@
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, #2d5a27, #4caf50); /* 🎨 CAMBIO: Verde */
+  background: linear-gradient(90deg, #2d5a27, #4caf50);
   transition: width 0.3s ease;
 }
 
@@ -426,7 +424,7 @@
 @media (max-width: 320px) {
   .loginFormContainer {
     padding: 0.75rem 0.5rem;
-    max-width: 300px; /* 🎯 AJUSTADO para móviles */
+    max-width: 300px;
   }
 
   .formHeader {
@@ -454,7 +452,7 @@
 /* Pantallas muy grandes - NUEVO */
 @media (min-width: 1200px) {
   .loginFormContainer {
-    max-width: 680px; /* 🎯 NUEVO: Máximo ancho en pantallas grandes */
+    max-width: 680px;
     padding: 3rem 2.5rem;
   }
 
@@ -500,19 +498,19 @@
   }
 
   .submitButton {
-    background: #2d5a27; /* 🎨 CAMBIO: Verde oscuro */
+    background: #2d5a27;
     border: 2px solid #000;
   }
 
   .footerLink {
-    color: #2d5a27; /* 🎨 CAMBIO: Verde */
+    color: #2d5a27;
   }
 }
 
 /* Estados de loading - VERDE */
 .loadingSpinner {
-  border: 2px solid rgba(76, 175, 80, 0.3); /* 🎨 CAMBIO: Verde */
-  border-top: 2px solid #4caf50; /* 🎨 CAMBIO: Verde */
+  border: 2px solid rgba(76, 175, 80, 0.3);
+  border-top: 2px solid #4caf50;
 }
 
 /* Efectos adicionales para el formulario más ancho */
@@ -528,7 +526,7 @@
     top: 0;
     width: 3px;
     height: 0;
-    background: linear-gradient(180deg, #2d5a27, #4caf50); /* 🎨 Verde */
+    background: linear-gradient(180deg, #2d5a27, #4caf50);
     border-radius: 2px;
     transition: height 0.3s ease;
   }

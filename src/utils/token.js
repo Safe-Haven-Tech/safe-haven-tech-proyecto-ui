@@ -44,7 +44,6 @@ export const parseJwt = (token) => {
     );
     return JSON.parse(jsonPayload);
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error('parseJwt error:', err.message || err);
     return null;
   }

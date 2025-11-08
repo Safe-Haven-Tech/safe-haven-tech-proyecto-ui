@@ -2,7 +2,12 @@ import React from 'react';
 import ProfessionalCard from './ProfessionalCard';
 import styles from '../../pages/profesionals/Professionals.module.css';
 
-export default function ProfessionalsList({ items = [], loading, onLoadMore, hasMore }) {
+export default function ProfessionalsList({
+  items = [],
+  loading,
+  onLoadMore,
+  hasMore,
+}) {
   if (loading && items.length === 0) {
     return <div className={styles.loading}>Cargando profesionales…</div>;
   }
@@ -21,7 +26,9 @@ export default function ProfessionalsList({ items = [], loading, onLoadMore, has
 
       {hasMore && (
         <div className={styles.loadMore}>
-          <button className={styles.btn} onClick={onLoadMore}>Cargar más</button>
+          <button className={styles.btn} onClick={onLoadMore}>
+            Cargar más
+          </button>
         </div>
       )}
     </section>

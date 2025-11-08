@@ -1,12 +1,9 @@
-/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\components\RecursosInformativos\Home\WelcomeCard.jsx */
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './WelcomeCard.module.css';
 
-// Importar la imagen de autoevaluaciones (ajusta la ruta según tu proyecto)
 import evaluationWelcome from '../../../assets/ResourcesHome.png';
 
-// Importamos los SVGs como imágenes normales
 import LightningIcon from '../../../assets/icons/Lightning.svg';
 import BookIcon from '../../../assets/icons/Book.svg';
 

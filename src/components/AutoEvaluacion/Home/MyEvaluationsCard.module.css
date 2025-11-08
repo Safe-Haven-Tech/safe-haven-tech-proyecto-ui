@@ -9,7 +9,7 @@
   border: none;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  margin-top: 0.5rem; /* 🎯 NUEVO: Margen superior pequeño */
+  margin-top: 0.5rem;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -19,7 +19,7 @@
   .evaluationsCard {
     padding: 2rem;
     margin-bottom: 2rem;
-    margin-top: 0.8rem; /* 🎯 NUEVO: Margen superior ligeramente mayor */
+    margin-top: 0.8rem;
   }
 }
 
@@ -27,7 +27,7 @@
   .evaluationsCard {
     padding: 2.5rem;
     margin-bottom: 2.5rem;
-    margin-top: 1rem; /* 🎯 NUEVO: Margen superior mayor en desktop */
+    margin-top: 1rem;
   }
 }
 /* Efectos decorativos de fondo */

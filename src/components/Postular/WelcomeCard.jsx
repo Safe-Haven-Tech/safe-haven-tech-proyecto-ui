@@ -8,7 +8,9 @@ export default function WelcomeCard({ onStart }) {
 
   const handleStart = () => {
     if (typeof onStart === 'function') return onStart();
-    const el = document.getElementById('postulacion-form') || document.querySelector('form');
+    const el =
+      document.getElementById('postulacion-form') ||
+      document.querySelector('form');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       // focus the first input if available
@@ -17,7 +19,6 @@ export default function WelcomeCard({ onStart }) {
     }
   };
 
-  // Safe display name (evita .split() sobre undefined)
   const displayName = usuario?.nombreCompleto
     ? String(usuario.nombreCompleto).split(' ')[0]
     : usuario?.nombreUsuario || null;
@@ -27,7 +28,11 @@ export default function WelcomeCard({ onStart }) {
       <div className={styles.welcomeInner}>
         <img
           src={usuario?.fotoPerfil || avatarPlaceholder}
-          alt={usuario ? (usuario.nombreCompleto || usuario.nombreUsuario) : 'Avatar usuario'}
+          alt={
+            usuario
+              ? usuario.nombreCompleto || usuario.nombreUsuario
+              : 'Avatar usuario'
+          }
           className={styles.welcomeAvatar}
         />
         <div className={styles.welcomeText}>
@@ -35,21 +40,22 @@ export default function WelcomeCard({ onStart }) {
             {displayName ? `Hola, ${displayName}` : 'Bienvenido'}
           </h3>
           <p className={styles.welcomeDesc}>
-            Gracias por querer formar parte del listado de profesionales de SafeHaven.
-            Completa este formulario con honestidad—tu información será revisada por nuestro equipo.
+            Gracias por querer formar parte del listado de profesionales de
+            SafeHaven. Completa este formulario con honestidad—tu información
+            será revisada por nuestro equipo.
           </p>
           <div style={{ marginTop: 12 }}>
             <button className={styles.btnPrimary} onClick={handleStart}>
               Completar postulación
             </button>
-
           </div>
         </div>
       </div>
 
       <div className={styles.welcomeFooter}>
         <small className={styles.confidentialNote}>
-          Tus datos serán tratados con confidencialidad. Tiempo estimado de revisión: 3–5 días hábiles.
+          Tus datos serán tratados con confidencialidad. Tiempo estimado de
+          revisión: 3–5 días hábiles.
         </small>
       </div>
     </aside>

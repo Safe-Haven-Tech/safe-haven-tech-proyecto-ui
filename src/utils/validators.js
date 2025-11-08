@@ -40,7 +40,9 @@ export const validateEmail = (email) =>
   typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
 export const validatePassword = (password) =>
-  typeof password === 'string' && password.length >= LIMITES.PASSWORD.MIN && password.length <= LIMITES.PASSWORD.MAX;
+  typeof password === 'string' &&
+  password.length >= LIMITES.PASSWORD.MIN &&
+  password.length <= LIMITES.PASSWORD.MAX;
 
 export const validateConfirmPassword = (password, confirmPassword) =>
   password === confirmPassword;
@@ -64,9 +66,12 @@ export const validarNombre = (nombre) => {
   if (!nombre) return null;
   const value = nombre.trim();
   const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
-  if (!regex.test(value)) return 'Tu apodo solo puede contener letras, espacios y acentos';
-  if (value.length < LIMITES.NOMBRE.MIN) return `Tu apodo debe tener al menos ${LIMITES.NOMBRE.MIN} caracteres`;
-  if (value.length > LIMITES.NOMBRE.MAX) return `Tu apodo no puede superar los ${LIMITES.NOMBRE.MAX} caracteres`;
+  if (!regex.test(value))
+    return 'Tu apodo solo puede contener letras, espacios y acentos';
+  if (value.length < LIMITES.NOMBRE.MIN)
+    return `Tu apodo debe tener al menos ${LIMITES.NOMBRE.MIN} caracteres`;
+  if (value.length > LIMITES.NOMBRE.MAX)
+    return `Tu apodo no puede superar los ${LIMITES.NOMBRE.MAX} caracteres`;
   return null;
 };
 
@@ -96,7 +101,8 @@ const formatBytes = (bytes) => {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 };
 
-const isAllowedImageType = (type) => LIMITES.IMAGEN.TIPOS_PERMITIDOS.includes(type);
+const isAllowedImageType = (type) =>
+  LIMITES.IMAGEN.TIPOS_PERMITIDOS.includes(type);
 
 /**
  * Valida un archivo de imagen.
@@ -141,7 +147,10 @@ export const validateProfileData = (data = {}, nicknameDisponible = true) => {
     errors.nombreUsuario = 'Nickname no disponible';
   }
 
-  if (data.pronombres && String(data.pronombres).length > LIMITES.PRONOMBRES.MAX) {
+  if (
+    data.pronombres &&
+    String(data.pronombres).length > LIMITES.PRONOMBRES.MAX
+  ) {
     errors.pronombres = `Máximo ${LIMITES.PRONOMBRES.MAX} caracteres`;
   }
 
@@ -151,7 +160,6 @@ export const validateProfileData = (data = {}, nicknameDisponible = true) => {
 
   return errors;
 };
-
 
 export default {
   LIMITES,

@@ -1,8 +1,6 @@
-
 .page {
   max-width: 980px;
   margin: 0 auto;
-  /* Asegura espacio para el navbar */
   padding-top: 80px;
   margin-top: 0;
 }
@@ -58,23 +56,33 @@
   padding: 14px 16px;
   border-radius: 10px;
   background: #fff;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
   margin-bottom: 12px;
   align-items: center;
-  transition: transform .12s ease, box-shadow .12s ease;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
   border-left: 4px solid transparent;
 }
 .item:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(35,41,54,0.08);
+  box-shadow: 0 8px 24px rgba(35, 41, 54, 0.08);
 }
 
-/* Bordes de color según tipo (aplicar vía class en el futuro si se desea) */
-.item[data-tipo="publicacion"] { border-left-color: #1e88e5; }
-.item[data-tipo="comentario"]  { border-left-color: #f59e0b; }
-.item[data-tipo="usuario"]     { border-left-color: #ef4444; }
+/* Bordes de color según tipo  */
+.item[data-tipo='publicacion'] {
+  border-left-color: #1e88e5;
+}
+.item[data-tipo='comentario'] {
+  border-left-color: #f59e0b;
+}
+.item[data-tipo='usuario'] {
+  border-left-color: #ef4444;
+}
 
-.left { flex: 1; }
+.left {
+  flex: 1;
+}
 
 .meta {
   display: flex;
@@ -91,7 +99,7 @@
   border-radius: 8px;
   font-size: 0.8rem;
   text-transform: capitalize;
-  border: 1px solid rgba(0,0,0,0.04);
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .motivo {
@@ -140,13 +148,28 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .select { min-width: 140px; }
-  .meta { gap: 6px; }
-  .item { padding: 12px; }
+  .select {
+    min-width: 140px;
+  }
+  .meta {
+    gap: 6px;
+  }
+  .item {
+    padding: 12px;
+  }
 }
 
 @media (max-width: 480px) {
-  .header { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .controls { width: 100%; justify-content: flex-start; }
-  .actions { margin-top: 8px; }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .actions {
+    margin-top: 8px;
+  }
 }

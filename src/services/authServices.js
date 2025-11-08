@@ -1,4 +1,3 @@
-
 /**
  * Servicios de autenticación (registro / login).
  * Entorno: Vite (import.meta.env.VITE_API_URL).
@@ -22,7 +21,9 @@ const parseResponse = async (res) => {
 const extractMessage = (body, fallback) => {
   if (!body) return fallback;
   if (typeof body === 'string') return body;
-  return body.message || body.mensaje || body.error || body.detalles || fallback;
+  return (
+    body.message || body.mensaje || body.error || body.detalles || fallback
+  );
 };
 
 /**
@@ -47,7 +48,6 @@ export const registrarUsuario = async (data) => {
 
     return payload;
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error('registrarUsuario error:', err.message || err);
     throw err;
   }
@@ -75,11 +75,11 @@ export async function iniciarSesion({ correo, contraseña }) {
     }
 
     if (data?.accessToken) localStorage.setItem('token', data.accessToken);
-    if (data?.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+    if (data?.refreshToken)
+      localStorage.setItem('refreshToken', data.refreshToken);
 
     return data;
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error('iniciarSesion error:', err.message || err);
     throw err;
   }

@@ -12,32 +12,70 @@ import styles from './Postulacion.module.css';
 function PreviewModal({ open, onClose, data = {}, onConfirm, loading }) {
   if (!open) return null;
 
-  const experiencia = Number.isFinite(Number(data.experienciaAnios)) ? data.experienciaAnios : '—';
-  const titulos = Array.isArray(data.titulos) ? data.titulos : (data.titulos ? String(data.titulos).split(',').map(s => s.trim()).filter(Boolean) : []);
-  const especialidades = Array.isArray(data.especialidades) ? data.especialidades : (data.especialidades ? String(data.especialidades).split(',').map(s => s.trim()).filter(Boolean) : []);
+  const experiencia = Number.isFinite(Number(data.experienciaAnios))
+    ? data.experienciaAnios
+    : '—';
+  const titulos = Array.isArray(data.titulos)
+    ? data.titulos
+    : data.titulos
+      ? String(data.titulos)
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+  const especialidades = Array.isArray(data.especialidades)
+    ? data.especialidades
+    : data.especialidades
+      ? String(data.especialidades)
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
 
   return (
     <div className={styles.modalOverlay} role="dialog" aria-modal="true">
       <div className={styles.modal}>
         <h2>Previsualizar postulación</h2>
 
-        <div className={styles.previewRow}><strong>Nombre:</strong> {data.nombreCompleto}</div>
-        <div className={styles.previewRow}><strong>Correo:</strong> {data.correo}</div>
-        <div className={styles.previewRow}><strong>Teléfono:</strong> {data.telefono || '—'}</div>
-        <div className={styles.previewRow}><strong>Ciudad:</strong> {data.ciudad}</div>
-
-        <div className={styles.previewRow}><strong>Títulos:</strong>
-          <div style={{ marginLeft: 8 }}>{titulos.length ? titulos.join(' • ') : '—'}</div>
+        <div className={styles.previewRow}>
+          <strong>Nombre:</strong> {data.nombreCompleto}
+        </div>
+        <div className={styles.previewRow}>
+          <strong>Correo:</strong> {data.correo}
+        </div>
+        <div className={styles.previewRow}>
+          <strong>Teléfono:</strong> {data.telefono || '—'}
+        </div>
+        <div className={styles.previewRow}>
+          <strong>Ciudad:</strong> {data.ciudad}
         </div>
 
-        <div className={styles.previewRow}><strong>Especialidades:</strong>
-          <div style={{ marginLeft: 8 }}>{especialidades.length ? especialidades.join(' • ') : '—'}</div>
+        <div className={styles.previewRow}>
+          <strong>Títulos:</strong>
+          <div style={{ marginLeft: 8 }}>
+            {titulos.length ? titulos.join(' • ') : '—'}
+          </div>
         </div>
 
-        <div className={styles.previewRow}><strong>Registro:</strong> {data.registroProfesional || '—'}</div>
-        <div className={styles.previewRow}><strong>Institución:</strong> {data.institucionTitulo || '—'}</div>
-        <div className={styles.previewRow}><strong>Experiencia (años):</strong> {experiencia}</div>
-        <div className={styles.previewRow}><strong>Disponible:</strong> {data.disponible ? 'Sí' : 'No'}</div>
+        <div className={styles.previewRow}>
+          <strong>Especialidades:</strong>
+          <div style={{ marginLeft: 8 }}>
+            {especialidades.length ? especialidades.join(' • ') : '—'}
+          </div>
+        </div>
+
+        <div className={styles.previewRow}>
+          <strong>Registro:</strong> {data.registroProfesional || '—'}
+        </div>
+        <div className={styles.previewRow}>
+          <strong>Institución:</strong> {data.institucionTitulo || '—'}
+        </div>
+        <div className={styles.previewRow}>
+          <strong>Experiencia (años):</strong> {experiencia}
+        </div>
+        <div className={styles.previewRow}>
+          <strong>Disponible:</strong> {data.disponible ? 'Sí' : 'No'}
+        </div>
 
         <div className={styles.previewBox}>
           <strong>Carta de motivación</strong>
@@ -45,8 +83,18 @@ function PreviewModal({ open, onClose, data = {}, onConfirm, loading }) {
         </div>
 
         <div className={styles.modalActions}>
-          <button className={styles.btnGhost} onClick={onClose} disabled={loading}>Volver</button>
-          <button className={styles.btnPrimary} onClick={onConfirm} disabled={loading}>
+          <button
+            className={styles.btnGhost}
+            onClick={onClose}
+            disabled={loading}
+          >
+            Volver
+          </button>
+          <button
+            className={styles.btnPrimary}
+            onClick={onConfirm}
+            disabled={loading}
+          >
             {loading ? 'Enviando…' : 'Confirmar y enviar'}
           </button>
         </div>
@@ -70,7 +118,7 @@ export default function PostulacionPage() {
     watch,
     formState: { errors },
     getValues,
-    reset
+    reset,
   } = useForm({
     defaultValues: {
       nombreCompleto: usuario?.nombreCompleto || '',
@@ -83,11 +131,10 @@ export default function PostulacionPage() {
       institucionTitulo: '',
       cartaMotivacion: '',
       experienciaAnios: '',
-      disponible: true
-    }
+      disponible: true,
+    },
   });
 
-  // valores en vivo para el SummaryPanel
   const watched = watch();
 
   const onSubmit = (data) => {
@@ -98,8 +145,15 @@ export default function PostulacionPage() {
 
   const normalizeList = (value) => {
     if (!value) return [];
-    if (Array.isArray(value)) return value.map(String).map(s => s.trim()).filter(Boolean);
-    return String(value).split(',').map(s => s.trim()).filter(Boolean);
+    if (Array.isArray(value))
+      return value
+        .map(String)
+        .map((s) => s.trim())
+        .filter(Boolean);
+    return String(value)
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
   };
 
   const handleConfirmSend = async () => {
@@ -115,19 +169,26 @@ export default function PostulacionPage() {
         especialidades: normalizeList(raw.especialidades),
         registroProfesional: raw.registroProfesional || '',
         institucionTitulo: raw.institucionTitulo || '',
-        'añosExperiencia': raw.experienciaAnios === '' || raw.experienciaAnios === null ? null : Number(raw.experienciaAnios),
-        disponible: Boolean(raw.disponible)
+        añosExperiencia:
+          raw.experienciaAnios === '' || raw.experienciaAnios === null
+            ? null
+            : Number(raw.experienciaAnios),
+        disponible: Boolean(raw.disponible),
       },
       motivacion: raw.cartaMotivacion || '',
       experiencia: raw.experienciaAnios || '',
-      especialidad: (normalizeList(raw.especialidades).length ? normalizeList(raw.especialidades)[0] : '')
+      especialidad: normalizeList(raw.especialidades).length
+        ? normalizeList(raw.especialidades)[0]
+        : '',
     };
 
     setSubmitting(true);
     setServerError(null);
     try {
       await createPostulacion(token, payload);
-      setSuccessMsg('Postulación enviada correctamente. Gracias por postularte.');
+      setSuccessMsg(
+        'Postulación enviada correctamente. Gracias por postularte.'
+      );
       reset();
       setPreviewOpen(false);
     } catch (err) {
@@ -138,7 +199,9 @@ export default function PostulacionPage() {
   };
 
   const focusForm = () => {
-    const el = document.getElementById('postulacion-form') || document.querySelector('form');
+    const el =
+      document.getElementById('postulacion-form') ||
+      document.querySelector('form');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       const firstInput = el.querySelector('input, textarea, select, button');
@@ -154,25 +217,37 @@ export default function PostulacionPage() {
 
   return (
     <>
-     
-
       <main className={styles.container}>
-         <HeroCard onStart={focusForm} />
+        <HeroCard onStart={focusForm} />
         <div className={styles.grid}>
           <div className={styles.formColumn}>
             <h2 className={styles.sectionTitle}>Formulario de postulación</h2>
 
             {successMsg && <div className={styles.success}>{successMsg}</div>}
-            {serverError && <div className={styles.error}>Error: {serverError}</div>}
+            {serverError && (
+              <div className={styles.error}>Error: {serverError}</div>
+            )}
 
-            <form id="postulacion-form" className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
+            <form
+              id="postulacion-form"
+              className={styles.form}
+              onSubmit={handleSubmit(onSubmit)}
+              noValidate
+            >
               <div className={styles.row}>
                 <label className={styles.label}>Nombre completo</label>
                 <input
                   className={styles.input}
-                  {...register('nombreCompleto', { required: 'Ingrese su nombre completo', minLength: { value: 3, message: 'Nombre demasiado corto' } })}
+                  {...register('nombreCompleto', {
+                    required: 'Ingrese su nombre completo',
+                    minLength: { value: 3, message: 'Nombre demasiado corto' },
+                  })}
                 />
-                {errors.nombreCompleto && <p className={styles.fieldError}>{errors.nombreCompleto.message}</p>}
+                {errors.nombreCompleto && (
+                  <p className={styles.fieldError}>
+                    {errors.nombreCompleto.message}
+                  </p>
+                )}
               </div>
 
               <div className={styles.row}>
@@ -182,25 +257,42 @@ export default function PostulacionPage() {
                   type="email"
                   {...register('correo', {
                     required: 'Ingrese su correo',
-                    pattern: { value: /^\S+@\S+\.\S+$/, message: 'Correo inválido' }
+                    pattern: {
+                      value: /^\S+@\S+\.\S+$/,
+                      message: 'Correo inválido',
+                    },
                   })}
                 />
-                {errors.correo && <p className={styles.fieldError}>{errors.correo.message}</p>}
+                {errors.correo && (
+                  <p className={styles.fieldError}>{errors.correo.message}</p>
+                )}
               </div>
 
               <div className={styles.row}>
                 <label className={styles.label}>Teléfono</label>
                 <input
                   className={styles.input}
-                  {...register('telefono', { maxLength: { value: 30, message: 'Teléfono demasiado largo' } })}
+                  {...register('telefono', {
+                    maxLength: {
+                      value: 30,
+                      message: 'Teléfono demasiado largo',
+                    },
+                  })}
                 />
-                {errors.telefono && <p className={styles.fieldError}>{errors.telefono.message}</p>}
+                {errors.telefono && (
+                  <p className={styles.fieldError}>{errors.telefono.message}</p>
+                )}
               </div>
 
               <div className={styles.row}>
                 <label className={styles.label}>Ciudad</label>
-                <input className={styles.input} {...register('ciudad', { required: 'Ingrese la ciudad' })} />
-                {errors.ciudad && <p className={styles.fieldError}>{errors.ciudad.message}</p>}
+                <input
+                  className={styles.input}
+                  {...register('ciudad', { required: 'Ingrese la ciudad' })}
+                />
+                {errors.ciudad && (
+                  <p className={styles.fieldError}>{errors.ciudad.message}</p>
+                )}
               </div>
 
               <div className={styles.row}>
@@ -223,7 +315,11 @@ export default function PostulacionPage() {
                 <Controller
                   control={control}
                   name="especialidades"
-                  rules={{ validate: v => (Array.isArray(v) && v.length > 0) || 'Indique al menos una especialidad' }}
+                  rules={{
+                    validate: (v) =>
+                      (Array.isArray(v) && v.length > 0) ||
+                      'Indique al menos una especialidad',
+                  }}
                   render={({ field }) => (
                     <ChipsInput
                       value={field.value}
@@ -232,46 +328,101 @@ export default function PostulacionPage() {
                     />
                   )}
                 />
-                {errors.especialidades && <p className={styles.fieldError}>{errors.especialidades.message}</p>}
+                {errors.especialidades && (
+                  <p className={styles.fieldError}>
+                    {errors.especialidades.message}
+                  </p>
+                )}
               </div>
 
               <div className={styles.row}>
                 <label className={styles.label}>Registro profesional</label>
-                <input className={styles.input} {...register('registroProfesional')} placeholder="Ej: PSI-12345" />
+                <input
+                  className={styles.input}
+                  {...register('registroProfesional')}
+                  placeholder="Ej: PSI-12345"
+                />
               </div>
 
               <div className={styles.row}>
                 <label className={styles.label}>Institución del título</label>
-                <input className={styles.input} {...register('institucionTitulo')} placeholder="Ej: Universidad de Chile" />
+                <input
+                  className={styles.input}
+                  {...register('institucionTitulo')}
+                  placeholder="Ej: Universidad de Chile"
+                />
               </div>
 
               <div className={styles.row}>
                 <label className={styles.label}>Años de experiencia</label>
-                <input className={styles.input} type="number" min="0" {...register('experienciaAnios', {
-                  valueAsNumber: true,
-                  validate: value => (value === '' || value === undefined || (Number.isFinite(Number(value)) && Number(value) >= 0)) || 'Valor inválido'
-                })} />
-                {errors.experienciaAnios && <p className={styles.fieldError}>{errors.experienciaAnios.message}</p>}
+                <input
+                  className={styles.input}
+                  type="number"
+                  min="0"
+                  {...register('experienciaAnios', {
+                    valueAsNumber: true,
+                    validate: (value) =>
+                      value === '' ||
+                      value === undefined ||
+                      (Number.isFinite(Number(value)) && Number(value) >= 0) ||
+                      'Valor inválido',
+                  })}
+                />
+                {errors.experienciaAnios && (
+                  <p className={styles.fieldError}>
+                    {errors.experienciaAnios.message}
+                  </p>
+                )}
               </div>
 
               <div className={styles.row}>
                 <label className={styles.label}>
-                  <input type="checkbox" {...register('disponible')} defaultChecked /> Disponible para atención
+                  <input
+                    type="checkbox"
+                    {...register('disponible')}
+                    defaultChecked
+                  />{' '}
+                  Disponible para atención
                 </label>
               </div>
 
               <div className={styles.row}>
                 <label className={styles.label}>Carta de motivación</label>
-                <textarea className={styles.textarea} rows="6" {...register('cartaMotivacion', { required: 'Escribe una carta de motivación', minLength: { value: 20, message: 'Escribe al menos 20 caracteres' } })} />
-                {errors.cartaMotivacion && <p className={styles.fieldError}>{errors.cartaMotivacion.message}</p>}
+                <textarea
+                  className={styles.textarea}
+                  rows="6"
+                  {...register('cartaMotivacion', {
+                    required: 'Escribe una carta de motivación',
+                    minLength: {
+                      value: 20,
+                      message: 'Escribe al menos 20 caracteres',
+                    },
+                  })}
+                />
+                {errors.cartaMotivacion && (
+                  <p className={styles.fieldError}>
+                    {errors.cartaMotivacion.message}
+                  </p>
+                )}
               </div>
 
               <div className={styles.actions}>
-                <button type="button" className={styles.btnGhost} onClick={() => { setPreviewData(getValues()); setPreviewOpen(true); }}>
+                <button
+                  type="button"
+                  className={styles.btnGhost}
+                  onClick={() => {
+                    setPreviewData(getValues());
+                    setPreviewOpen(true);
+                  }}
+                >
                   Previsualizar
                 </button>
 
-                <button type="submit" className={styles.btnPrimary} disabled={submitting}>
+                <button
+                  type="submit"
+                  className={styles.btnPrimary}
+                  disabled={submitting}
+                >
                   {submitting ? 'Enviando…' : 'Enviar postulación'}
                 </button>
               </div>
@@ -289,7 +440,13 @@ export default function PostulacionPage() {
           </div>
         </div>
 
-        <PreviewModal open={previewOpen} onClose={() => setPreviewOpen(false)} data={previewData || {}} onConfirm={handleConfirmSend} loading={submitting} />
+        <PreviewModal
+          open={previewOpen}
+          onClose={() => setPreviewOpen(false)}
+          data={previewData || {}}
+          onConfirm={handleConfirmSend}
+          loading={submitting}
+        />
       </main>
     </>
   );

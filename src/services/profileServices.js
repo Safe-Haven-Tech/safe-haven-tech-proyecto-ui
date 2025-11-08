@@ -1,4 +1,3 @@
-
 /**
  * Cliente HTTP para operaciones de perfil de usuario.
  * Entorno: Vite (import.meta.env.VITE_API_URL).
@@ -51,9 +50,15 @@ const parseResponse = async (res) => {
  * @param {string} defaultMessage
  * @throws {Error}
  */
-const handleErrorResponse = async (res, defaultMessage = 'Error en la petición') => {
+const handleErrorResponse = async (
+  res,
+  defaultMessage = 'Error en la petición'
+) => {
   const body = await parseResponse(res).catch(() => null);
-  const message = (body && (body.detalles || body.error || body.message)) || defaultMessage || `HTTP ${res.status}`;
+  const message =
+    (body && (body.detalles || body.error || body.message)) ||
+    defaultMessage ||
+    `HTTP ${res.status}`;
   const err = new Error(message);
   err.status = res.status;
   err.body = body;
@@ -86,7 +91,6 @@ export const fetchUsuarioPublico = async (nickname, token = null) => {
     const data = await parseResponse(res);
     return data?.usuario ?? null;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('fetchUsuarioPublico error:', error.message || error);
     throw error;
   }
@@ -108,12 +112,12 @@ export const fetchUsuarioCompleto = async (id, token) => {
       headers: { ...buildHeaders(token, true), 'Cache-Control': 'no-cache' },
     });
 
-    if (!res.ok) await handleErrorResponse(res, 'Error al obtener datos del usuario');
+    if (!res.ok)
+      await handleErrorResponse(res, 'Error al obtener datos del usuario');
 
     const data = await parseResponse(res);
     return data?.usuario ?? null;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('fetchUsuarioCompleto error:', error.message || error);
     throw error;
   }
@@ -135,7 +139,6 @@ export const verificarNickname = async (nickname) => {
     const data = await parseResponse(res);
     return Boolean(data?.disponible);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('verificarNickname error:', error.message || error);
     return false;
   }
@@ -153,22 +156,27 @@ export const actualizarPerfil = async (id, data, token, esFormData = false) => {
   if (!id) throw new Error('ID requerido');
 
   try {
-    const res = await fetch(`${API_URL}/api/usuarios/${encodeURIComponent(id)}`, {
-      method: 'PUT',
-      headers: buildHeaders(token, !esFormData),
-      body: esFormData ? data : JSON.stringify(data),
-    });
+    const res = await fetch(
+      `${API_URL}/api/usuarios/${encodeURIComponent(id)}`,
+      {
+        method: 'PUT',
+        headers: buildHeaders(token, !esFormData),
+        body: esFormData ? data : JSON.stringify(data),
+      }
+    );
 
     const parsed = await parseResponse(res);
     if (!res.ok) {
       const message =
-        parsed?.detalles?.join?.(', ') || parsed?.error || parsed?.message || 'Error al actualizar el perfil';
+        parsed?.detalles?.join?.(', ') ||
+        parsed?.error ||
+        parsed?.message ||
+        'Error al actualizar el perfil';
       throw new Error(message);
     }
 
     return parsed ?? {};
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('actualizarPerfil error:', error.message || error);
     throw error;
   }
@@ -193,7 +201,6 @@ export const renovarToken = async (refreshToken) => {
 
     return await parseResponse(res);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('renovarToken error:', error.message || error);
     throw error;
   }
@@ -224,7 +231,6 @@ export const toggleSeguirUsuario = async (usuarioId, token) => {
 
     return await parseResponse(res);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('toggleSeguirUsuario error:', error.message || error);
     throw error;
   }
@@ -243,7 +249,6 @@ export const getUsuarioActual = () => {
     if (payload.exp && payload.exp < Date.now() / 1000) return null;
     return payload;
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error('getUsuarioActual error:', err.message || err);
     return null;
   }
@@ -262,8 +267,13 @@ export const isTokenValid = () => Boolean(getUsuarioActual());
  * @param {string} token
  * @returns {Promise<Object>}
  */
-export const cambiarContraseña = async (contraseñaActual, nuevaContraseña, token) => {
-  if (!contraseñaActual || !nuevaContraseña) throw new Error('Datos de contraseña incompletos');
+export const cambiarContraseña = async (
+  contraseñaActual,
+  nuevaContraseña,
+  token
+) => {
+  if (!contraseñaActual || !nuevaContraseña)
+    throw new Error('Datos de contraseña incompletos');
 
   try {
     const res = await fetch(`${API_URL}/api/auth/cambiar-contrasena`, {
@@ -278,7 +288,6 @@ export const cambiarContraseña = async (contraseñaActual, nuevaContraseña, to
     }
     return parsed;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('cambiarContraseña error:', error.message || error);
     throw error;
   }
@@ -295,20 +304,25 @@ export const eliminarCuenta = async (id, contraseña, token) => {
   if (!id || !contraseña) throw new Error('ID y contraseña requeridos');
 
   try {
-    const res = await fetch(`${API_URL}/api/usuarios/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: buildHeaders(token, true),
-      body: JSON.stringify({ contraseña }),
-    });
+    const res = await fetch(
+      `${API_URL}/api/usuarios/${encodeURIComponent(id)}`,
+      {
+        method: 'DELETE',
+        headers: buildHeaders(token, true),
+        body: JSON.stringify({ contraseña }),
+      }
+    );
 
     const parsed = await parseResponse(res);
     if (!res.ok) {
-      const message = parsed?.detalles?.join?.(', ') || parsed?.error || `Error ${res.status}`;
+      const message =
+        parsed?.detalles?.join?.(', ') ||
+        parsed?.error ||
+        `Error ${res.status}`;
       throw new Error(message);
     }
     return parsed;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('eliminarCuenta error:', error.message || error);
     throw error;
   }
@@ -325,20 +339,25 @@ export const actualizarConfiguracion = async (id, configuracion, token) => {
   if (!id) throw new Error('ID requerido');
 
   try {
-    const res = await fetch(`${API_URL}/api/usuarios/${encodeURIComponent(id)}`, {
-      method: 'PUT',
-      headers: buildHeaders(token, true),
-      body: JSON.stringify(configuracion),
-    });
+    const res = await fetch(
+      `${API_URL}/api/usuarios/${encodeURIComponent(id)}`,
+      {
+        method: 'PUT',
+        headers: buildHeaders(token, true),
+        body: JSON.stringify(configuracion),
+      }
+    );
 
     const parsed = await parseResponse(res);
     if (!res.ok) {
-      const message = parsed?.detalles?.join?.(', ') || parsed?.error || 'Error al actualizar configuración';
+      const message =
+        parsed?.detalles?.join?.(', ') ||
+        parsed?.error ||
+        'Error al actualizar configuración';
       throw new Error(message);
     }
     return parsed;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('actualizarConfiguracion error:', error.message || error);
     throw error;
   }
@@ -357,7 +376,8 @@ export const fetchPostsPerfilByUserId = async (userId, token = null) => {
 
   try {
     const res = await fetch(url, { headers: buildHeaders(token, true) });
-    if (!res.ok) await handleErrorResponse(res, 'Error al obtener posts de perfil');
+    if (!res.ok)
+      await handleErrorResponse(res, 'Error al obtener posts de perfil');
 
     const data = await parseResponse(res);
     return data?.posts ?? [];

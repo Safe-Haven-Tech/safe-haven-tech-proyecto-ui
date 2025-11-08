@@ -1,4 +1,3 @@
-
 /**
  * Servicios HTTP para encuestas.
  * Entorno: Vite (import.meta.env.VITE_API_URL).
@@ -42,14 +41,17 @@ const parseResponse = async (res) => {
  */
 export const fetchEncuestaById = async (id) => {
   try {
-    const res = await fetch(`${API_URL}/api/encuestas/${encodeURIComponent(id)}`);
+    const res = await fetch(
+      `${API_URL}/api/encuestas/${encodeURIComponent(id)}`
+    );
     const data = await parseResponse(res);
 
     if (res.status === 404) {
       return {
         encuesta: null,
         status: 404,
-        mensaje: (data && (data.detalles || data.mensaje)) || 'Encuesta no encontrada',
+        mensaje:
+          (data && (data.detalles || data.mensaje)) || 'Encuesta no encontrada',
       };
     }
 
@@ -57,7 +59,9 @@ export const fetchEncuestaById = async (id) => {
       return {
         encuesta: null,
         status: 400,
-        mensaje: (data && (data.detalles || data.mensaje)) || 'La encuesta no está activa',
+        mensaje:
+          (data && (data.detalles || data.mensaje)) ||
+          'La encuesta no está activa',
       };
     }
 
@@ -65,14 +69,20 @@ export const fetchEncuestaById = async (id) => {
       return {
         encuesta: null,
         status: res.status,
-        mensaje: (data && (data.detalles || data.mensaje)) || 'Error al obtener la encuesta',
+        mensaje:
+          (data && (data.detalles || data.mensaje)) ||
+          'Error al obtener la encuesta',
       };
     }
 
-    return { encuesta: data?.encuesta ?? null, status: 200, mensaje: data?.mensaje ?? '' };
+    return {
+      encuesta: data?.encuesta ?? null,
+      status: 200,
+      mensaje: data?.mensaje ?? '',
+    };
   } catch (error) {
     // Registro mínimo para depuración local; no exponer datos sensibles.
-    
+
     console.error('fetchEncuestaById:', error);
     return {
       encuesta: null,
@@ -93,7 +103,11 @@ export const fetchEncuestaById = async (id) => {
  * @returns {Promise<Blob>}
  * @throws {Error}
  */
-export const completarEncuesta = async (encuestaId, respuestas, token = null) => {
+export const completarEncuesta = async (
+  encuestaId,
+  respuestas,
+  token = null
+) => {
   try {
     const res = await fetch(
       `${API_URL}/api/encuestas/${encodeURIComponent(encuestaId)}/completar`,
@@ -107,13 +121,13 @@ export const completarEncuesta = async (encuestaId, respuestas, token = null) =>
     if (!res.ok) {
       const errorData = await parseResponse(res).catch(() => ({}));
       throw new Error(
-        (errorData && (errorData.detalles || errorData.mensaje)) || 'Error al completar la encuesta'
+        (errorData && (errorData.detalles || errorData.mensaje)) ||
+          'Error al completar la encuesta'
       );
     }
 
     return await res.blob();
   } catch (error) {
-   
     console.error('completarEncuesta:', error);
     throw error;
   }
@@ -132,7 +146,6 @@ export const fetchEncuestas = async () => {
     const data = await res.json();
     return data.encuestas || [];
   } catch (error) {
-   
     console.error('fetchEncuestas:', error);
     throw error;
   }
@@ -159,7 +172,9 @@ export const obtenerHistorialRespuestas = async (token, filtros = {}) => {
     if (!res.ok) {
       return {
         success: false,
-        mensaje: (data && (data.detalles || data.mensaje)) || 'Error al obtener historial',
+        mensaje:
+          (data && (data.detalles || data.mensaje)) ||
+          'Error al obtener historial',
       };
     }
 
@@ -201,7 +216,9 @@ export const getMisRespuestas = async (token, filtros = {}) => {
     if (!res.ok) {
       return {
         success: false,
-        mensaje: (data && (data.detalles || data.mensaje)) || 'Error al obtener respuestas del usuario',
+        mensaje:
+          (data && (data.detalles || data.mensaje)) ||
+          'Error al obtener respuestas del usuario',
         respuestas: [],
       };
     }
@@ -258,7 +275,10 @@ export const crearEncuesta = async (encuesta, token) => {
     });
     const data = await parseResponse(res);
     if (!res.ok) {
-      throw new Error((data && (data.detalles || data.mensaje)) || 'Error al crear la encuesta');
+      throw new Error(
+        (data && (data.detalles || data.mensaje)) ||
+          'Error al crear la encuesta'
+      );
     }
     return data.encuesta;
   } catch (error) {
@@ -283,7 +303,8 @@ export const desactivarEncuesta = async (encuestaId, token) => {
       }
     );
     const data = await parseResponse(res);
-    if (!res.ok) throw new Error((data && data.mensaje) || 'Error al desactivar encuesta');
+    if (!res.ok)
+      throw new Error((data && data.mensaje) || 'Error al desactivar encuesta');
     return { success: true, encuesta: data.encuesta };
   } catch (error) {
     console.error('desactivarEncuesta:', error);
@@ -299,12 +320,16 @@ export const desactivarEncuesta = async (encuestaId, token) => {
  */
 export const eliminarEncuesta = async (encuestaId, token) => {
   try {
-    const res = await fetch(`${API_URL}/api/encuestas/${encodeURIComponent(encuestaId)}`, {
-      method: 'DELETE',
-      headers: buildHeaders(token, true),
-    });
+    const res = await fetch(
+      `${API_URL}/api/encuestas/${encodeURIComponent(encuestaId)}`,
+      {
+        method: 'DELETE',
+        headers: buildHeaders(token, true),
+      }
+    );
     const data = await parseResponse(res);
-    if (!res.ok) throw new Error((data && data.mensaje) || 'Error al eliminar encuesta');
+    if (!res.ok)
+      throw new Error((data && data.mensaje) || 'Error al eliminar encuesta');
     return { success: true };
   } catch (error) {
     console.error('eliminarEncuesta:', error);
@@ -320,12 +345,16 @@ export const eliminarEncuesta = async (encuestaId, token) => {
  */
 export const activarEncuesta = async (encuestaId, token) => {
   try {
-    const res = await fetch(`${API_URL}/api/encuestas/${encodeURIComponent(encuestaId)}/activar`, {
-      method: 'PUT',
-      headers: buildHeaders(token, true),
-    });
+    const res = await fetch(
+      `${API_URL}/api/encuestas/${encodeURIComponent(encuestaId)}/activar`,
+      {
+        method: 'PUT',
+        headers: buildHeaders(token, true),
+      }
+    );
     const data = await parseResponse(res);
-    if (!res.ok) throw new Error((data && data.mensaje) || 'Error al activar encuesta');
+    if (!res.ok)
+      throw new Error((data && data.mensaje) || 'Error al activar encuesta');
     return { success: true, encuesta: data.encuesta };
   } catch (error) {
     console.error('activarEncuesta:', error);
@@ -342,13 +371,17 @@ export const activarEncuesta = async (encuestaId, token) => {
  */
 export const actualizarEncuesta = async (encuestaId, datos, token) => {
   try {
-    const res = await fetch(`${API_URL}/api/encuestas/${encodeURIComponent(encuestaId)}`, {
-      method: 'PUT',
-      headers: buildHeaders(token, true),
-      body: JSON.stringify(datos),
-    });
+    const res = await fetch(
+      `${API_URL}/api/encuestas/${encodeURIComponent(encuestaId)}`,
+      {
+        method: 'PUT',
+        headers: buildHeaders(token, true),
+        body: JSON.stringify(datos),
+      }
+    );
     const data = await parseResponse(res);
-    if (!res.ok) throw new Error((data && data.mensaje) || 'Error al actualizar encuesta');
+    if (!res.ok)
+      throw new Error((data && data.mensaje) || 'Error al actualizar encuesta');
     return { success: true, encuesta: data.encuesta };
   } catch (error) {
     console.error('actualizarEncuesta:', error);

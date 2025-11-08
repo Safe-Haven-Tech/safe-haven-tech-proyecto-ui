@@ -136,14 +136,16 @@ export const useEditarPerfil = () => {
 
       const tokens = await renovarToken(refreshToken);
       // tokens puede venir con distintas keys; manejar varios casos
-      if (tokens?.accessToken) localStorage.setItem('token', tokens.accessToken);
-      else if (tokens?.nuevoToken) localStorage.setItem('token', tokens.nuevoToken);
-      if (tokens?.refreshToken) localStorage.setItem('refreshToken', tokens.refreshToken);
+      if (tokens?.accessToken)
+        localStorage.setItem('token', tokens.accessToken);
+      else if (tokens?.nuevoToken)
+        localStorage.setItem('token', tokens.nuevoToken);
+      if (tokens?.refreshToken)
+        localStorage.setItem('refreshToken', tokens.refreshToken);
 
       window.dispatchEvent(new Event('tokenChanged'));
       return true;
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('handleTokenInvalidation error:', error?.message || error);
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
@@ -170,7 +172,6 @@ export const useEditarPerfil = () => {
       const usuario = await fetchUsuarioCompleto(userId, token);
       dispatch({ type: 'SET_USUARIO', usuario });
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('fetchUsuario error:', error?.message || error);
 
       const msg = String(error?.message || '').toLowerCase();
@@ -187,7 +188,6 @@ export const useEditarPerfil = () => {
               dispatch({ type: 'SET_USUARIO', usuario });
               return;
             } catch (err) {
-              // eslint-disable-next-line no-console
               console.error('fetchUsuario retry error:', err?.message || err);
             }
           }
@@ -207,72 +207,83 @@ export const useEditarPerfil = () => {
   }, [fetchUsuario]);
 
   // Handler para seleccionar imagen
-  const handleImagenSeleccionada = useCallback((event) => {
-    const archivo = event?.target?.files?.[0];
-    if (!archivo) return;
+  const handleImagenSeleccionada = useCallback(
+    (event) => {
+      const archivo = event?.target?.files?.[0];
+      if (!archivo) return;
 
-    // Validar tipo
-    const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png'];
-    if (!tiposPermitidos.includes(archivo.type)) {
-      dispatch({
-        type: 'SET_ERROR',
-        error: 'Solo se permiten imágenes JPG o PNG',
-      });
-      return;
-    }
-
-    // Validar tamaño (2MB máximo)
-    const maxSize = 2 * 1024 * 1024;
-    if (archivo.size > maxSize) {
-      dispatch({ type: 'SET_ERROR', error: 'La imagen no puede superar 2MB' });
-      return;
-    }
-
-    dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.src = e.target.result;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxDim = 300; // ancho/alto máximo para preview
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height && width > maxDim) {
-          height *= maxDim / width;
-          width = maxDim;
-        } else if (height >= width && height > maxDim) {
-          width *= maxDim / height;
-          height = maxDim;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
+      // Validar tipo
+      const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!tiposPermitidos.includes(archivo.type)) {
         dispatch({
-          type: 'SET_IMAGEN_SELECCIONADA',
-          imagen: archivo,
-          previsualizacion: canvas.toDataURL('image/png'),
+          type: 'SET_ERROR',
+          error: 'Solo se permiten imágenes JPG o PNG',
         });
+        return;
+      }
 
-        // Sincroniza los datos del formulario para el PreviewCard
+      // Validar tamaño (2MB máximo)
+      const maxSize = 2 * 1024 * 1024;
+      if (archivo.size > maxSize) {
         dispatch({
-          type: 'SET_FORM_DATA',
-          payload: {
-            nombreCompleto: state.nombreCompleto,
-            nombreUsuario: state.nombreUsuario,
-            biografia: state.biografia,
-            pronombres: state.pronombres,
-          },
+          type: 'SET_ERROR',
+          error: 'La imagen no puede superar 2MB',
         });
+        return;
+      }
+
+      dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 300; // ancho/alto máximo para preview
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height && width > maxDim) {
+            height *= maxDim / width;
+            width = maxDim;
+          } else if (height >= width && height > maxDim) {
+            width *= maxDim / height;
+            height = maxDim;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          dispatch({
+            type: 'SET_IMAGEN_SELECCIONADA',
+            imagen: archivo,
+            previsualizacion: canvas.toDataURL('image/png'),
+          });
+
+          // Sincroniza los datos del formulario para el PreviewCard
+          dispatch({
+            type: 'SET_FORM_DATA',
+            payload: {
+              nombreCompleto: state.nombreCompleto,
+              nombreUsuario: state.nombreUsuario,
+              biografia: state.biografia,
+              pronombres: state.pronombres,
+            },
+          });
+        };
       };
-    };
-    reader.readAsDataURL(archivo);
-  }, [state.nombreCompleto, state.nombreUsuario, state.biografia, state.pronombres]);
+      reader.readAsDataURL(archivo);
+    },
+    [
+      state.nombreCompleto,
+      state.nombreUsuario,
+      state.biografia,
+      state.pronombres,
+    ]
+  );
 
   // Eliminar imagen seleccionada
   const eliminarImagenSeleccionada = useCallback(() => {
@@ -332,18 +343,24 @@ export const useEditarPerfil = () => {
       );
 
       // Guardar tokens si vienen
-      if (resultado?.accessToken) localStorage.setItem('token', resultado.accessToken);
-      if (resultado?.refreshToken) localStorage.setItem('refreshToken', resultado.refreshToken);
-      if (resultado?.nuevoToken) localStorage.setItem('token', resultado.nuevoToken);
+      if (resultado?.accessToken)
+        localStorage.setItem('token', resultado.accessToken);
+      if (resultado?.refreshToken)
+        localStorage.setItem('refreshToken', resultado.refreshToken);
+      if (resultado?.nuevoToken)
+        localStorage.setItem('token', resultado.nuevoToken);
 
       // Actualizar contexto de auth si es necesario
-      const tokenParaDecodificar = resultado?.accessToken ?? resultado?.nuevoToken ?? token;
+      const tokenParaDecodificar =
+        resultado?.accessToken ?? resultado?.nuevoToken ?? token;
       try {
         const nuevoDecoded = parseJwt(tokenParaDecodificar);
         if (nuevoDecoded && actualizarUsuario) actualizarUsuario(nuevoDecoded);
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('Decodificar token tras actualizar perfil error:', err?.message || err);
+        console.error(
+          'Decodificar token tras actualizar perfil error:',
+          err?.message || err
+        );
       }
 
       dispatch({
@@ -354,7 +371,9 @@ export const useEditarPerfil = () => {
       const usuarioActualizado = {
         ...state.usuario,
         ...(resultado.usuario || {}),
-        fotoPerfil: state.fotoEliminada ? null : (resultado.usuario?.fotoPerfil ?? state.usuario?.fotoPerfil),
+        fotoPerfil: state.fotoEliminada
+          ? null
+          : (resultado.usuario?.fotoPerfil ?? state.usuario?.fotoPerfil),
       };
 
       dispatch({
@@ -378,7 +397,6 @@ export const useEditarPerfil = () => {
         }, 1200);
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('handleGuardar error:', error?.message || error);
 
       const status = error?.status ?? null;
@@ -390,7 +408,11 @@ export const useEditarPerfil = () => {
         });
       } else if (body && (body.message || body.mensaje)) {
         dispatch({ type: 'SET_ERROR', error: body.message || body.mensaje });
-      } else if (String(error?.message || '').toLowerCase().includes('nickname')) {
+      } else if (
+        String(error?.message || '')
+          .toLowerCase()
+          .includes('nickname')
+      ) {
         dispatch({
           type: 'SET_ERROR',
           error: 'El nickname no está disponible',

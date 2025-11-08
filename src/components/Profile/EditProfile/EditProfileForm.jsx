@@ -17,7 +17,6 @@ const EditarPerfilForm = React.memo(
   }) => {
     const navigate = useNavigate();
 
-    // Inicializar el hook de validación con los datos del usuario
     const {
       formData,
       updateField,
@@ -134,14 +133,9 @@ const EditarPerfilForm = React.memo(
       [isFieldValidating, isFieldValid, validatingNickname]
     );
 
-    // NUEVO: Permitir guardar si hay cambios en la imagen o se eliminó la foto
-    const hasImageChange =
-      state.previsualizacionImagen ||
-      state.fotoEliminada;
+    const hasImageChange = state.previsualizacionImagen || state.fotoEliminada;
 
-    const canSave =
-      hasChanges() ||
-      hasImageChange;
+    const canSave = hasChanges() || hasImageChange;
 
     return (
       <div
@@ -360,20 +354,14 @@ const EditarPerfilForm = React.memo(
           className="btn btn-success w-100 py-2 fw-semibold"
           onClick={confirmarGuardado}
           disabled={
-            state.cargando ||
-            validatingNickname ||
-            !isFormValid ||
-            !canSave
+            state.cargando || validatingNickname || !isFormValid || !canSave
           }
           style={{
             borderRadius: '14px',
             boxShadow: '0 6px 18px rgba(34,197,94,0.3)',
             transition: 'transform 0.2s, box-shadow 0.2s',
             opacity:
-              state.cargando ||
-              validatingNickname ||
-              !isFormValid ||
-              !canSave
+              state.cargando || validatingNickname || !isFormValid || !canSave
                 ? 0.7
                 : 1,
           }}

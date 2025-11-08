@@ -5,8 +5,8 @@
   --bg: #fff;
   --muted: #8a8a8a;
   --text: #334155;
-  --shadow: rgba(96,60,126,0.13);
-  --shadow-soft: rgba(96,60,126,0.07);
+  --shadow: rgba(96, 60, 126, 0.13);
+  --shadow-soft: rgba(96, 60, 126, 0.07);
   --danger: #d32f2f;
   --radius-lg: 18px;
   --radius-md: 14px;
@@ -66,7 +66,9 @@
   box-shadow: 0 2px 8px var(--shadow);
   opacity: 0.92;
   z-index: 2;
-  transition: background 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s;
   font-size: 1.3rem;
   display: inline-flex;
   align-items: center;
@@ -78,8 +80,12 @@
   transform: scale(1.08) translateY(-50%);
   outline: none;
 }
-.carruselBtnLeft { left: 12px; }
-.carruselBtnRight { right: 12px; }
+.carruselBtnLeft {
+  left: 12px;
+}
+.carruselBtnRight {
+  right: 12px;
+}
 
 .carruselIndicators {
   position: absolute;
@@ -99,7 +105,9 @@
   display: inline-block;
   transition: background 0.2s;
 }
-.carruselIndicatorActive { background: var(--primary); }
+.carruselIndicatorActive {
+  background: var(--primary);
+}
 
 /* -----------------------
    Autor / encabezado card
@@ -194,7 +202,9 @@
   font-size: 0.95rem;
   color: var(--primary);
 }
-.comentarioMenuEliminar { color: var(--danger); }
+.comentarioMenuEliminar {
+  color: var(--danger);
+}
 
 .comentarioMenuEliminar:hover,
 .comentarioMenuDenunciar:hover,
@@ -215,7 +225,11 @@
   border-radius: 6px;
 }
 .comentarioMenuBtn:hover,
-.comentarioMenuBtn:focus-visible { background: #ede7f6; color: #8e44ad; outline: none; }
+.comentarioMenuBtn:focus-visible {
+  background: #ede7f6;
+  color: #8e44ad;
+  outline: none;
+}
 
 /* -----------------------
    Estadísticas (likes/comentarios)
@@ -240,13 +254,16 @@
   padding: 10px 24px;
   margin-right: 0;
   box-shadow: 0 2px 8px var(--shadow);
-  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
   cursor: pointer;
 }
 .cardLikes:hover,
 .cardLikes:focus-visible {
   background: var(--primary-dark);
-  box-shadow: 0 6px 20px rgba(96,60,126,0.17);
+  box-shadow: 0 6px 20px rgba(96, 60, 126, 0.17);
   transform: scale(1.05);
   outline: none;
 }
@@ -294,14 +311,19 @@
   margin-right: auto;
   background: #f6f2fa;
   border-radius: var(--radius-md);
-  box-shadow: 0 1px 8px rgba(96,60,126,0.09);
+  box-shadow: 0 1px 8px rgba(96, 60, 126, 0.09);
   padding: 16px 22px;
   margin-bottom: 18px;
   display: flex;
   flex-direction: column;
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
 }
-.comentarioCard:hover { box-shadow: 0 6px 20px rgba(96,60,126,0.13); transform: scale(1.01); }
+.comentarioCard:hover {
+  box-shadow: 0 6px 20px rgba(96, 60, 126, 0.13);
+  transform: scale(1.01);
+}
 
 .comentarioAutorImg {
   width: 32px;
@@ -349,7 +371,9 @@
   border-radius: 0 10px 10px 0;
   font-weight: 700;
   font-size: 1.05rem;
-  transition: background 0.2s, transform 0.2s;
+  transition:
+    background 0.2s,
+    transform 0.2s;
 }
 .input-group .btn-primary:hover,
 .input-group .btn-primary:focus-visible {
@@ -361,7 +385,10 @@
 /* -----------------------
    Menú contextual (tres puntos)
    ----------------------- */
-.cardMenuWrapper { position: relative; margin-left: 10px; }
+.cardMenuWrapper {
+  position: relative;
+  margin-left: 10px;
+}
 
 .cardMenuBtn {
   background: transparent;
@@ -371,10 +398,16 @@
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 6px;
-  transition: background 0.18s, color 0.18s;
+  transition:
+    background 0.18s,
+    color 0.18s;
 }
 .cardMenuBtn:hover,
-.cardMenuBtn:focus-visible { background: #ede7f6; color: #8e44ad; outline: none; }
+.cardMenuBtn:focus-visible {
+  background: #ede7f6;
+  color: #8e44ad;
+  outline: none;
+}
 
 .cardMenu {
   position: absolute;
@@ -415,14 +448,24 @@
 }
 
 /* Variante "Eliminar" en color de alerta */
-.cardMenuButtonDanger { color: var(--danger); }
+.cardMenuButtonDanger {
+  color: var(--danger);
+}
 
-.cardMenuButtonText { color: inherit; }
+.cardMenuButtonText {
+  color: inherit;
+}
 
 /* Animación */
 @keyframes fadeInMenu {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* -----------------------
@@ -431,7 +474,7 @@
 /* Mejora de foco para usuarios de teclado */
 button:focus-visible,
 a:focus-visible {
-  outline: 3px solid rgba(96,60,126,0.15);
+  outline: 3px solid rgba(96, 60, 126, 0.15);
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -445,5 +488,90 @@ a:focus-visible {
     min-height: 160px;
   }
 
-  .cardContainer { padding: 24px 18px; }
+  .cardContainer {
+    padding: 24px 18px;
+  }
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.42);
+  z-index: 1050;
+  padding: 20px;
+}
+
+.modalCard {
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 20px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.24);
+  animation: modalPop 0.16s ease-out;
+  outline: none;
+}
+
+/* Título / mensaje / acciones del modal */
+.modalTitle {
+  margin: 0 0 8px 0;
+  font-size: 1.15rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.modalMessage {
+  margin: 0 0 16px 0;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.modalActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Animación de aparición */
+@keyframes modalPop {
+  from {
+    transform: translateY(-8px) scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Toast básico (usado por el componente Toast en el fichero) */
+.toastContainer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1200;
+}
+
+.toast {
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(96, 60, 126, 0.18);
+  font-weight: 600;
+  min-width: 180px;
+  text-align: center;
+}
+
+/* Ajustes móviles */
+@media (max-width: 576px) {
+  .modalCard {
+    max-width: 96%;
+    padding: 16px;
+    border-radius: 12px;
+  }
 }

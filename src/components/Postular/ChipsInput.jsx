@@ -3,16 +3,22 @@ import styles from '../../pages/profesionals/Postulacion.module.css';
 
 function arraysEqual(a = [], b = []) {
   if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) if (String(a[i]) !== String(b[i])) return false;
+  for (let i = 0; i < a.length; i++)
+    if (String(a[i]) !== String(b[i])) return false;
   return true;
 }
 
-export default function ChipsInput({ value = [], onChange = () => {}, placeholder = '', max = 50, disabled = false }) {
+export default function ChipsInput({
+  value = [],
+  onChange = () => {},
+  placeholder = '',
+  max = 50,
+  disabled = false,
+}) {
   const [tags, setTags] = useState(Array.isArray(value) ? value.slice() : []);
   const [input, setInput] = useState('');
   const inputRef = useRef(null);
 
- 
   useEffect(() => {
     const incoming = Array.isArray(value) ? value.slice() : [];
     if (!arraysEqual(incoming, tags)) {
@@ -22,27 +28,31 @@ export default function ChipsInput({ value = [], onChange = () => {}, placeholde
   }, [value]);
 
   const flushOnChange = (next) => {
-    // Llamada diferida para evitar actualizar padre durante el render del child
     Promise.resolve().then(() => {
-      try { onChange(next); } catch (e) { }
+      try {
+        onChange(next);
+      } catch (e) {}
     });
   };
 
   const addTag = (raw) => {
     const text = String(raw || '').trim();
     if (!text) return;
-    const parts = text.split(',').map(p => p.trim()).filter(Boolean);
+    const parts = text
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean);
     if (!parts.length) return;
 
-    setTags(prev => {
+    setTags((prev) => {
       const next = [...prev];
       for (const p of parts) {
         if (next.length >= max) break;
         if (!next.includes(p)) next.push(p);
       }
-      // notificar padre de forma diferida
       flushOnChange(next);
-      if (process.env.NODE_ENV !== 'production') console.debug('ChipsInput added tags:', parts, '=>', next);
+      if (process.env.NODE_ENV !== 'production')
+        console.debug('ChipsInput added tags:', parts, '=>', next);
       return next;
     });
 
@@ -51,7 +61,7 @@ export default function ChipsInput({ value = [], onChange = () => {}, placeholde
   };
 
   const removeAt = (index) => {
-    setTags(prev => {
+    setTags((prev) => {
       const next = prev.slice();
       next.splice(index, 1);
       flushOnChange(next);
@@ -87,7 +97,8 @@ export default function ChipsInput({ value = [], onChange = () => {}, placeholde
 
   const handleClick = (e) => {
     const btn = e.target.closest('button');
-    if (btn && btn.classList && btn.classList.contains(styles.chipRemove)) return;
+    if (btn && btn.classList && btn.classList.contains(styles.chipRemove))
+      return;
     if (inputRef.current && !disabled) inputRef.current.focus();
   };
 

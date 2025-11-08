@@ -1,4 +1,3 @@
-
 /**
  * Cliente HTTP para Recursos Informativos.
  * Entorno: Vite (import.meta.env.VITE_API_URL).
@@ -45,7 +44,9 @@ export const fetchRecursoById = async (id) => {
   if (!id) throw new Error('ID requerido');
 
   try {
-    const res = await fetch(`${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}`);
+    const res = await fetch(
+      `${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}`
+    );
     const body = await parseResponse(res);
 
     if (res.status === 404) {
@@ -78,7 +79,6 @@ export const fetchRecursoById = async (id) => {
       mensaje: extractMessage(body) || 'Recurso obtenido exitosamente',
     };
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('fetchRecursoById error:', error.message || error);
     return {
       data: null,
@@ -100,9 +100,11 @@ export const fetchRecursos = async (filtros = {}) => {
     const params = new URLSearchParams();
     if (filtros.pagina) params.append('pagina', String(filtros.pagina));
     if (filtros.limite) params.append('limite', String(filtros.limite));
-    if (filtros.topico && filtros.topico !== 'Todos') params.append('topico', filtros.topico);
+    if (filtros.topico && filtros.topico !== 'Todos')
+      params.append('topico', filtros.topico);
     if (filtros.tipo) params.append('tipo', filtros.tipo);
-    if (filtros.destacado !== undefined) params.append('destacado', String(filtros.destacado));
+    if (filtros.destacado !== undefined)
+      params.append('destacado', String(filtros.destacado));
     if (filtros.busqueda) params.append('busqueda', filtros.busqueda);
 
     const url = `${API_URL}/api/recursos-informativos${params.toString() ? `?${params.toString()}` : ''}`;
@@ -116,7 +118,6 @@ export const fetchRecursos = async (filtros = {}) => {
       paginacion: body?.paginacion ?? {},
     };
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('fetchRecursos error:', error.message || error);
     throw error;
   }
@@ -135,7 +136,6 @@ export const fetchRecursosDestacados = async (limite = 6) => {
     const body = await parseResponse(res);
     return body?.data ?? [];
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('fetchRecursosDestacados error:', error.message || error);
     throw error;
   }
@@ -161,7 +161,6 @@ export const buscarRecursos = async (termino, opciones = {}) => {
     const body = await parseResponse(res);
     return body?.data ?? [];
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('buscarRecursos error:', error.message || error);
     throw error;
   }
@@ -186,7 +185,6 @@ export const fetchRecursosPorTopico = async (topico, opciones = {}) => {
     const body = await parseResponse(res);
     return body?.data ?? [];
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('fetchRecursosPorTopico error:', error.message || error);
     throw error;
   }
@@ -211,7 +209,6 @@ export const fetchRecursosPorTipo = async (tipo, opciones = {}) => {
     const body = await parseResponse(res);
     return body?.data ?? [];
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('fetchRecursosPorTipo error:', error.message || error);
     throw error;
   }
@@ -225,12 +222,13 @@ export const fetchRecursosPorTipo = async (tipo, opciones = {}) => {
  */
 export const fetchTopicosDisponibles = async () => {
   try {
-    const res = await fetch(`${API_URL}/api/recursos-informativos/topicos/disponibles`);
+    const res = await fetch(
+      `${API_URL}/api/recursos-informativos/topicos/disponibles`
+    );
     if (!res.ok) throw new Error('Error al obtener tópicos disponibles');
     const body = await parseResponse(res);
     return body?.data ?? [];
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('fetchTopicosDisponibles error:', error.message || error);
     throw error;
   }
@@ -242,12 +240,13 @@ export const fetchTopicosDisponibles = async () => {
  */
 export const fetchTiposDisponibles = async () => {
   try {
-    const res = await fetch(`${API_URL}/api/recursos-informativos/tipos/disponibles`);
+    const res = await fetch(
+      `${API_URL}/api/recursos-informativos/tipos/disponibles`
+    );
     if (!res.ok) throw new Error('Error al obtener tipos disponibles');
     const body = await parseResponse(res);
     return body?.data ?? [];
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('fetchTiposDisponibles error:', error.message || error);
     throw error;
   }
@@ -259,10 +258,13 @@ export const fetchTiposDisponibles = async () => {
  */
 export const fetchEstadisticas = async () => {
   try {
-    const res = await fetch(`${API_URL}/api/recursos-informativos/estadisticas`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const res = await fetch(
+      `${API_URL}/api/recursos-informativos/estadisticas`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
 
     if (!res.ok) {
       const body = await parseResponse(res).catch(() => null);
@@ -272,7 +274,6 @@ export const fetchEstadisticas = async () => {
     const body = await parseResponse(res);
     return body?.data ?? null;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('fetchEstadisticas error:', error.message || error);
     throw error;
   }
@@ -288,10 +289,13 @@ export const fetchEstadisticas = async () => {
 export const incrementarVisitas = async (id) => {
   if (!id) throw new Error('ID requerido');
   try {
-    const res = await fetch(`${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}/visitas`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const res = await fetch(
+      `${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}/visitas`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
 
     if (!res.ok) {
       const body = await parseResponse(res).catch(() => null);
@@ -300,7 +304,6 @@ export const incrementarVisitas = async (id) => {
 
     return await parseResponse(res);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('incrementarVisitas error:', error.message || error);
     throw error;
   }
@@ -314,10 +317,13 @@ export const incrementarVisitas = async (id) => {
 export const incrementarDescargas = async (id) => {
   if (!id) throw new Error('ID requerido');
   try {
-    const res = await fetch(`${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}/descargas`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const res = await fetch(
+      `${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}/descargas`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
 
     if (!res.ok) {
       const body = await parseResponse(res).catch(() => null);
@@ -326,7 +332,6 @@ export const incrementarDescargas = async (id) => {
 
     return await parseResponse(res);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('incrementarDescargas error:', error.message || error);
     throw error;
   }
@@ -340,14 +345,19 @@ export const incrementarDescargas = async (id) => {
 export const incrementarCompartidos = async (id) => {
   if (!id) throw new Error('ID requerido');
   try {
-    const res = await fetch(`${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}/compartidos`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const res = await fetch(
+      `${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}/compartidos`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
 
     if (!res.ok) {
       const body = await parseResponse(res).catch(() => null);
-      throw new Error(extractMessage(body) || 'Error al incrementar compartidos');
+      throw new Error(
+        extractMessage(body) || 'Error al incrementar compartidos'
+      );
     }
 
     return await parseResponse(res);
@@ -372,14 +382,17 @@ export const calificarRecurso = async (id, calificacion, token) => {
   if (!token) throw new Error('Token requerido');
 
   try {
-    const res = await fetch(`${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}/calificar`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ calificacion }),
-    });
+    const res = await fetch(
+      `${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}/calificar`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ calificacion }),
+      }
+    );
 
     if (!res.ok) {
       const body = await parseResponse(res).catch(() => null);

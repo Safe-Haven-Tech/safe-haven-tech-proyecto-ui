@@ -1,4 +1,3 @@
-// ...existing code...
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './PostDetail.module.css';
@@ -11,7 +10,7 @@ import {
   eliminarComentario,
   deletePublicacion,
   denunciarPublicacion,
-  denunciarComentario
+  denunciarComentario,
 } from '../../services/publicacionesService';
 
 import DenunciaModal from '../../components/Publicaciones/Denuncia';
@@ -24,7 +23,6 @@ function getUsuarioIdFromToken(token) {
   if (!token) return null;
   try {
     const payload = token.split('.')[1];
-    // atob puede fallar en entornos no-browser; envolver en try/catch
     const decoded = JSON.parse(atob(payload));
     return decoded.id || decoded._id || null;
   } catch {
@@ -32,10 +30,9 @@ function getUsuarioIdFromToken(token) {
   }
 }
 
-
 /**
- * Simple toast para mostrar mensajes no intrusivos.
- * Se oculta automáticamente tras timeout ms.
+ * Toast ligero para mensajes transitorios.
+ * Cierra automáticamente tras timeout ms.
  */
 const Toast = ({ message, show, onClose, timeout = 3500 }) => {
   useEffect(() => {
@@ -53,10 +50,17 @@ const Toast = ({ message, show, onClose, timeout = 3500 }) => {
 };
 
 /**
- * Modal de confirmación reutilizable para acciones críticas.
- * Mensajes y callbacks pasan por props.
+ * Modal de confirmación reutilizable.
+ * Uso: acciones críticas (eliminar, confirmar, etc.).
  */
-const ConfirmModal = ({ show, title, message, onCancel, onConfirm, confirmText = 'Confirmar' }) => {
+const ConfirmModal = ({
+  show,
+  title,
+  message,
+  onCancel,
+  onConfirm,
+  confirmText = 'Confirmar',
+}) => {
   if (!show) return null;
   return (
     <div className={styles.modalBackdrop} role="dialog" aria-modal="true">
@@ -64,8 +68,40 @@ const ConfirmModal = ({ show, title, message, onCancel, onConfirm, confirmText =
         <h5 className={styles.modalTitle}>{title}</h5>
         <p className={styles.modalMessage}>{message}</p>
         <div className={styles.modalActions}>
-          <button type="button" className="btn btn-outline-secondary" onClick={onCancel}>Cancelar</button>
-          <button type="button" className="btn btn-danger" onClick={onConfirm}>{confirmText}</button>
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={onCancel}
+          >
+            Cancelar
+          </button>
+          <button type="button" className="btn btn-danger" onClick={onConfirm}>
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Modal informativo para mostrar confirmaciones (por ejemplo: "Denuncia enviada").
+ * Este modal reemplaza confirm() del navegador para ofrecer mejor UX.
+ */
+const InfoModal = ({ show, title, message, onClose, okText = 'Aceptar' }) => {
+  if (!show) return null;
+  return (
+    <div className={styles.modalBackdrop} role="dialog" aria-modal="true">
+      <div className={styles.modalCard}>
+        <h5 className={styles.modalTitle}>{title}</h5>
+        <p className={styles.modalMessage}>{message}</p>
+        <div
+          className={styles.modalActions}
+          style={{ justifyContent: 'flex-end' }}
+        >
+          <button type="button" className="btn btn-primary" onClick={onClose}>
+            {okText}
+          </button>
         </div>
       </div>
     </div>
@@ -81,8 +117,14 @@ const ImagenesCarrusel = ({ imagenes }) => {
 
   if (!imagenes || imagenes.length === 0) return null;
 
-  const siguiente = useCallback(() => setIndice((i) => (i + 1) % imagenes.length), [imagenes.length]);
-  const anterior = useCallback(() => setIndice((i) => (i - 1 + imagenes.length) % imagenes.length), [imagenes.length]);
+  const siguiente = useCallback(
+    () => setIndice((i) => (i + 1) % imagenes.length),
+    [imagenes.length]
+  );
+  const anterior = useCallback(
+    () => setIndice((i) => (i - 1 + imagenes.length) % imagenes.length),
+    [imagenes.length]
+  );
 
   const esVideo = (url = '') => {
     const ext = url.split('.').pop()?.toLowerCase();
@@ -93,9 +135,18 @@ const ImagenesCarrusel = ({ imagenes }) => {
     <div className="d-flex flex-column align-items-center mb-3">
       <div className={styles.carruselContainer}>
         {esVideo(imagenes[indice]) ? (
-          <video src={imagenes[indice]} className={styles.carruselImg} controls style={{ background: '#000' }} />
+          <video
+            src={imagenes[indice]}
+            className={styles.carruselImg}
+            controls
+            style={{ background: '#000' }}
+          />
         ) : (
-          <img src={imagenes[indice]} alt={`multimedia-${indice + 1}`} className={styles.carruselImg} />
+          <img
+            src={imagenes[indice]}
+            alt={`multimedia-${indice + 1}`}
+            className={styles.carruselImg}
+          />
         )}
 
         {imagenes.length > 1 && (
@@ -121,7 +172,11 @@ const ImagenesCarrusel = ({ imagenes }) => {
               {imagenes.map((_, idx) => (
                 <span
                   key={imagenes[idx] || idx}
-                  className={idx === indice ? `${styles.carruselIndicator} ${styles.carruselIndicatorActive}` : styles.carruselIndicator}
+                  className={
+                    idx === indice
+                      ? `${styles.carruselIndicator} ${styles.carruselIndicatorActive}`
+                      : styles.carruselIndicator
+                  }
                   aria-hidden
                 />
               ))}
@@ -169,15 +224,30 @@ const PostDetail = () => {
   const [denunciaTarget, setDenunciaTarget] = useState(null); // { tipo: 'publicacion'|'comentario', id }
 
   // Confirm modal state centralizado para eliminar publicación/comentario
-  const [confirmState, setConfirmState] = useState({ show: false, tipo: null, payload: null, title: '', message: '' });
+  const [confirmState, setConfirmState] = useState({
+    show: false,
+    tipo: null,
+    payload: null,
+    title: '',
+    message: '',
+  });
 
-  // Toast
+  // Info modal para confirmar envío de denuncia (reemplaza confirm del navegador)
+  const [infoDenuncia, setInfoDenuncia] = useState({
+    show: false,
+    title: '',
+    message: '',
+  });
+
+  // Toast global
   const [toast, setToast] = useState({ show: false, message: '' });
 
   const puedeBorrar = Boolean(
     publicacion &&
-    usuarioId &&
-    (publicacion.autorId && (publicacion.autorId._id === usuarioId || publicacion.autorId === usuarioId))
+      usuarioId &&
+      publicacion.autorId &&
+      (publicacion.autorId._id === usuarioId ||
+        publicacion.autorId === usuarioId)
   );
 
   /* Cargar publicación por id y establecer estados relacionados */
@@ -191,7 +261,9 @@ const PostDetail = () => {
         if (!mounted) return;
         setPublicacion(data);
         setLikesCount(data.likes ? data.likes.length : 0);
-        setYaDioLike(data.likes ? data.likes.some((uid) => uid === usuarioId) : false);
+        setYaDioLike(
+          data.likes ? data.likes.some((uid) => uid === usuarioId) : false
+        );
       } catch (err) {
         if (!mounted) return;
         setError(err?.message || 'Error al cargar la publicación');
@@ -223,7 +295,10 @@ const PostDetail = () => {
         setYaDioLike(true);
       }
     } catch (err) {
-      setToast({ show: true, message: err?.message || 'Error al procesar like' });
+      setToast({
+        show: true,
+        message: err?.message || 'Error al procesar like',
+      });
     } finally {
       setLikeLoading(false);
     }
@@ -253,8 +328,8 @@ const PostDetail = () => {
   };
 
   /*
-   * Solicita confirmación para eliminar comentario/publicacion
-   * Se abre modal confirmState; la acción concreta se realiza en handleConfirmAction.
+   * Solicita confirmación para eliminar comentario/publicacion.
+   * La acción concreta se ejecuta en handleConfirmAction tras confirmación.
    */
   const openConfirm = ({ tipo, payload, title, message }) => {
     setConfirmState({ show: true, tipo, payload, title, message });
@@ -273,15 +348,17 @@ const PostDetail = () => {
       } else if (tipo === 'eliminarPublicacion') {
         await deletePublicacion(id, token);
         setToast({ show: true, message: 'Publicación eliminada' });
-        // pequeña demora para que el toast sea visible antes de navegar
         setTimeout(() => navigate('/publicaciones'), 600);
       }
     } catch (err) {
-      setToast({ show: true, message: err?.message || 'Error en la operación' });
+      setToast({
+        show: true,
+        message: err?.message || 'Error en la operación',
+      });
     }
   };
 
-  /* Manejo de menú clic fuera para cerrarlo */
+  /* Manejo de clic fuera del menú para cerrarlo */
   useEffect(() => {
     const handleClickOutsideMenu = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -290,7 +367,8 @@ const PostDetail = () => {
     };
     if (menuOpen) {
       window.addEventListener('mousedown', handleClickOutsideMenu);
-      return () => window.removeEventListener('mousedown', handleClickOutsideMenu);
+      return () =>
+        window.removeEventListener('mousedown', handleClickOutsideMenu);
     }
     return undefined;
   }, [menuOpen]);
@@ -313,10 +391,15 @@ const PostDetail = () => {
     setComentarioMenuOpen(null);
   };
 
-  /* Envía denuncia y refresca la publicación */
+  /**
+   * Envía la denuncia al servidor y muestra un modal informativo al usuario.
+   * Se evita el uso de confirm() nativo para mantener consistencia visual.
+   */
   const handleDenunciar = async ({ motivo, descripcion }) => {
     try {
-      if (!denunciaTarget) throw new Error('Objetivo de denuncia no especificado');
+      if (!denunciaTarget)
+        throw new Error('Objetivo de denuncia no especificado');
+
       if (denunciaTarget.tipo === 'publicacion') {
         await denunciarPublicacion(denunciaTarget.id, motivo, descripcion);
       } else if (denunciaTarget.tipo === 'comentario') {
@@ -324,18 +407,34 @@ const PostDetail = () => {
       } else {
         throw new Error('Tipo de denuncia no soportado');
       }
-      setToast({ show: true, message: 'Denuncia enviada correctamente' });
+
+      // Cerrar formulario y mostrar confirmación en modal (mejor UX que alert/confirm del navegador)
       setShowDenunciaModal(false);
       setDenunciaTarget(null);
+      setInfoDenuncia({
+        show: true,
+        title: 'Denuncia enviada',
+        message:
+          'Tu denuncia se ha enviado correctamente. El equipo de moderación revisará el caso y tomará las acciones pertinentes si corresponde.',
+      });
+
+      // refrescar publicación para reflejar cambios
       const data = await fetchPublicacionPorId(id);
       setPublicacion(data);
     } catch (err) {
-      setToast({ show: true, message: err?.message || 'Error al enviar denuncia' });
+      setToast({
+        show: true,
+        message: err?.message || 'Error al enviar denuncia',
+      });
     }
   };
 
-  if (loading) return <div className="container my-5 text-center">Cargando publicación...</div>;
-  if (error) return <div className="container my-5 alert alert-danger">{error}</div>;
+  if (loading)
+    return (
+      <div className="container my-5 text-center">Cargando publicación...</div>
+    );
+  if (error)
+    return <div className="container my-5 alert alert-danger">{error}</div>;
   if (!publicacion) return null;
 
   return (
@@ -349,7 +448,13 @@ const PostDetail = () => {
                 <div className={styles.cardHeader}>
                   {publicacion.autorId?.anonimo ? (
                     <>
-                      <img src={publicacion.autorId?.fotoPerfil || placeholderImage} alt="Avatar" className={styles.cardAutorImg} />
+                      <img
+                        src={
+                          publicacion.autorId?.fotoPerfil || placeholderImage
+                        }
+                        alt="Avatar"
+                        className={styles.cardAutorImg}
+                      />
                       <span className={styles.cardAutorNombre}>Anónimo</span>
                     </>
                   ) : (
@@ -358,15 +463,24 @@ const PostDetail = () => {
                       className={styles.cardAutorLink}
                       aria-label={`Ir al perfil de ${publicacion.autorId?.nombreCompleto || publicacion.autorId?.nombreUsuario || 'usuario'}`}
                     >
-                      <img src={publicacion.autorId?.fotoPerfil || placeholderImage} alt="Avatar" className={styles.cardAutorImg} />
+                      <img
+                        src={
+                          publicacion.autorId?.fotoPerfil || placeholderImage
+                        }
+                        alt="Avatar"
+                        className={styles.cardAutorImg}
+                      />
                       <span className={styles.cardAutorNombre}>
-                        {publicacion.autorId?.nombreCompleto || publicacion.autorId?.nombreUsuario}
+                        {publicacion.autorId?.nombreCompleto ||
+                          publicacion.autorId?.nombreUsuario}
                       </span>
                     </a>
                   )}
 
                   <div className={styles.cardFechaWrapper}>
-                    <div className={styles.cardAutorFecha}>{new Date(publicacion.fecha).toLocaleString()}</div>
+                    <div className={styles.cardAutorFecha}>
+                      {new Date(publicacion.fecha).toLocaleString()}
+                    </div>
                   </div>
 
                   {/* Botón de tres puntos - menú de publicación */}
@@ -375,14 +489,20 @@ const PostDetail = () => {
                       <button
                         type="button"
                         className={styles.cardMenuBtn}
-                        onClick={(e) => { e.stopPropagation(); setMenuOpen((prev) => !prev); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMenuOpen((prev) => !prev);
+                        }}
                         aria-label="Abrir opciones"
                       >
                         <i className="bi bi-three-dots-vertical" />
                       </button>
 
                       {menuOpen && (
-                        <div className={styles.cardMenu} onClick={(e) => e.stopPropagation()}>
+                        <div
+                          className={styles.cardMenu}
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {puedeBorrar ? (
                             <button
                               type="button"
@@ -392,21 +512,31 @@ const PostDetail = () => {
                                   tipo: 'eliminarPublicacion',
                                   payload: id,
                                   title: 'Eliminar publicación',
-                                  message: '¿Seguro que deseas eliminar esta publicación?'
+                                  message:
+                                    '¿Seguro que deseas eliminar esta publicación?',
                                 })
                               }
                               aria-label="Eliminar publicación"
                             >
-                              <span className={styles.cardMenuButtonText}>Eliminar publicación</span>
+                              <span className={styles.cardMenuButtonText}>
+                                Eliminar publicación
+                              </span>
                             </button>
                           ) : (
                             <button
                               type="button"
                               className={styles.cardMenuButton}
-                              onClick={() => prepararDenuncia({ tipo: 'publicacion', id: publicacion._id || id })}
+                              onClick={() =>
+                                prepararDenuncia({
+                                  tipo: 'publicacion',
+                                  id: publicacion._id || id,
+                                })
+                              }
                               aria-label="Denunciar publicación"
                             >
-                              <span className={styles.cardMenuButtonText}>Denunciar publicación</span>
+                              <span className={styles.cardMenuButtonText}>
+                                Denunciar publicación
+                              </span>
                             </button>
                           )}
                         </div>
@@ -438,21 +568,35 @@ const PostDetail = () => {
                       alignItems: 'center',
                       padding: '8px 20px',
                       marginRight: 16,
-                      boxShadow: yaDioLike ? '0 2px 8px rgba(96,60,126,0.10)' : 'none',
-                      transition: 'background 0.2s, box-shadow 0.2s'
+                      boxShadow: yaDioLike
+                        ? '0 2px 8px rgba(96,60,126,0.10)'
+                        : 'none',
+                      transition: 'background 0.2s, box-shadow 0.2s',
                     }}
                     disabled={likeLoading}
                     onClick={handleLike}
                     aria-label={yaDioLike ? 'Quitar like' : 'Dar like'}
                     title={yaDioLike ? 'Quitar like' : 'Dar like'}
                   >
-                    <i className={`bi ${yaDioLike ? 'bi-heart-fill' : 'bi-heart'}`} style={{ marginRight: 8, fontSize: '1.4rem' }} />
+                    <i
+                      className={`bi ${yaDioLike ? 'bi-heart-fill' : 'bi-heart'}`}
+                      style={{ marginRight: 8, fontSize: '1.4rem' }}
+                    />
                     {likesCount} Me gusta
                   </button>
 
                   <span className={styles.cardComentarios}>
-                    <i className="bi bi-chat-left-text" style={{ marginRight: 6, fontSize: '1.2rem', color: '#603c7e' }} />
-                    {publicacion.comentarios?.length !== undefined ? `${publicacion.comentarios.length} comentarios` : '0 comentarios'}
+                    <i
+                      className="bi bi-chat-left-text"
+                      style={{
+                        marginRight: 6,
+                        fontSize: '1.2rem',
+                        color: '#603c7e',
+                      }}
+                    />
+                    {publicacion.comentarios?.length !== undefined
+                      ? `${publicacion.comentarios.length} comentarios`
+                      : '0 comentarios'}
                   </span>
                 </div>
 
@@ -460,7 +604,10 @@ const PostDetail = () => {
                 {publicacion.etiquetasUsuarios?.length > 0 && (
                   <div className={styles.cardEtiquetas}>
                     {publicacion.etiquetasUsuarios.map((user) => (
-                      <span key={user._id || user.nombreUsuario} className={`badge bg-secondary ${styles.cardEtiqueta}`}>
+                      <span
+                        key={user._id || user.nombreUsuario}
+                        className={`badge bg-secondary ${styles.cardEtiqueta}`}
+                      >
                         @{user.nombreCompleto}
                       </span>
                     ))}
@@ -469,11 +616,29 @@ const PostDetail = () => {
 
                 <hr />
 
-                <h5 className="mb-3" style={{ color: '#603c7e' }}>Comentarios</h5>
+                <h5 className="mb-3" style={{ color: '#603c7e' }}>
+                  Comentarios
+                </h5>
 
-                {(!token || !usuarioId) ? (
-                  <div className="alert alert-warning mb-3" style={{ borderRadius: 10 }}>
-                    Para participar y comentar <a href="/register" style={{ color: '#603c7e', fontWeight: 'bold' }}>registrate</a> o <a href="/login" style={{ color: '#603c7e', fontWeight: 'bold' }}>inicia sesión</a>
+                {!token || !usuarioId ? (
+                  <div
+                    className="alert alert-warning mb-3"
+                    style={{ borderRadius: 10 }}
+                  >
+                    Para participar y comentar{' '}
+                    <a
+                      href="/register"
+                      style={{ color: '#603c7e', fontWeight: 'bold' }}
+                    >
+                      registrate
+                    </a>{' '}
+                    o{' '}
+                    <a
+                      href="/login"
+                      style={{ color: '#603c7e', fontWeight: 'bold' }}
+                    >
+                      inicia sesión
+                    </a>
                   </div>
                 ) : (
                   <form onSubmit={handleComentar} className="mb-3">
@@ -486,7 +651,10 @@ const PostDetail = () => {
                         onChange={(e) => setComentarioTexto(e.target.value)}
                         disabled={comentarioLoading}
                         maxLength={500}
-                        style={{ border: '1px solid #603c7e', borderRadius: '8px 0 0 8px' }}
+                        style={{
+                          border: '1px solid #603c7e',
+                          borderRadius: '8px 0 0 8px',
+                        }}
                         aria-label="Escribe un comentario"
                       />
                       <button
@@ -498,26 +666,41 @@ const PostDetail = () => {
                           border: 'none',
                           color: '#fff',
                           borderRadius: '0 8px 8px 0',
-                          fontWeight: 'bold'
+                          fontWeight: 'bold',
                         }}
                       >
-                        <i className="bi bi-send" style={{ marginRight: 6, fontSize: '1.2rem' }} />
+                        <i
+                          className="bi bi-send"
+                          style={{ marginRight: 6, fontSize: '1.2rem' }}
+                        />
                         {comentarioLoading ? 'Comentando...' : 'Comentar'}
                       </button>
                     </div>
-                    {comentarioError && <div className="text-danger mt-2">{comentarioError}</div>}
+                    {comentarioError && (
+                      <div className="text-danger mt-2">{comentarioError}</div>
+                    )}
                   </form>
                 )}
 
                 {/* Lista de comentarios (usar ids como key en lugar de index) */}
-                {publicacion.comentarios && publicacion.comentarios.length > 0 ? (
+                {publicacion.comentarios &&
+                publicacion.comentarios.length > 0 ? (
                   publicacion.comentarios.map((comentario) => (
                     <div key={comentario._id} className={styles.comentarioCard}>
                       <div className={styles.comentarioHeader}>
                         {comentario.usuarioId?.anonimo ? (
                           <>
-                            <img src={comentario.usuarioId?.fotoPerfil || placeholderImage} alt="Avatar" className={styles.comentarioAutorImg} />
-                            <span className={styles.comentarioAutorNombre}>Anónimo</span>
+                            <img
+                              src={
+                                comentario.usuarioId?.fotoPerfil ||
+                                placeholderImage
+                              }
+                              alt="Avatar"
+                              className={styles.comentarioAutorImg}
+                            />
+                            <span className={styles.comentarioAutorNombre}>
+                              Anónimo
+                            </span>
                           </>
                         ) : (
                           <a
@@ -525,36 +708,55 @@ const PostDetail = () => {
                             className={styles.comentarioAutorLink}
                             aria-label={`Ir al perfil de ${comentario.usuarioId?.nombreCompleto || comentario.usuarioId?.nombreUsuario || 'usuario'}`}
                           >
-                            <img src={comentario.usuarioId?.fotoPerfil || placeholderImage} alt="Avatar" className={styles.comentarioAutorImg} />
-                            <span className={styles.comentarioAutorNombre}>{comentario.usuarioId?.nombreCompleto || comentario.usuarioId?.nombreUsuario}</span>
+                            <img
+                              src={
+                                comentario.usuarioId?.fotoPerfil ||
+                                placeholderImage
+                              }
+                              alt="Avatar"
+                              className={styles.comentarioAutorImg}
+                            />
+                            <span className={styles.comentarioAutorNombre}>
+                              {comentario.usuarioId?.nombreCompleto ||
+                                comentario.usuarioId?.nombreUsuario}
+                            </span>
                           </a>
                         )}
 
-                        <span className={styles.comentarioFecha}>{new Date(comentario.fecha).toLocaleString()}</span>
+                        <span className={styles.comentarioFecha}>
+                          {new Date(comentario.fecha).toLocaleString()}
+                        </span>
 
                         {usuarioId && (
                           <div className={styles.comentarioMenuWrapper}>
                             <button
                               type="button"
                               className={styles.comentarioMenuBtn}
-                              onClick={(e) => { e.stopPropagation(); setComentarioMenuOpen(comentario._id); }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setComentarioMenuOpen(comentario._id);
+                              }}
                               aria-label="Abrir menú de comentario"
                             >
                               <i className="bi bi-three-dots-vertical" />
                             </button>
                             {comentarioMenuOpen === comentario._id && (
-                              <div className={styles.comentarioMenu} onClick={(e) => e.stopPropagation()}>
+                              <div
+                                className={styles.comentarioMenu}
+                                onClick={(e) => e.stopPropagation()}
+                              >
                                 {comentario.usuarioId?._id === usuarioId ? (
                                   <button
                                     type="button"
                                     className={styles.comentarioMenuEliminar}
                                     onClick={() => {
-                                      setComentarioMenuOpen(null); // cerrar menú antes de abrir confirm
+                                      setComentarioMenuOpen(null);
                                       openConfirm({
                                         tipo: 'eliminarComentario',
                                         payload: comentario._id,
                                         title: 'Eliminar comentario',
-                                        message: '¿Seguro que deseas eliminar este comentario?'
+                                        message:
+                                          '¿Seguro que deseas eliminar este comentario?',
                                       });
                                     }}
                                   >
@@ -565,8 +767,11 @@ const PostDetail = () => {
                                     type="button"
                                     className={styles.comentarioMenuDenunciar}
                                     onClick={() => {
-                                      setComentarioMenuOpen(null); // cerrar menú y abrir formulario de denuncia
-                                      prepararDenuncia({ tipo: 'comentario', id: comentario._id });
+                                      setComentarioMenuOpen(null);
+                                      prepararDenuncia({
+                                        tipo: 'comentario',
+                                        id: comentario._id,
+                                      });
                                     }}
                                   >
                                     Denunciar comentario
@@ -578,7 +783,9 @@ const PostDetail = () => {
                         )}
                       </div>
 
-                      <div className={styles.comentarioContenido}>{comentario.contenido}</div>
+                      <div className={styles.comentarioContenido}>
+                        {comentario.contenido}
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -594,13 +801,36 @@ const PostDetail = () => {
       {showLoginModal && (
         <div className={styles.modalBackdrop} role="dialog" aria-modal="true">
           <div className={styles.modalCard}>
-            <h4 className={styles.modalTitle} style={{ color: '#603c7e' }}>¡Únete a la comunidad!</h4>
-            <p className={styles.modalMessage}>Para participar y dar "Me gusta" debes iniciar sesión o registrarte.</p>
+            <h4 className={styles.modalTitle} style={{ color: '#603c7e' }}>
+              ¡Únete a la comunidad!
+            </h4>
+            <p className={styles.modalMessage}>
+              Para participar y dar "Me gusta" debes iniciar sesión o
+              registrarte.
+            </p>
             <div className={styles.modalActions}>
-              <a href="/login" className="btn btn-primary" style={{ background: '#603c7e', border: 'none' }}>Iniciar sesión</a>
-              <a href="/register" className="btn btn-outline-primary" style={{ borderColor: '#603c7e', color: '#603c7e' }}>Registrarse</a>
+              <a
+                href="/login"
+                className="btn btn-primary"
+                style={{ background: '#603c7e', border: 'none' }}
+              >
+                Iniciar sesión
+              </a>
+              <a
+                href="/register"
+                className="btn btn-outline-primary"
+                style={{ borderColor: '#603c7e', color: '#603c7e' }}
+              >
+                Registrarse
+              </a>
             </div>
-            <button type="button" className="btn btn-link" onClick={() => setShowLoginModal(false)}>Cancelar</button>
+            <button
+              type="button"
+              className="btn btn-link"
+              onClick={() => setShowLoginModal(false)}
+            >
+              Cancelar
+            </button>
           </div>
         </div>
       )}
@@ -619,13 +849,29 @@ const PostDetail = () => {
       {showDenunciaModal && (
         <DenunciaModal
           show={showDenunciaModal}
-          onClose={() => { setShowDenunciaModal(false); setDenunciaTarget(null); }}
+          onClose={() => {
+            setShowDenunciaModal(false);
+            setDenunciaTarget(null);
+          }}
           onSubmit={handleDenunciar}
         />
       )}
 
+      {/* Modal informativo tras enviar denuncia */}
+      <InfoModal
+        show={infoDenuncia.show}
+        title={infoDenuncia.title}
+        message={infoDenuncia.message}
+        onClose={() => setInfoDenuncia({ show: false, title: '', message: '' })}
+        okText="Aceptar"
+      />
+
       {/* Toast global */}
-      <Toast message={toast.message} show={toast.show} onClose={() => setToast({ show: false, message: '' })} />
+      <Toast
+        message={toast.message}
+        show={toast.show}
+        onClose={() => setToast({ show: false, message: '' })}
+      />
     </>
   );
 };

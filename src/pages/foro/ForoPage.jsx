@@ -6,7 +6,7 @@ import placeholder from '../../assets/perfil_placeholder.png';
 
 const LIMITE_POR_PAGINA = 15;
 
-// Lista de tópicos (ajusta según tus datos)
+// Lista de tópicos
 const TOPICOS_FORO = [
   'violencia física',
   'violencia psicológica',
@@ -21,7 +21,7 @@ const TOPICOS_FORO = [
   'prevención',
   'orientación profesional',
   'comunidad y redes de apoyo',
-  'otros'
+  'otros',
 ];
 
 function acortarTexto(texto, max = 57) {
@@ -40,7 +40,6 @@ const ForoPage = () => {
   const [menuAbierto, setMenuAbierto] = useState(null);
   const [topicoSeleccionado, setTopicoSeleccionado] = useState('todos');
 
-
   useEffect(() => {
     const cargarTemas = async () => {
       setLoading(true);
@@ -50,7 +49,8 @@ const ForoPage = () => {
           pagina,
           limite: LIMITE_POR_PAGINA,
           tipo: 'foro',
-          topico: topicoSeleccionado !== 'todos' ? topicoSeleccionado : undefined
+          topico:
+            topicoSeleccionado !== 'todos' ? topicoSeleccionado : undefined,
         });
         setTemas(data.publicaciones || []);
         if (data.totalPaginas) {
@@ -80,26 +80,39 @@ const ForoPage = () => {
 
   const handleBusqueda = (e) => setBusqueda(e.target.value);
 
-  let temasFiltrados = temas.filter(t =>
+  let temasFiltrados = temas.filter((t) =>
     (t.contenido || '').toLowerCase().includes(busqueda.toLowerCase())
   );
 
   if (filtro === 'populares') {
-    temasFiltrados = temasFiltrados.sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
+    temasFiltrados = temasFiltrados.sort(
+      (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
+    );
   } else if (filtro === 'sinresponder') {
-    temasFiltrados = temasFiltrados.filter(t => !t.comentarios || t.comentarios.length === 0);
+    temasFiltrados = temasFiltrados.filter(
+      (t) => !t.comentarios || t.comentarios.length === 0
+    );
   } else {
-    temasFiltrados = temasFiltrados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    temasFiltrados = temasFiltrados.sort(
+      (a, b) => new Date(b.fecha) - new Date(a.fecha)
+    );
   }
 
-
-
-  // Mensaje de bienvenida con estilos de módulo
+  // Mensaje de bienvenida
   const mensajeBienvenida = (
     <div className={styles.foroBienvenida}>
-      <span className={styles.foroBienvenidaIcon} role="img" aria-label="Bienvenida"></span>
+      <span
+        className={styles.foroBienvenidaIcon}
+        role="img"
+        aria-label="Bienvenida"
+      ></span>
       <span>
-        ¡Bienvenida/o al foro de SafeHaven! Este es un espacio seguro para compartir, preguntar y acompañarnos en el proceso de sanar y salir adelante tras situaciones de violencia de género. Recuerda que no estás sola/o, aquí puedes encontrar apoyo, información y experiencias de otras personas que han pasado por lo mismo. Si necesitas ayuda urgente, busca los recursos legales y profesionales en la plataforma.
+        ¡Bienvenida/o al foro de SafeHaven! Este es un espacio seguro para
+        compartir, preguntar y acompañarnos en el proceso de sanar y salir
+        adelante tras situaciones de violencia de género. Recuerda que no estás
+        sola/o, aquí puedes encontrar apoyo, información y experiencias de otras
+        personas que han pasado por lo mismo. Si necesitas ayuda urgente, busca
+        los recursos legales y profesionales en la plataforma.
       </span>
     </div>
   );
@@ -114,15 +127,21 @@ const ForoPage = () => {
             <div className={styles.foroTopicosSidebar}>
               <button
                 className={`${styles.foroTopicoBtn} ${topicoSeleccionado === 'todos' ? styles.foroTopicoBtnActive : ''}`}
-                onClick={() => { setTopicoSeleccionado('todos'); setPagina(1); }}
+                onClick={() => {
+                  setTopicoSeleccionado('todos');
+                  setPagina(1);
+                }}
               >
                 Todos los tópicos
               </button>
-              {TOPICOS_FORO.map(topico => (
+              {TOPICOS_FORO.map((topico) => (
                 <button
                   key={topico}
                   className={`${styles.foroTopicoBtn} ${topicoSeleccionado === topico ? styles.foroTopicoBtnActive : ''}`}
-                  onClick={() => { setTopicoSeleccionado(topico); setPagina(1); }}
+                  onClick={() => {
+                    setTopicoSeleccionado(topico);
+                    setPagina(1);
+                  }}
                 >
                   {topico.charAt(0).toUpperCase() + topico.slice(1)}
                 </button>
@@ -138,13 +157,21 @@ const ForoPage = () => {
                 placeholder="Buscar en el foro..."
                 value={busqueda}
                 onChange={handleBusqueda}
-                style={{ maxWidth: 400, borderRadius: 8, border: '1.5px solid #e5d1f2' }}
+                style={{
+                  maxWidth: 400,
+                  borderRadius: 8,
+                  border: '1.5px solid #e5d1f2',
+                }}
               />
               <select
                 className="form-select"
-                style={{ maxWidth: 220, borderRadius: 8, border: '1.5px solid #e5d1f2' }}
+                style={{
+                  maxWidth: 220,
+                  borderRadius: 8,
+                  border: '1.5px solid #e5d1f2',
+                }}
                 value={filtro}
-                onChange={e => setFiltro(e.target.value)}
+                onChange={(e) => setFiltro(e.target.value)}
               >
                 <option value="recientes">Más recientes</option>
                 <option value="populares">Más populares</option>
@@ -158,9 +185,8 @@ const ForoPage = () => {
                   background: '#8e44ad',
                   border: 'none',
                   minWidth: 160,
-      
                 }}
-                onClick={() => window.location.href = '/crear-foro'}
+                onClick={() => (window.location.href = '/crear-foro')}
               >
                 <i className="bi bi-plus-lg me-2"></i>
                 Crear publicación
@@ -168,12 +194,22 @@ const ForoPage = () => {
             </div>
 
             <div className="mt-3">
-              {loading && <div className={styles.foroLoading}>Cargando temas...</div>}
-              {error && <div className={`alert alert-danger ${styles.foroError}`}>{error}</div>}
+              {loading && (
+                <div className={styles.foroLoading}>Cargando temas...</div>
+              )}
+              {error && (
+                <div className={`alert alert-danger ${styles.foroError}`}>
+                  {error}
+                </div>
+              )}
               {!loading && temasFiltrados.length === 0 && (
                 <>
-                  <div className={styles.foroEmpty}>No hay temas en el foro.</div>
-                  <div className={styles.foroEmpty}>Te invitamos a crear la primer publicacion.</div>
+                  <div className={styles.foroEmpty}>
+                    No hay temas en el foro.
+                  </div>
+                  <div className={styles.foroEmpty}>
+                    Te invitamos a crear la primer publicacion.
+                  </div>
                 </>
               )}
               {!loading && temasFiltrados.length > 0 && (
@@ -187,19 +223,20 @@ const ForoPage = () => {
                     <span></span>
                   </div>
                   {temasFiltrados.map((tema, idx) => {
-       
                     const esPopular = tema.likes?.length >= 5;
-                    const esNuevo = (Date.now() - new Date(tema.fecha)) < 1000 * 60 * 60 * 24 * 2;
-                    const sinRespuesta = !tema.comentarios || tema.comentarios.length === 0;
+                    const esNuevo =
+                      Date.now() - new Date(tema.fecha) <
+                      1000 * 60 * 60 * 24 * 2;
+                    const sinRespuesta =
+                      !tema.comentarios || tema.comentarios.length === 0;
 
-            
                     const fullAuthor = tema.autorId?.anonimo
                       ? 'Anónimo'
                       : tema.autorId?.nombreCompleto ||
                         tema.autorId?.nombreUsuario ||
                         'Usuario';
                     const displayAuthor = acortarTexto(fullAuthor, 7);
-            
+
                     return (
                       <div
                         key={tema._id}
@@ -207,26 +244,38 @@ const ForoPage = () => {
                         tabIndex={0}
                         role="button"
                         aria-label={`Ver tema: ${acortarTexto(tema.contenido, 57) || 'Sin título'}`}
-                        onClick={() => window.location.href = `/publicacion/${tema._id}`}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter' || e.key === ' ') window.location.href = `/publicacion/${tema._id}`;
+                        onClick={() =>
+                          (window.location.href = `/publicacion/${tema._id}`)
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ')
+                            window.location.href = `/publicacion/${tema._id}`;
                         }}
                         style={{ position: 'relative' }}
                       >
                         <span className={styles.foroTema}>
                           {acortarTexto(tema.contenido, 57) || 'Sin título'}
                           {esPopular && (
-                            <span className={`${styles.foroBadge} ${styles.foroBadgePopular}`} title="Popular">
+                            <span
+                              className={`${styles.foroBadge} ${styles.foroBadgePopular}`}
+                              title="Popular"
+                            >
                               <i className="bi bi-fire"></i>
                             </span>
                           )}
                           {esNuevo && (
-                            <span className={`${styles.foroBadge} ${styles.foroBadgeNuevo}`} title="Nuevo">
+                            <span
+                              className={`${styles.foroBadge} ${styles.foroBadgeNuevo}`}
+                              title="Nuevo"
+                            >
                               <i className="bi bi-star-fill"></i>
                             </span>
                           )}
                           {sinRespuesta && (
-                            <span className={`${styles.foroBadge} ${styles.foroBadgeSinRespuesta}`} title="Sin respuesta">
+                            <span
+                              className={`${styles.foroBadge} ${styles.foroBadgeSinRespuesta}`}
+                              title="Sin respuesta"
+                            >
                               <i className="bi bi-question-circle"></i>
                             </span>
                           )}
@@ -245,11 +294,17 @@ const ForoPage = () => {
                           {new Date(tema.fecha).toLocaleDateString()}
                         </span>
                         <span className={styles.foroLikes}>
-                          <i className="bi bi-heart-fill" style={{ marginRight: 4 }}></i>
+                          <i
+                            className="bi bi-heart-fill"
+                            style={{ marginRight: 4 }}
+                          ></i>
                           {Array.isArray(tema.likes) ? tema.likes.length : 0}
                         </span>
                         <span className={styles.foroComentarios}>
-                          <i className="bi bi-chat-left-text" style={{ marginRight: 4 }}></i>
+                          <i
+                            className="bi bi-chat-left-text"
+                            style={{ marginRight: 4 }}
+                          ></i>
                           {tema.comentarios?.length || 0}
                         </span>
                       </div>
@@ -261,16 +316,38 @@ const ForoPage = () => {
               {!loading && temasFiltrados.length > 0 && totalPaginas > 1 && (
                 <nav className="d-flex justify-content-center mt-4">
                   <ul className="pagination">
-                    <li className={`page-item${pagina === 1 ? ' disabled' : ''}`}>
-                      <button className="page-link" onClick={() => setPagina(pagina - 1)}>&laquo;</button>
+                    <li
+                      className={`page-item${pagina === 1 ? ' disabled' : ''}`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => setPagina(pagina - 1)}
+                      >
+                        &laquo;
+                      </button>
                     </li>
                     {[...Array(totalPaginas)].map((_, idx) => (
-                      <li key={idx} className={`page-item${pagina === idx + 1 ? ' active' : ''}`}>
-                        <button className="page-link" onClick={() => setPagina(idx + 1)}>{idx + 1}</button>
+                      <li
+                        key={idx}
+                        className={`page-item${pagina === idx + 1 ? ' active' : ''}`}
+                      >
+                        <button
+                          className="page-link"
+                          onClick={() => setPagina(idx + 1)}
+                        >
+                          {idx + 1}
+                        </button>
                       </li>
                     ))}
-                    <li className={`page-item${pagina === totalPaginas ? ' disabled' : ''}`}>
-                      <button className="page-link" onClick={() => setPagina(pagina + 1)}>&raquo;</button>
+                    <li
+                      className={`page-item${pagina === totalPaginas ? ' disabled' : ''}`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => setPagina(pagina + 1)}
+                      >
+                        &raquo;
+                      </button>
                     </li>
                   </ul>
                 </nav>

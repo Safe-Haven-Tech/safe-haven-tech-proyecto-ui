@@ -38,7 +38,7 @@ export default function WelcomeCard({
         fullWidth ? styles.welcomeCardFullWidth : ''
       }`}
       style={{
-        '--welcome-image': `url(${evaluationWelcome})`, // 🎯 NUEVO: Pasamos la imagen como variable CSS
+        '--welcome-image': `url(${evaluationWelcome})`,
       }}
     >
       {/* Fondos decorativos */}
@@ -76,9 +76,6 @@ export default function WelcomeCard({
             ))}
           </div>
         </div>
-
-        {/* 🎯 REMOVIDO: imageContainer e welcomeImage ya no son necesarios */}
-        {/* La imagen ahora es parte del fondo del card */}
       </div>
     </div>
   );

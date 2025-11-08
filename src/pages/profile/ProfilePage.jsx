@@ -44,7 +44,10 @@ export default function ProfilePage() {
       // Si la API devuelve un error relacionado con token, redirigir al login.
       // Nota: el string exacto puede variar según la implementación del backend.
       const mensaje = err?.message || '';
-      if (mensaje.includes('Token de autenticación requerido') || mensaje.includes('Authentication required')) {
+      if (
+        mensaje.includes('Token de autenticación requerido') ||
+        mensaje.includes('Authentication required')
+      ) {
         navigate('/login');
       } else {
         // Re-lanzar para que caller (o un logger global) pueda manejarlo si procede.

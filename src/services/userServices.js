@@ -1,4 +1,3 @@
-
 /**
  * Servicios HTTP relacionados con usuarios.
  *
@@ -43,7 +42,10 @@ const parseResponse = async (res) => {
  * @param {string} defaultMessage
  * @throws {Error}
  */
-const handleErrorResponse = async (res, defaultMessage = 'Error en petición') => {
+const handleErrorResponse = async (
+  res,
+  defaultMessage = 'Error en petición'
+) => {
   const body = await parseResponse(res).catch(() => null);
   const detail =
     body && (body.error || body.message || body.mensaje || body.detalles)
@@ -174,11 +176,14 @@ export const updateUser = async (token, id, data) => {
  */
 export const changeUserState = async (token, id, estado, motivo = '') => {
   if (!id) throw new Error('ID requerido');
-  const res = await fetch(`${API_URL}/api/usuarios/${encodeURIComponent(id)}/estado`, {
-    method: 'PATCH',
-    headers: buildHeaders(token),
-    body: JSON.stringify({ estado, motivo }),
-  });
+  const res = await fetch(
+    `${API_URL}/api/usuarios/${encodeURIComponent(id)}/estado`,
+    {
+      method: 'PATCH',
+      headers: buildHeaders(token),
+      body: JSON.stringify({ estado, motivo }),
+    }
+  );
 
   if (!res.ok) {
     throw new Error('Error al cambiar estado');
@@ -189,10 +194,13 @@ export const changeUserState = async (token, id, estado, motivo = '') => {
 
 export const activateUser = async (token, id) => {
   if (!id) throw new Error('ID requerido');
-  const res = await fetch(`${API_URL}/api/usuarios/${encodeURIComponent(id)}/activar`, {
-    method: 'PATCH',
-    headers: buildHeaders(token),
-  });
+  const res = await fetch(
+    `${API_URL}/api/usuarios/${encodeURIComponent(id)}/activar`,
+    {
+      method: 'PATCH',
+      headers: buildHeaders(token),
+    }
+  );
 
   if (!res.ok) throw new Error('Error al activar usuario');
   return res.json();
@@ -200,11 +208,14 @@ export const activateUser = async (token, id) => {
 
 export const deactivateUser = async (token, id, motivo = '') => {
   if (!id) throw new Error('ID requerido');
-  const res = await fetch(`${API_URL}/api/usuarios/${encodeURIComponent(id)}/desactivar`, {
-    method: 'PATCH',
-    headers: buildHeaders(token),
-    body: JSON.stringify({ motivo }),
-  });
+  const res = await fetch(
+    `${API_URL}/api/usuarios/${encodeURIComponent(id)}/desactivar`,
+    {
+      method: 'PATCH',
+      headers: buildHeaders(token),
+      body: JSON.stringify({ motivo }),
+    }
+  );
 
   if (!res.ok) throw new Error('Error al desactivar usuario');
   return res.json();
@@ -238,15 +249,19 @@ export const denunciarUsuario = async (token, id, motivo, descripcion = '') => {
   if (!id) throw new Error('ID de usuario requerido');
   if (!motivo) throw new Error('Motivo de denuncia requerido');
 
-  const res = await fetch(`${API_URL}/api/usuarios/${encodeURIComponent(id)}/denunciar`, {
-    method: 'POST',
-    headers: buildHeaders(token),
-    body: JSON.stringify({ motivo, descripcion }),
-  });
+  const res = await fetch(
+    `${API_URL}/api/usuarios/${encodeURIComponent(id)}/denunciar`,
+    {
+      method: 'POST',
+      headers: buildHeaders(token),
+      body: JSON.stringify({ motivo, descripcion }),
+    }
+  );
 
   if (!res.ok) {
     const body = await parseResponse(res).catch(() => null);
-    const message = (body && (body.error || body.detalles)) || 'Error al denunciar usuario';
+    const message =
+      (body && (body.error || body.detalles)) || 'Error al denunciar usuario';
     throw new Error(message);
   }
 
@@ -277,19 +292,25 @@ export const fetchProfessionals = async (options = {}) => {
   if (especialidad) qs.set('especialidad', especialidad);
   if (ciudad) qs.set('ciudad', ciudad);
   if (disponible !== undefined) qs.set('disponible', String(disponible));
-  if (idiomas) qs.set('idiomas', Array.isArray(idiomas) ? idiomas.join(',') : idiomas);
+  if (idiomas)
+    qs.set('idiomas', Array.isArray(idiomas) ? idiomas.join(',') : idiomas);
   if (modalidad) qs.set('modalidad', modalidad);
   if (q) qs.set('q', q);
   if (ordenar) qs.set('ordenar', ordenar);
 
-  const res = await fetch(`${API_URL}/api/usuarios/profesionales?${qs.toString()}`, {
-    method: 'GET',
-    headers: buildHeaders(null),
-  });
+  const res = await fetch(
+    `${API_URL}/api/usuarios/profesionales?${qs.toString()}`,
+    {
+      method: 'GET',
+      headers: buildHeaders(null),
+    }
+  );
 
   if (!res.ok) {
     const txt = await parseResponse(res).catch(() => null);
-    throw new Error(`Error al obtener profesionales: ${res.status} ${txt || ''}`.trim());
+    throw new Error(
+      `Error al obtener profesionales: ${res.status} ${txt || ''}`.trim()
+    );
   }
 
   return res.json();
@@ -312,7 +333,9 @@ export const getProfessionalPublicByNickname = async (nickname) => {
 
   if (!res.ok) {
     const body = await parseResponse(res).catch(() => null);
-    const msg = (body && (body.error || body.message)) || 'Error al obtener perfil público';
+    const msg =
+      (body && (body.error || body.message)) ||
+      'Error al obtener perfil público';
     throw new Error(msg);
   }
 
@@ -334,7 +357,8 @@ export const getProfessionalById = async (id, token = null) => {
 
   if (!res.ok) {
     const body = await parseResponse(res).catch(() => null);
-    const msg = (body && (body.error || body.message)) || 'Error al obtener profesional';
+    const msg =
+      (body && (body.error || body.message)) || 'Error al obtener profesional';
     throw new Error(msg);
   }
 
@@ -348,7 +372,10 @@ export const getProfessionalById = async (id, token = null) => {
  * @param {Object} options { type: 'both'|'following'|'followers', query: string, limit: number }
  * @returns {Promise<Array>}
  */
-export const obtenerConexiones = async (token, { type = 'both', query = '', limit = 50 } = {}) => {
+export const obtenerConexiones = async (
+  token,
+  { type = 'both', query = '', limit = 50 } = {}
+) => {
   const url = new URL(`${API_URL}/api/usuarios/connections`);
   url.searchParams.set('type', type);
   if (query) url.searchParams.set('query', query);
@@ -365,4 +392,3 @@ export const obtenerConexiones = async (token, { type = 'both', query = '', limi
   if (body?.data && Array.isArray(body.data)) return body.data;
   return [];
 };
-

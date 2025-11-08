@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { fetchProfessionals } from '../../services/userServices.js';
 import ProfessionalsFilter from '../../components/Professionals/ProfessionalsFilter.jsx';
@@ -6,7 +5,6 @@ import ProfessionalsList from '../../components/Professionals/ProfessionalsList.
 import styles from './Professionals.module.css';
 import WelcomeCard from '../../components/Professionals/WelcomeCard.jsx';
 import BenefitsSection from '../../components/Professionals/BenefitsSection.jsx';
-
 
 export default function ProfessionalsHome() {
   const [professionals, setProfessionals] = useState([]);
@@ -28,7 +26,12 @@ export default function ProfessionalsHome() {
         const users = res.usuarios || res.data || [];
         const pag = res.paginacion || {};
         setProfessionals((prev) => (page === 1 ? users : [...prev, ...users]));
-        setHasMore(Boolean(pag && (pag.totalPages ? page < pag.totalPages : users.length === LIMIT)));
+        setHasMore(
+          Boolean(
+            pag &&
+              (pag.totalPages ? page < pag.totalPages : users.length === LIMIT)
+          )
+        );
       })
       .catch((err) => {
         if (!mounted) return;
@@ -47,24 +50,28 @@ export default function ProfessionalsHome() {
 
   const loadMore = () => setPage((p) => p + 1);
 
-return (
+  return (
     <>
-      {/* Spacer para navbar fijo */}
       <div className={styles.pageTopSpacer} />
 
-      {/* WelcomeCard fuera del contenedor centrado para poder ser full-width */}
+      {/* WelcomeCard */}
       <WelcomeCard
         title="Conecta con profesionales de confianza"
         subtitle="Acompañamiento seguro, cercano y especializado"
         description="Explora perfiles verificados y filtra por especialidad, modalidad o ciudad. Si necesitas atención urgente, prioriza servicios de emergencia."
-        fullWidth={true} 
+        fullWidth={true}
       />
 
       <div className={styles.container}>
         <BenefitsSection />
-        <ProfessionalsFilter onChange={handleFilterChange} initialValues={filters} />
+        <ProfessionalsFilter
+          onChange={handleFilterChange}
+          initialValues={filters}
+        />
         {error ? (
-          <div className={styles.error} role="alert">Error: {error.message || 'Problema al cargar profesionales'}</div>
+          <div className={styles.error} role="alert">
+            Error: {error.message || 'Problema al cargar profesionales'}
+          </div>
         ) : (
           <>
             <ProfessionalsList
@@ -79,6 +86,3 @@ return (
     </>
   );
 }
-
-  
-// ...existing code...

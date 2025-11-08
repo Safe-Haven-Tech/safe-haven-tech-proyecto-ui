@@ -4,7 +4,6 @@ import styles from './WelcomeSection.module.css';
 const WelcomeSection = React.memo(() => {
   return (
     <div className={styles.welcomeSection}>
-      {/* 🎨 NUEVO: Envolver todo el contenido en contentBox */}
       <div className={styles.contentBox}>
         <h1 className={styles.welcomeTitle}>Bienvenido a SafeHaven</h1>
 

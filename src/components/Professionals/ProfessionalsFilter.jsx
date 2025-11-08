@@ -12,14 +12,23 @@ function useDebounced(value, ms = 350) {
 
 export default function ProfessionalsFilter({ onChange, initialValues = {} }) {
   const mountedRef = useRef(true);
-  useEffect(() => () => { mountedRef.current = false; }, []);
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+    },
+    []
+  );
 
   const [q, setQ] = useState(initialValues.q || '');
-  const [especialidad, setEspecialidad] = useState(initialValues.especialidad || '');
+  const [especialidad, setEspecialidad] = useState(
+    initialValues.especialidad || ''
+  );
   const [ciudad, setCiudad] = useState(initialValues.ciudad || '');
   const [modalidad, setModalidad] = useState(initialValues.modalidad || '');
   const [disponible, setDisponible] = useState(
-    initialValues.disponible === undefined ? '' : String(initialValues.disponible)
+    initialValues.disponible === undefined
+      ? ''
+      : String(initialValues.disponible)
   );
 
   // sync when initialValues prop changes
@@ -28,7 +37,11 @@ export default function ProfessionalsFilter({ onChange, initialValues = {} }) {
     setEspecialidad(initialValues.especialidad || '');
     setCiudad(initialValues.ciudad || '');
     setModalidad(initialValues.modalidad || '');
-    setDisponible(initialValues.disponible === undefined ? '' : String(initialValues.disponible));
+    setDisponible(
+      initialValues.disponible === undefined
+        ? ''
+        : String(initialValues.disponible)
+    );
   }, [initialValues]);
 
   const debouncedQ = useDebounced(q, 350);
@@ -52,7 +65,13 @@ export default function ProfessionalsFilter({ onChange, initialValues = {} }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedQ, especialidad, ciudad, modalidad, disponible]);
 
-  const quickSpecialties = ['Psicología', 'Psiquiatría', 'Trabajo social', 'Abogacía', 'Mediación'];
+  const quickSpecialties = [
+    'Psicología',
+    'Psiquiatría',
+    'Trabajo social',
+    'Abogacía',
+    'Mediación',
+  ];
 
   const toggleEspecialidad = (s) => {
     setEspecialidad((prev) => (prev === s ? '' : s));
@@ -76,10 +95,16 @@ export default function ProfessionalsFilter({ onChange, initialValues = {} }) {
   };
 
   return (
-    <div className={styles.filterWrap} role="region" aria-label="Filtros de profesionales">
-
-
-      <div className={styles.quickChips} aria-label="Especialidades rápidas" role="list">
+    <div
+      className={styles.filterWrap}
+      role="region"
+      aria-label="Filtros de profesionales"
+    >
+      <div
+        className={styles.quickChips}
+        aria-label="Especialidades rápidas"
+        role="list"
+      >
         {quickSpecialties.map((s) => {
           const active = especialidad === s;
           return (

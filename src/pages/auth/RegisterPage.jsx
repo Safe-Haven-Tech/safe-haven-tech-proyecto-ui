@@ -1,12 +1,21 @@
 import React, { Suspense, useMemo, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './RegisterPage.module.css';
 import RegisterForm from '../../components/Register/RegisterForm';
 import background from '../../assets/FondoRegister.png';
 import { sanitizeInput } from '../../utils/validators';
 import { registrarUsuario } from '../../services/authServices';
-import { useFormValidation } from '../../hooks/useFormValidator';
+import useFormValidator from '../../hooks/useFormValidator'; // Importar el hook por defecto
 
+/**
+ * Página de registro.
+ * Usa el hook de validación de formularios (useFormValidator) y navega al login
+ * tras el registro exitoso. Los mensajes de error/éxito se muestran aquí,
+ * el formulario queda a cargo del componente RegisterForm.
+ */
 export default function RegisterPage() {
+  const navigate = useNavigate();
+
   const initialFormData = {
     email: '',
     password: '',
@@ -22,6 +31,7 @@ export default function RegisterPage() {
     biografia: '',
   };
 
+  // Usar el hook correcto (importado por defecto)
   const {
     formData,
     setFormData,
@@ -31,13 +41,13 @@ export default function RegisterPage() {
     nicknameAvailable,
     validateForm,
     handleFieldBlur,
-  } = useFormValidation(initialFormData);
+  } = useFormValidator(initialFormData);
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Submit handler
+  // Handler de envío del formulario
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -72,22 +82,22 @@ export default function RegisterPage() {
         };
 
         await registrarUsuario(payload);
-        setSuccess('¡Cuenta creada exitosamente! Redirigiendo al login...');
 
-        // Usar navigate en lugar de window.location
+        setSuccess('¡Cuenta creada exitosamente! Redirigiendo al login...');
+        // Navegar con react-router en lugar de reasignar location
         setTimeout(() => {
-          window.location.href = '/login';
-        }, 2000);
+          navigate('/login');
+        }, 1400);
       } catch (err) {
         console.error('Error en registro:', err);
         setError(
-          err.message || 'Error al crear la cuenta. Intenta nuevamente.'
+          err?.message || 'Error al crear la cuenta. Intenta nuevamente.'
         );
       } finally {
         setLoading(false);
       }
     },
-    [formData, validateForm, validatingNickname]
+    [formData, validateForm, validatingNickname, navigate]
   );
 
   const memoizedForm = useMemo(
@@ -128,11 +138,11 @@ export default function RegisterPage() {
     </div>
   );
 
-  const ErrorFallback = ({ error }) => (
+  const ErrorFallback = ({ error: err }) => (
     <div className={styles.errorState}>
       <div className={styles.errorTitle}>Error al cargar</div>
       <div className={styles.errorMessage}>
-        {error?.message || 'Hubo un problema al cargar el formulario'}
+        {err?.message || 'Hubo un problema al cargar el formulario'}
       </div>
     </div>
   );
@@ -142,10 +152,8 @@ export default function RegisterPage() {
       className={styles.registerContainer}
       style={{ backgroundImage: `url(${background})` }}
     >
-      {/* Overlay mejorado */}
       <div className={styles.overlay}></div>
 
-      {/* Contenedor principal */}
       <div className={styles.contentContainer}>
         <div className={styles.formWrapper}>
           <Suspense fallback={<LoadingFallback />}>{memoizedForm}</Suspense>

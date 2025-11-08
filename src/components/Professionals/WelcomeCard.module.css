@@ -7,19 +7,16 @@
   min-height: 350px;
   overflow: hidden;
   margin: 0 1rem;
-
 }
-
 
 .welcomeCardFullWidth {
   border-radius: 0;
   margin: 0;
-  width: 100vw; 
-  
+  width: 100vw;
+
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  box-shadow: none; 
-
+  box-shadow: none;
 }
 
 @media (min-width: 576px) {
@@ -47,7 +44,6 @@
   margin: 0;
 }
 
-/* 🌟 NUEVO: Imagen de fondo SOLO EN DESKTOP - OCULTA EN MOBILE/TABLET */
 .welcomeCard::before {
   content: '';
   position: absolute;
@@ -61,17 +57,16 @@
   background-repeat: no-repeat;
   z-index: 0;
   border-radius: 0 1.5rem 1.5rem 0;
-  /* 🎯 NUEVO: Solo visible en desktop (1200px+) */
   display: none;
 }
 
 @media (min-width: 1200px) {
   .welcomeCard::before {
-    display: block; /* 🎯 NUEVO: Mostrar imagen solo en desktop */
+    display: block;
   }
 }
 
-/* Formas decorativas - SOLO en la zona de texto */
+/* Formas decorativas */
 .decorativeShape {
   position: absolute;
   z-index: 2;
@@ -114,15 +109,14 @@
   border-radius: 45% / 55%;
 }
 
-/* 🎯 NUEVO: Formas decorativas adicionales para móvil/tablet (cuando no hay imagen) */
 @media (max-width: 1199px) {
   .shape2 {
-    right: -10%; /* 🎯 Vuelve a la derecha cuando no hay imagen */
+    right: -10%;
     left: auto;
   }
 
   .shape3 {
-    right: 5%; /* 🎯 Vuelve a la derecha cuando no hay imagen */
+    right: 5%;
     left: auto;
   }
 }
@@ -133,7 +127,7 @@
   z-index: 3;
   height: 100%;
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   align-items: center;
 }
 
@@ -144,14 +138,14 @@
   }
 }
 
-/* Contenedor de texto - AJUSTADO SEGÚN LA PANTALLA */
+/* Contenedor de texto  */
 .textContainer {
   flex: 1;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 100%; /* 🎯 CAMBIO: 100% por defecto en móvil/tablet */
+  width: 100%;
   position: relative;
   z-index: 4;
   background: transparent;
@@ -171,26 +165,25 @@
 
 @media (min-width: 1200px) {
   .textContainer {
-    flex: 0 0 60%; /* 🎯 Solo 60% en desktop cuando hay imagen */
+    flex: 0 0 60%;
     width: 60%;
     padding: 3rem;
   }
 }
 
-/* 🎯 NUEVO: Espacio reservado para la imagen - SOLO EN DESKTOP */
 .imageSpace {
   flex: 0 0 40%;
   position: relative;
-  display: none; /* 🎯 OCULTO por defecto */
+  display: none;
 }
 
 @media (min-width: 1200px) {
   .imageSpace {
-    display: block; /* 🎯 Solo visible en desktop */
+    display: block;
   }
 }
 
-/* Títulos y texto - RESPONSIVE MEJORADO */
+/* Títulos y texto  */
 .title {
   font-family: 'Poppins', sans-serif;
   font-weight: bold;
@@ -200,12 +193,12 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 1rem;
-  text-align: center; /* 🎯 CAMBIO: Centrado por defecto */
+  text-align: center;
 }
 
 @media (min-width: 1200px) {
   .title {
-    text-align: left; /* 🎯 Solo alineado a la izquierda en desktop */
+    text-align: left;
   }
 }
 
@@ -215,12 +208,12 @@
   font-size: clamp(0.9rem, 2.5vw, 1.4rem);
   color: #6b5fa5;
   margin-bottom: 1rem;
-  text-align: center; /* 🎯 CAMBIO: Centrado por defecto */
+  text-align: center;
 }
 
 @media (min-width: 1200px) {
   .subtitle {
-    text-align: left; /* 🎯 Solo alineado a la izquierda en desktop */
+    text-align: left;
   }
 }
 
@@ -230,16 +223,15 @@
   color: #555;
   margin-bottom: 1rem;
   line-height: 1.5;
-  text-align: center; /* 🎯 CAMBIO: Centrado por defecto */
+  text-align: center;
 }
 
 @media (min-width: 1200px) {
   .description {
-    text-align: left; /* 🎯 Solo alineado a la izquierda en desktop */
+    text-align: left;
   }
 }
 
-/* Mini cajas - SIN CAMBIOS */
 .miniBoxesContainer {
   display: flex;
   gap: 0.75rem;
@@ -316,8 +308,6 @@
   }
 }
 
-/* 🎯 REMOVIDO: Media queries específicas para móvil ya que la imagen no aparece */
-
 /* Animaciones */
 @keyframes slideInFromLeft {
   0% {
@@ -345,7 +335,6 @@
   animation: slideInFromLeft 0.8s ease-out;
 }
 
-/* 🎯 CAMBIO: Animación de imagen solo en desktop */
 @media (min-width: 1200px) {
   .welcomeCard::before {
     animation: slideInFromRight 1.2s ease-out;
@@ -384,7 +373,6 @@
   }
 }
 
-/* 🎯 NUEVO: Estilos para el bloque de invitación a profesionales (reemplaza imagen) */
 .imageSpace {
   flex: 0 0 40%;
   position: relative;
@@ -404,14 +392,18 @@
 }
 
 .applyCard {
-  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(250,250,255,0.9));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(250, 250, 255, 0.9)
+  );
   border-radius: 1rem;
   padding: 1.6rem;
   width: 90%;
   max-width: 360px;
   text-align: left;
-  box-shadow: 0 10px 30px rgba(16,24,40,0.06);
-  border: 1px solid rgba(90,78,124,0.04);
+  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.06);
+  border: 1px solid rgba(90, 78, 124, 0.04);
 }
 
 .applyTitle {
@@ -437,18 +429,18 @@
 }
 
 .applyButton {
-  background: linear-gradient(90deg,#5a4e7c,#9b79be);
+  background: linear-gradient(90deg, #5a4e7c, #9b79be);
   color: #fff;
   padding: 0.5rem 0.9rem;
   border-radius: 0.6rem;
   text-decoration: none;
   font-weight: 600;
-  box-shadow: 0 6px 18px rgba(90,78,124,0.12);
+  box-shadow: 0 6px 18px rgba(90, 78, 124, 0.12);
 }
 
 .applyButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(90,78,124,0.16);
+  box-shadow: 0 12px 26px rgba(90, 78, 124, 0.16);
 }
 
 .applyLink {
@@ -460,6 +452,10 @@
 
 /* Asegurar contraste y accesibilidad */
 @media (prefers-contrast: high) {
-  .applyCard { border-width: 2px; }
-  .applyButton { box-shadow: none; }
+  .applyCard {
+    border-width: 2px;
+  }
+  .applyButton {
+    box-shadow: none;
+  }
 }

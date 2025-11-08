@@ -30,7 +30,6 @@ const isLocalStorageAvailable = () => {
 export const saveResponseToLocalStorage = (surveyId, answers) => {
   if (!surveyId) return false;
   if (!isLocalStorageAvailable()) {
-    // eslint-disable-next-line no-console
     console.error('localStorage no disponible');
     return false;
   }
@@ -45,7 +44,6 @@ export const saveResponseToLocalStorage = (surveyId, answers) => {
     localStorage.setItem(buildKey(surveyId), JSON.stringify(data));
     return true;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Error saving survey:', error?.message || error);
     return false;
   }
@@ -73,8 +71,10 @@ export const getResponseFromLocalStorage = (surveyId) => {
 
     return null;
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error reading survey from localStorage:', error?.message || error);
+    console.error(
+      'Error reading survey from localStorage:',
+      error?.message || error
+    );
     return null;
   }
 };
@@ -90,8 +90,10 @@ export const clearLocalSurvey = (surveyId) => {
   try {
     localStorage.removeItem(buildKey(surveyId));
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error clearing survey from localStorage:', error?.message || error);
+    console.error(
+      'Error clearing survey from localStorage:',
+      error?.message || error
+    );
   }
 };
 

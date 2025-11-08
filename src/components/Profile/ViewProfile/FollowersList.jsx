@@ -8,19 +8,15 @@ export default function FollowersList({ usuarioId }) {
   useEffect(() => {
     setLoading(true);
     obtenerSeguidores(usuarioId)
-      .then(data => setSeguidores(data.seguidores || []))
+      .then((data) => setSeguidores(data.seguidores || []))
       .finally(() => setLoading(false));
   }, [usuarioId]);
 
   if (loading) return <div>Cargando seguidores...</div>;
- 
 
   return (
     <div>
-      
-      <ul>
-        
-      </ul>
+      <ul></ul>
     </div>
   );
 }

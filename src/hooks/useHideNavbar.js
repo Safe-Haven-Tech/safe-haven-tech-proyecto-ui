@@ -29,13 +29,11 @@ export function useHideNavbar(hideRoutes = ['/login', '/register']) {
       if (typeof route !== 'string') return false;
       if (route === pathname) return true;
 
-      // wildcard at end: '/admin/*' matches '/admin/...' 
       if (route.endsWith('*')) {
         const prefix = route.slice(0, -1);
         return pathname.startsWith(prefix);
       }
 
-      // parameterized routes like '/perfil/:nickname'
       if (route.includes(':')) {
         const pattern = '^' + route.replace(/:[^/]+/g, '[^/]+') + '$';
         try {
@@ -45,7 +43,6 @@ export function useHideNavbar(hideRoutes = ['/login', '/register']) {
         }
       }
 
-      // fallback to startsWith for partial matches (optional)
       return false;
     });
   }, [hideRoutes, pathname]);

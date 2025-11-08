@@ -4,6 +4,73 @@ import { useNavigate } from 'react-router-dom';
 import { fetchEstadisticas } from '../../services/informationalResourcesService';
 import styles from './ResourcesManagement.module.css';
 
+const ConfirmModal = ({
+  show,
+  title,
+  message,
+  onCancel,
+  onConfirm,
+  confirmText = 'Confirmar',
+  cancelText = 'Cancelar',
+}) => {
+  if (!show) return null;
+  return (
+    <div className={styles.modalOverlay} role="dialog" aria-modal="true">
+      <div className={styles.modal}>
+        <div className={styles.modalHeader}>
+          <h2>{title}</h2>
+          <button
+            className={styles.closeButton}
+            onClick={onCancel}
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+        <div className={styles.modalContent}>
+          <p>{message}</p>
+        </div>
+        <div className={styles.modalActions}>
+          <button className={styles.cancelButton} onClick={onCancel}>
+            {cancelText}
+          </button>
+          <button className={styles.saveButton} onClick={onConfirm}>
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const InfoModal = ({ show, title, message, onClose, okText = 'Aceptar' }) => {
+  if (!show) return null;
+  return (
+    <div className={styles.modalOverlay} role="dialog" aria-modal="true">
+      <div className={styles.modal}>
+        <div className={styles.modalHeader}>
+          <h2>{title}</h2>
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+        <div className={styles.modalContent}>
+          <p>{message}</p>
+        </div>
+        <div className={styles.modalActions}>
+          <button className={styles.saveButton} onClick={onClose}>
+            {okText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ResourcesManagement = () => {
   const { usuario } = useAuth();
   const navigate = useNavigate();
@@ -67,6 +134,20 @@ const ResourcesManagement = () => {
   const inicializandoRef = useRef(false);
   const estadisticasCargadasRef = useRef(false);
 
+  // Confirm / Info modals state
+  const [confirmState, setConfirmState] = useState({
+    show: false,
+    title: '',
+    message: '',
+    onConfirm: null,
+  });
+  const [infoState, setInfoState] = useState({
+    show: false,
+    title: '',
+    message: '',
+    onClose: null,
+  });
+
   // Verificar autenticación y permisos
   useEffect(() => {
     if (!usuario) {
@@ -128,7 +209,7 @@ const ResourcesManagement = () => {
     [filtros]
   );
 
-  // Función para cargar estadísticas - OPTIMIZADA
+  // Función para cargar estadísticas
   const cargarEstadisticas = useCallback(async () => {
     // Evitar cargas duplicadas
     if (estadisticasCargadasRef.current || loadingEstadisticas === false) {
@@ -158,7 +239,6 @@ const ResourcesManagement = () => {
     }
   }, [loadingEstadisticas]);
 
-  // Función para calcular estadísticas manualmente como fallback
   const calcularEstadisticasManualmente = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -216,7 +296,6 @@ const ResourcesManagement = () => {
     }
   };
 
-  // Cargar datos iniciales SOLO UNA VEZ
   useEffect(() => {
     if (
       usuario &&
@@ -228,7 +307,6 @@ const ResourcesManagement = () => {
       inicializandoRef.current = true;
       setDatosInicializados(true);
 
-      // Cargar recursos y estadísticas en paralelo
       Promise.all([cargarRecursos(true), cargarEstadisticas()]).finally(() => {
         console.log('✅ Datos inicializados correctamente');
         inicializandoRef.current = false;
@@ -236,7 +314,6 @@ const ResourcesManagement = () => {
     }
   }, [usuario, datosInicializados, cargarRecursos, cargarEstadisticas]);
 
-  // Cargar recursos cuando cambien los filtros (excepto la primera vez)
   useEffect(() => {
     if (datosInicializados && !inicializandoRef.current) {
       console.log('🔄 Actualizando recursos por filtros...');
@@ -244,7 +321,6 @@ const ResourcesManagement = () => {
     }
   }, [filtros, datosInicializados, cargarRecursos]);
 
-  // Función para validar formulario
   const validarFormulario = () => {
     const errores = {};
 
@@ -419,7 +495,7 @@ const ResourcesManagement = () => {
     setMostrarModal(true);
   };
 
-  // Función para guardar recurso - OPTIMIZADA
+  // Función para guardar recurso - reemplaza alerts por modal infoState
   const guardarRecurso = async () => {
     try {
       console.log('💾 Guardando recurso...');
@@ -428,9 +504,13 @@ const ResourcesManagement = () => {
       const errores = validarFormulario();
       if (Object.keys(errores).length > 0) {
         setErroresValidacion(errores);
-        alert(
-          'Por favor corrija los errores en el formulario antes de continuar.'
-        );
+        setInfoState({
+          show: true,
+          title: 'Errores en el formulario',
+          message:
+            'Por favor corrija los errores en el formulario antes de continuar.',
+          onClose: null,
+        });
         return;
       }
 
@@ -455,10 +535,21 @@ const ResourcesManagement = () => {
       const token = localStorage.getItem('token');
 
       if (!token) {
-        alert(
-          'Error: No se encontró token de autenticación. Por favor, inicia sesión nuevamente.'
-        );
-        navigate('/login');
+        setInfoState({
+          show: true,
+          title: 'Sesión expirada',
+          message:
+            'No se encontró token de autenticación. Por favor, inicia sesión nuevamente.',
+          onClose: () => {
+            setInfoState({
+              show: false,
+              title: '',
+              message: '',
+              onClose: null,
+            });
+            navigate('/login');
+          },
+        });
         return;
       }
 
@@ -510,36 +601,52 @@ const ResourcesManagement = () => {
           destacado: false,
         });
 
-        alert(
-          `${modoModal === 'crear' ? 'Recurso creado' : 'Recurso actualizado'} exitosamente`
-        );
+        // Mostrar modal de éxito
+        setInfoState({
+          show: true,
+          title:
+            modoModal === 'crear' ? 'Recurso creado' : 'Recurso actualizado',
+          message:
+            modoModal === 'crear'
+              ? 'El recurso se creó correctamente.'
+              : 'El recurso se actualizó correctamente.',
+          onClose: null,
+        });
       } else {
         let mensajeError = 'Error desconocido';
 
-        if (responseData.mensaje) {
+        if (responseData && responseData.mensaje) {
           mensajeError = responseData.mensaje;
-        } else if (responseData.error) {
+        } else if (responseData && responseData.error) {
           mensajeError = responseData.error;
-        } else if (responseData.errors && Array.isArray(responseData.errors)) {
+        } else if (
+          responseData &&
+          responseData.errors &&
+          Array.isArray(responseData.errors)
+        ) {
           mensajeError = responseData.errors.join('\n');
         }
 
-        alert(`Error (${response.status}): ${mensajeError}`);
+        setInfoState({
+          show: true,
+          title: `Error (${response.status})`,
+          message: mensajeError,
+          onClose: null,
+        });
       }
     } catch (error) {
       console.error('❌ Error guardando recurso:', error);
-      alert(
-        `Error: ${error.message || 'Error desconocido al guardar el recurso'}`
-      );
+      setInfoState({
+        show: true,
+        title: 'Error al guardar',
+        message: error.message || 'Error desconocido al guardar el recurso',
+        onClose: null,
+      });
     }
   };
 
-  // Función para eliminar recurso - OPTIMIZADA
-  const eliminarRecurso = async (id) => {
-    if (!window.confirm('¿Estás seguro de que deseas eliminar este recurso?')) {
-      return;
-    }
-
+  // Ejecuta la petición de eliminación (llamada interna tras confirmar)
+  const ejecutarEliminarRecurso = async (id) => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
@@ -554,22 +661,45 @@ const ResourcesManagement = () => {
       );
 
       if (response.ok) {
-        // Resetear flags para permitir recarga de estadísticas
         estadisticasCargadasRef.current = false;
-
         await Promise.all([cargarRecursos(false), cargarEstadisticas()]);
 
-        alert('Recurso eliminado exitosamente');
+        // Mostrar modal de éxito
+        setInfoState({
+          show: true,
+          title: 'Recurso eliminado',
+          message: 'El recurso se eliminó correctamente.',
+          onClose: null,
+        });
       } else {
         throw new Error('Error al eliminar el recurso');
       }
     } catch (error) {
       console.error('Error eliminando recurso:', error);
-      alert('Error al eliminar el recurso');
+      setInfoState({
+        show: true,
+        title: 'Error',
+        message: 'Error al eliminar el recurso. Intenta de nuevo.',
+        onClose: null,
+      });
+    } finally {
+      // Cerrar confirm modal si aún está abierta
+      setConfirmState((s) => ({ ...s, show: false, onConfirm: null }));
     }
   };
 
-  // Función para alternar destacado - OPTIMIZADA
+  // Abre modal de confirmación para eliminar recurso
+  const confirmarEliminarRecurso = (id) => {
+    setConfirmState({
+      show: true,
+      title: 'Eliminar recurso',
+      message:
+        '¿Estás seguro de que deseas eliminar este recurso? Esta acción no se puede deshacer.',
+      onConfirm: () => ejecutarEliminarRecurso(id),
+    });
+  };
+
+  // Función para alternar destacado
   const alternarDestacado = async (recurso) => {
     try {
       const token = localStorage.getItem('token');
@@ -588,16 +718,19 @@ const ResourcesManagement = () => {
       );
 
       if (response.ok) {
-        // Resetear flags para permitir recarga de estadísticas
         estadisticasCargadasRef.current = false;
-
         await Promise.all([cargarRecursos(false), cargarEstadisticas()]);
       } else {
         throw new Error('Error al actualizar el recurso');
       }
     } catch (error) {
       console.error('Error actualizando recurso:', error);
-      alert('Error al actualizar el recurso');
+      setInfoState({
+        show: true,
+        title: 'Error al actualizar',
+        message: 'No se pudo actualizar el recurso. Intenta nuevamente.',
+        onClose: null,
+      });
     }
   };
 
@@ -773,7 +906,7 @@ const ResourcesManagement = () => {
                     </button>
                     <button
                       className={styles.deleteButton}
-                      onClick={() => eliminarRecurso(recurso._id)}
+                      onClick={() => confirmarEliminarRecurso(recurso._id)}
                     >
                       Eliminar
                     </button>
@@ -812,7 +945,7 @@ const ResourcesManagement = () => {
         )}
       </section>
 
-      {/* Modal */}
+      {/* Modal crear/editar */}
       {mostrarModal && (
         <div
           className={styles.modalOverlay}
@@ -1073,6 +1206,44 @@ const ResourcesManagement = () => {
           </div>
         </div>
       )}
+
+      {/* Confirmación global */}
+      <ConfirmModal
+        show={confirmState.show}
+        title={confirmState.title}
+        message={confirmState.message}
+        onCancel={() =>
+          setConfirmState((s) => ({ ...s, show: false, onConfirm: null }))
+        }
+        onConfirm={() => {
+          // cerrar modal inmediatamente para evitar dobles clicks
+          setConfirmState((s) => ({ ...s, show: false }));
+          if (typeof confirmState.onConfirm === 'function')
+            confirmState.onConfirm();
+        }}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+      />
+
+      {/* Modal de información / éxito */}
+      <InfoModal
+        show={infoState.show}
+        title={infoState.title}
+        message={infoState.message}
+        onClose={() => {
+          if (typeof infoState.onClose === 'function') {
+            infoState.onClose();
+          } else {
+            setInfoState({
+              show: false,
+              title: '',
+              message: '',
+              onClose: null,
+            });
+          }
+        }}
+        okText="Aceptar"
+      />
     </div>
   );
 };

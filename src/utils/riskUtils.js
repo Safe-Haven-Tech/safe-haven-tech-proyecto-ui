@@ -1,4 +1,3 @@
-
 import {
   FaExclamationTriangle,
   FaCheckCircle,
@@ -22,35 +21,35 @@ const normalizeLevel = (nivel) => {
 };
 
 const BADGE_MAP = {
-  'crítico': 'bg-danger text-white',
-  'alto': 'bg-warning text-dark',
-  'medio': 'bg-info text-dark',
-  'bajo': 'bg-success text-white',
-  'desconocido': 'bg-secondary text-white',
+  crítico: 'bg-danger text-white',
+  alto: 'bg-warning text-dark',
+  medio: 'bg-info text-dark',
+  bajo: 'bg-success text-white',
+  desconocido: 'bg-secondary text-white',
 };
 
 const BACKGROUND_MAP = {
-  'crítico': '#FFD6D6',
-  'alto': '#FFE5B4',
-  'medio': '#FFF4B2',
-  'bajo': '#D6FFD6',
-  'desconocido': '#F0F0F0',
+  crítico: '#FFD6D6',
+  alto: '#FFE5B4',
+  medio: '#FFF4B2',
+  bajo: '#D6FFD6',
+  desconocido: '#F0F0F0',
 };
 
 const ICON_MAP = {
-  'crítico': FaExclamationTriangle,
-  'alto': FaExclamationCircle,
-  'medio': FaExclamationCircle,
-  'bajo': FaCheckCircle,
-  'desconocido': null,
+  crítico: FaExclamationTriangle,
+  alto: FaExclamationCircle,
+  medio: FaExclamationCircle,
+  bajo: FaCheckCircle,
+  desconocido: null,
 };
 
 const TIP_MAP = {
-  'crítico': 'Recomendación: Busca ayuda profesional cuanto antes.',
-  'alto': 'Recomendación: Presta atención a tus resultados y considera acciones de mejora.',
-  'medio': 'Recomendación: Mantente alerta y sigue trabajando en tu desarrollo.',
-  'bajo': 'Recomendación: ¡Excelente! Mantén tus buenos hábitos.',
-  'desconocido': '',
+  crítico: 'Recomendación: Busca ayuda profesional cuanto antes.',
+  alto: 'Recomendación: Presta atención a tus resultados y considera acciones de mejora.',
+  medio: 'Recomendación: Mantente alerta y sigue trabajando en tu desarrollo.',
+  bajo: 'Recomendación: ¡Excelente! Mantén tus buenos hábitos.',
+  desconocido: '',
 };
 
 /**
@@ -65,7 +64,8 @@ export const getBadgeColor = (nivel) => BADGE_MAP[normalizeLevel(nivel)];
  * @param {string} nivel
  * @returns {string}
  */
-export const getBackgroundColor = (nivel) => BACKGROUND_MAP[normalizeLevel(nivel)];
+export const getBackgroundColor = (nivel) =>
+  BACKGROUND_MAP[normalizeLevel(nivel)];
 
 /**
  * Devuelve el componente icono correspondiente al nivel (react-icon) o null.

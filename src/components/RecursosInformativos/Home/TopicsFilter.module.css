@@ -1,4 +1,4 @@
-/* Sección principal - NUEVOS ESTILOS */
+/* Sección principal*/
 .topicsSection {
   border-radius: 1.5rem;
   background: #faf8ff;
@@ -19,7 +19,7 @@
   }
 }
 
-/* Título de la sección - NUEVOS ESTILOS */
+/* Título de la sección */
 .sectionTitle {
   font-family: 'Poppins', sans-serif;
   font-weight: bold;
@@ -38,7 +38,7 @@
   }
 }
 
-/* Contenedor flexbox centrado - NUEVOS ESTILOS */
+/* Contenedor flexbox centrado*/
 .topicsContainer {
   display: flex;
   flex-wrap: wrap;
@@ -54,7 +54,6 @@
   }
 }
 
-/* 🎯 LOADING CONTAINER - LÓGICA ORIGINAL + ESTILOS NUEVOS */
 .loadingContainer {
   display: flex;
   flex-direction: column;
@@ -78,7 +77,6 @@
   margin: 0;
 }
 
-/* 🎯 BOTONES - LÓGICA ORIGINAL + ESTILOS NUEVOS */
 .topicBtn {
   font-family: 'Poppins', sans-serif;
   font-weight: 500;
@@ -113,7 +111,6 @@
   text-decoration: none;
 }
 
-/* Estado activo - NUEVOS ESTILOS */
 .topicBtnActive {
   background: linear-gradient(90deg, #5a4e7c, #a17cca) !important;
   color: #fff !important;
@@ -129,13 +126,11 @@
   box-shadow: 0 6px 15px rgba(90, 78, 124, 0.4);
 }
 
-/* 🎯 ICONO CHECK - LÓGICA ORIGINAL */
 .checkIcon {
   font-size: 0.8rem;
   margin-left: 0.25rem;
 }
 
-/* Estados de interacción */
 .topicBtn:active {
   transform: translateY(-1px);
 }
@@ -144,7 +139,6 @@
   transform: translateY(-1px);
 }
 
-/* 🎯 INFORMACIÓN ADICIONAL - LÓGICA ORIGINAL + ESTILOS NUEVOS */
 .additionalInfo {
   text-align: center;
   margin-top: 1.5rem;
@@ -245,7 +239,6 @@
   animation: fadeInUp 0.3s ease-out backwards;
 }
 
-/* Desactivar animación si el usuario lo prefiere */
 @media (prefers-reduced-motion: reduce) {
   .topicBtn {
     animation: none;

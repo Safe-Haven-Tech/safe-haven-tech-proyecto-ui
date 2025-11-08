@@ -6,12 +6,12 @@ export default function EmergencyButton(menuOpen) {
   useEffect(() => {
     const updatePosition = () => {
       const navbar = document.querySelector('.navbar');
-      const userMenu = document.querySelector('.user-menu'); // identificamos el div del menú
+      const userMenu = document.querySelector('.user-menu');
 
       if (navbar) {
-        let newTop = navbar.offsetHeight + 20; // posición base
+        let newTop = navbar.offsetHeight + 20;
         if (menuOpen && userMenu) {
-          newTop += userMenu.offsetHeight + 10; // sumamos altura extra
+          newTop += userMenu.offsetHeight + 10;
         }
         setTopPosition(newTop);
       }
@@ -34,19 +34,19 @@ export default function EmergencyButton(menuOpen) {
         position: 'fixed',
         top: `${topPosition}px`,
         right: '20px',
-        width: '80px', // ancho fijo
-        height: '80px', // alto fijo
-        borderRadius: '50%', // círculo perfecto
+        width: '80px',
+        height: '80px',
+        borderRadius: '50%',
         backgroundColor: '#d32f2f',
         color: '#fff',
-        fontSize: '0.75rem', // más pequeño para caber
+        fontSize: '0.75rem',
         fontWeight: 'bold',
         border: 'none',
         boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
         cursor: 'pointer',
         zIndex: 2000,
         transition: 'top 0.3s ease, transform 0.1s ease',
-        display: 'flex', // centra contenido
+        display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',

@@ -56,7 +56,11 @@ export const styles = {
     cursor: 'pointer',
   },
   buttonHover: { backgroundColor: colors.primaryHover },
-  buttonDisabled: { backgroundColor: colors.secondary, cursor: 'not-allowed', opacity: 0.9 },
+  buttonDisabled: {
+    backgroundColor: colors.secondary,
+    cursor: 'not-allowed',
+    opacity: 0.9,
+  },
   alert: { fontSize: '1rem', borderRadius: '8px', padding: '12px 16px' },
   alertError: {
     backgroundColor: '#fef2f2',

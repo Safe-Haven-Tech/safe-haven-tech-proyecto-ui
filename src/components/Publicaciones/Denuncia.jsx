@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styles from './DenunciaModal.module.css';
 
-
 const motivos = [
   { value: 'contenido_inapropiado', label: 'Contenido inapropiado' },
   { value: 'spam', label: 'Spam' },
@@ -36,7 +35,14 @@ export default function DenunciaModal({ show, onClose, onSubmit }) {
       <div className={styles.modalWrapper}>
         <div className={styles.modalHeader}>
           <h5 className={styles.title}>Denunciar publicación</h5>
-          <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Cerrar">×</button>
+          <button
+            type="button"
+            className={styles.closeBtn}
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
         </div>
 
         <div className={styles.modalBody}>
@@ -46,12 +52,14 @@ export default function DenunciaModal({ show, onClose, onSubmit }) {
           <select
             className={styles.select}
             value={motivo}
-            onChange={e => setMotivo(e.target.value)}
+            onChange={(e) => setMotivo(e.target.value)}
             aria-label="Seleccionar motivo de denuncia"
           >
             <option value="">Selecciona un motivo</option>
-            {motivos.map(m => (
-              <option key={m.value} value={m.value}>{m.label}</option>
+            {motivos.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
             ))}
           </select>
 
@@ -61,7 +69,7 @@ export default function DenunciaModal({ show, onClose, onSubmit }) {
           <textarea
             className={styles.textarea}
             value={descripcion}
-            onChange={e => setDescripcion(e.target.value)}
+            onChange={(e) => setDescripcion(e.target.value)}
             maxLength={500}
             rows={3}
             placeholder="Describe el problema (opcional)"
@@ -71,8 +79,18 @@ export default function DenunciaModal({ show, onClose, onSubmit }) {
         </div>
 
         <div className={styles.modalFooter}>
-          <button className={`${styles.btn} ${styles.btnCancel}`} onClick={onClose}>Cancelar</button>
-          <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleEnviar}>Enviar denuncia</button>
+          <button
+            className={`${styles.btn} ${styles.btnCancel}`}
+            onClick={onClose}
+          >
+            Cancelar
+          </button>
+          <button
+            className={`${styles.btn} ${styles.btnPrimary}`}
+            onClick={handleEnviar}
+          >
+            Enviar denuncia
+          </button>
         </div>
       </div>
     </div>

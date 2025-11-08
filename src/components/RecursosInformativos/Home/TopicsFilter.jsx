@@ -13,11 +13,9 @@ export default function TopicsFilter({ onSelect }) {
     const loadTopics = async () => {
       try {
         const topicosData = await fetchTopicosDisponibles();
-        // Agregamos "Todos" como primera opción
         setTopics(['Todos', ...topicosData]);
       } catch (error) {
         console.error('Error al cargar tópicos:', error);
-        // Fallback con tópicos predeterminados si falla la API
         setTopics([
           'Todos',
           'Bienestar emocional',
@@ -38,7 +36,6 @@ export default function TopicsFilter({ onSelect }) {
 
   const handleClick = (topic) => {
     setSelectedTopic(topic);
-    // Enviamos null si es "Todos", de lo contrario el tópico seleccionado
     onSelect(topic === 'Todos' ? null : topic);
   };
 
