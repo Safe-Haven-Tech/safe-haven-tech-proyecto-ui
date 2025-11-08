@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import * as usersService from '../../services/userServices';
-import styles from './UsersManagement.module.css';
+import styles from './ResourcesManagement.module.css';
 import placeholderAvatar from '../../assets/perfil_placeholder.png';
 
 const ROLES = ['', 'usuario', 'profesional', 'administrador'];
@@ -70,6 +70,17 @@ const UsersManagement = () => {
   const [filtros, setFiltros] = useState({ busqueda: '', rol: '', activo: '' });
   const [error, setError] = useState(null);
 
+  // Estadísticas
+  const [estadisticas, setEstadisticas] = useState({
+    total: 0,
+    porRol: {
+      usuario: 0,
+      profesional: 0,
+      administrador: 0,
+    },
+  });
+  const [loadingEstadisticas, setLoadingEstadisticas] = useState(true);
+
   const [mostrarModalForm, setMostrarModalForm] = useState(false);
   const [modo, setModo] = useState('crear');
   const [form, setForm] = useState(emptyForm);
@@ -136,6 +147,7 @@ const UsersManagement = () => {
     [token, usuario, paginacion.limite, filtrosKey]
   );
 
+  // Cargar usuarios inicial y cuando cambian filtros
   useEffect(() => {
     if (!usuario || usuario.rol !== 'administrador') return;
     loadUsers(1);
@@ -145,6 +157,70 @@ const UsersManagement = () => {
     if (!usuario || usuario.rol !== 'administrador') return;
     loadUsers(1);
   }, [filtrosKey, usuario]);
+
+  // Función para calcular estadísticas desde datos existentes (fallback)
+  const calcularEstadisticasManualmente = useCallback(() => {
+    const totals = {
+      usuario: 0,
+      profesional: 0,
+      administrador: 0,
+    };
+    for (const u of usuarios) {
+      const r = (u && u.rol) || 'usuario';
+      if (r === 'administrador') totals.administrador += 1;
+      else if (r === 'profesional') totals.profesional += 1;
+      else totals.usuario += 1;
+    }
+    const totalGeneral = paginacion.total || usuarios.length || 0; // paginacion.total es preferible si backend lo entrega
+    setEstadisticas({ total: totalGeneral, porRol: totals });
+    setLoadingEstadisticas(false);
+  }, [usuarios, paginacion.total]);
+
+  // Intentar cargar estadísticas desde servicio; si falla, usar cálculo manual
+  const cargarEstadisticas = useCallback(async () => {
+    if (!token || !usuario || usuario.rol !== 'administrador') return;
+    setLoadingEstadisticas(true);
+    try {
+      // Intento usar un endpoint de estadísticas si existe
+      if (typeof usersService.getUserStats === 'function') {
+        const res = await usersService.getUserStats(token);
+        // Se espera: { total, porRol: { usuario, profesional, administrador } }
+        if (res) {
+          const total =
+            res.total ?? res.totalUsers ?? paginacion.total ?? usuarios.length;
+          const porRol = {
+            usuario: (res.porRol && res.porRol.usuario) ?? res.usuario ?? 0,
+            profesional:
+              (res.porRol && res.porRol.profesional) ?? res.profesional ?? 0,
+            administrador:
+              (res.porRol && res.porRol.administrador) ??
+              res.administrador ??
+              0,
+          };
+          setEstadisticas({ total, porRol });
+          setLoadingEstadisticas(false);
+          return;
+        }
+      }
+      // Fallback: cálculo local (puede reflejar solo la página actual si backend no provee totales)
+      calcularEstadisticasManualmente();
+    } catch (err) {
+      // En caso de error, usar fallback y mostrar aviso leve
+      calcularEstadisticasManualmente();
+      // no bloquear UI con error de estadisticas
+    }
+  }, [
+    token,
+    usuario,
+    usuarios,
+    calcularEstadisticasManualmente,
+    paginacion.total,
+  ]);
+
+  // Cargar estadísticas al montar y cuando cambien usuarios/paginación
+  useEffect(() => {
+    cargarEstadisticas();
+  }, [cargarEstadisticas]);
 
   const handlePageChange = (n) => {
     loadUsers(n);
@@ -283,6 +359,8 @@ const UsersManagement = () => {
       }
       closeModal();
       loadUsers(paginacion.pagina || 1);
+      // refrescar estadísticas
+      cargarEstadisticas();
     } catch (err) {
       const msg = getErrorMessage(err);
       setToast({ tipo: 'error', texto: msg || 'Error al guardar' });
@@ -337,6 +415,7 @@ const UsersManagement = () => {
       }
       cerrarConfirm();
       loadUsers(paginacion.pagina || 1);
+      cargarEstadisticas();
     } catch (err) {
       const msg = getErrorMessage(err);
       setToast({ tipo: 'error', texto: msg || 'Error en la acción' });
@@ -358,156 +437,246 @@ const UsersManagement = () => {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <h1>Gestión de usuarios</h1>
-          <p>Listado y acciones administrativas</p>
-        </div>
-        <div>
-          <button className={styles.createButton} onClick={openCrear}>
-            Crear usuario
-          </button>
+        <div className={styles.headerContent}>
+          <div className={styles.headerLeft}>
+            <div className={styles.headerTitle}>
+              <h1>Gestión de usuarios</h1>
+              <p>Listado y acciones administrativas</p>
+            </div>
+          </div>
+          <div>
+            <button className={styles.createButton} onClick={openCrear}>
+              Crear usuario
+            </button>
+          </div>
         </div>
       </header>
 
-      <section className={styles.filters}>
-        <input
-          className={styles.searchInput}
-          placeholder="Buscar por nombre, usuario o email"
-          value={filtros.busqueda}
-          onChange={(e) => handleInputChange('busqueda', e.target.value)}
-        />
-        <select
-          value={filtros.rol}
-          onChange={(e) => handleInputChange('rol', e.target.value)}
-          className={styles.filterSelect}
-        >
-          {ROLES.map((r) => (
-            <option key={r} value={r}>
-              {r || 'Rol'}
-            </option>
-          ))}
-        </select>
-        <select
-          value={filtros.activo}
-          onChange={(e) => handleInputChange('activo', e.target.value)}
-          className={styles.filterSelect}
-        >
-          <option value="">Estado</option>
-          <option value="true">Activo</option>
-          <option value="false">Inactivo</option>
-        </select>
+      {/* Estadísticas */}
+      <section className={styles.statsSection}>
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <div className={styles.statContent}>
+              <div className={styles.statNumber}>
+                {loadingEstadisticas ? '—' : estadisticas.total}
+              </div>
+              <div className={styles.statLabel}>Total de usuarios</div>
+            </div>
+          </div>
+
+          <div className={styles.statCard}>
+            <div className={styles.statContent}>
+              <div className={styles.statNumber}>
+                {loadingEstadisticas ? '—' : estadisticas.porRol.usuario}
+              </div>
+              <div className={styles.statLabel}>Usuarios</div>
+            </div>
+          </div>
+
+          <div className={styles.statCard}>
+            <div className={styles.statContent}>
+              <div className={styles.statNumber}>
+                {loadingEstadisticas ? '—' : estadisticas.porRol.profesional}
+              </div>
+              <div className={styles.statLabel}>Profesionales</div>
+            </div>
+          </div>
+
+          <div className={styles.statCard}>
+            <div className={styles.statContent}>
+              <div className={styles.statNumber}>
+                {loadingEstadisticas ? '—' : estadisticas.porRol.administrador}
+              </div>
+              <div className={styles.statLabel}>Administradores</div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section className={styles.tableSection}>
+      <section className={styles.filtersSection}>
+        <div className={styles.filtersGrid} style={{ alignItems: 'center' }}>
+          <div className={styles.searchBox} style={{ minWidth: 0 }}>
+            <input
+              className={styles.searchInput}
+              placeholder="Buscar por nombre, usuario o email"
+              value={filtros.busqueda}
+              onChange={(e) => handleInputChange('busqueda', e.target.value)}
+            />
+          </div>
+
+          <select
+            value={filtros.rol}
+            onChange={(e) => handleInputChange('rol', e.target.value)}
+            className={styles.filterSelect}
+          >
+            {ROLES.map((r) => (
+              <option key={r} value={r}>
+                {r || 'Rol'}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={filtros.activo}
+            onChange={(e) => handleInputChange('activo', e.target.value)}
+            className={styles.filterSelect}
+          >
+            <option value="">Estado</option>
+            <option value="true">Activo</option>
+            <option value="false">Inactivo</option>
+          </select>
+
+          <div style={{ justifySelf: 'end' }}>
+            <button
+              className={styles.createButton}
+              onClick={() => loadUsers(1)}
+              style={{
+                background: 'linear-gradient(135deg, #6c9b4f 0%, #7cb342 100%)',
+              }}
+            >
+              Buscar
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.resourcesSection}>
         {loading ? (
-          <p> Cargando...</p>
+          <p className={styles.loading}>Cargando...</p>
         ) : error ? (
           <p className={styles.error}>{error}</p>
+        ) : usuarios.length === 0 ? (
+          <p className={styles.noResources}>No hay usuarios</p>
         ) : (
           <>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Avatar</th>
-                  <th>Usuario</th>
-                  <th>Nombre</th>
-                  <th>Email</th>
-                  <th>Rol</th>
-                  <th>Estado</th>
-                  <th>Creado</th>
-                  <th>Últ. login</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {usuarios.length === 0 && (
-                  <tr>
-                    <td colSpan="9">No hay usuarios</td>
-                  </tr>
-                )}
-                {usuarios.map((u) => (
-                  <tr key={u._id}>
-                    <td>
+            <div className={styles.resourcesGrid}>
+              {usuarios.map((u) => (
+                <article key={u._id} className={styles.resourceCard}>
+                  <div className={styles.resourceHeader}>
+                    <span className={styles.resourceType}>{u.rol}</span>
+                    {u.activo ? (
+                      <span className={styles.featuredBadge}>Activo</span>
+                    ) : (
+                      <span
+                        className={styles.featuredBadge}
+                        style={{ background: '#f1f5f9', color: '#333' }}
+                      >
+                        {u.estado || 'Inactivo'}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className={styles.resourceContent}>
+                    <h3 className={styles.resourceTitle}>{u.username}</h3>
+                    <p className={styles.resourceDescription}>
+                      {u.nombreCompleto} — {u.email}
+                    </p>
+                  </div>
+
+                  <div
+                    className={styles.resourceMeta}
+                    style={{ marginBottom: 14 }}
+                  >
+                    <div
+                      style={{ display: 'flex', alignItems: 'center', gap: 12 }}
+                    >
                       <img
                         src={u.fotoPerfilUrl || placeholderAvatar}
                         alt=""
-                        className={styles.avatar}
+                        style={{
+                          width: 64,
+                          height: 64,
+                          borderRadius: 12,
+                          objectFit: 'cover',
+                        }}
                       />
-                    </td>
-                    <td>{u.username}</td>
-                    <td>{u.nombreCompleto}</td>
-                    <td>{u.email}</td>
-                    <td>{u.rol}</td>
-                    <td>{u.activo ? 'Activo' : u.estado || 'Inactivo'}</td>
-                    <td>{formatDate(u.fechaCreacion)}</td>
-                    <td>{formatDate(u.ultimoLogin)}</td>
-                    <td className={styles.actions}>
-                      <div className={styles.actionsInner}>
-                        <button
-                          onClick={() => openVer(u._id)}
-                          className={styles.iconBtn}
-                        >
-                          Ver
-                        </button>
-                        <button
-                          onClick={() => openEditar(u._id)}
-                          className={styles.iconBtn}
-                        >
-                          Editar
-                        </button>
-                        {u.activo ? (
-                          <button
-                            onClick={() =>
-                              abrirConfirm(
-                                'desactivar',
-                                u._id,
-                                'Desactivar usuario?'
-                              )
-                            }
-                            className={styles.iconBtnWarn}
-                          >
-                            Desactivar
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() =>
-                              abrirConfirm('activar', u._id, 'Activar usuario?')
-                            }
-                            className={styles.iconBtn}
-                          >
-                            Activar
-                          </button>
-                        )}
-                        <button
-                          onClick={() =>
-                            abrirConfirm(
-                              'eliminar',
-                              u._id,
-                              'Eliminar usuario? Esta acción es irreversible'
-                            )
-                          }
-                          className={styles.iconBtnDanger}
-                        >
-                          Eliminar
-                        </button>
+                      <div style={{ fontWeight: 600, color: '#2e4d3a' }}>
+                        Creado: {formatDate(u.fechaCreacion)}
+                        <br />
+                        Últ. login: {formatDate(u.ultimoLogin)}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  </div>
 
-            <div className={styles.pagination}>
+                  <div
+                    className={styles.resourceActions}
+                    style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
+                  >
+                    <button
+                      onClick={() => openVer(u._id)}
+                      className={styles.editButton}
+                      title="Ver"
+                      style={{ padding: '8px 12px' }}
+                    >
+                      Ver
+                    </button>
+
+                    <button
+                      onClick={() => openEditar(u._id)}
+                      className={styles.editButton}
+                      title="Editar"
+                      style={{ padding: '8px 12px' }}
+                    >
+                      Editar
+                    </button>
+
+                    {u.activo ? (
+                      <button
+                        onClick={() =>
+                          abrirConfirm(
+                            'desactivar',
+                            u._id,
+                            'Desactivar usuario?'
+                          )
+                        }
+                        className={styles.featuredToggle}
+                        title="Desactivar"
+                      >
+                        Desactivar
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() =>
+                          abrirConfirm('activar', u._id, 'Activar usuario?')
+                        }
+                        className={styles.featuredToggle}
+                        title="Activar"
+                      >
+                        Activar
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() =>
+                        abrirConfirm(
+                          'eliminar',
+                          u._id,
+                          'Eliminar usuario? Esta acción es irreversible'
+                        )
+                      }
+                      className={styles.deleteButton}
+                      title="Eliminar"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className={styles.pagination} style={{ marginTop: 20 }}>
               <button
+                className={styles.paginationButton}
                 disabled={paginacion.pagina <= 1}
                 onClick={() => handlePageChange(paginacion.pagina - 1)}
               >
                 Anterior
               </button>
-              <span>
+              <div className={styles.paginationInfo}>
                 Página {paginacion.pagina} de {paginacion.totalPaginas}
-              </span>
+              </div>
               <button
+                className={styles.paginationButton}
                 disabled={paginacion.pagina >= paginacion.totalPaginas}
                 onClick={() => handlePageChange(paginacion.pagina + 1)}
               >
@@ -533,10 +702,12 @@ const UsersManagement = () => {
                 ×
               </button>
             </header>
+
             <form className={styles.form} onSubmit={submitForm}>
               <div className={styles.formRow}>
-                <label>Nombre completo</label>
+                <label className={styles.label}>Nombre completo</label>
                 <input
+                  className={styles.input}
                   value={form.nombreCompleto}
                   onChange={(e) =>
                     setForm({ ...form, nombreCompleto: e.target.value })
@@ -545,9 +716,11 @@ const UsersManagement = () => {
                   disabled={modo === 'ver'}
                 />
               </div>
+
               <div className={styles.formRow}>
-                <label>Usuario (username)</label>
+                <label className={styles.label}>Usuario (username)</label>
                 <input
+                  className={styles.input}
                   value={form.username}
                   onChange={(e) =>
                     setForm({ ...form, username: e.target.value })
@@ -556,9 +729,11 @@ const UsersManagement = () => {
                   disabled={modo === 'ver'}
                 />
               </div>
+
               <div className={styles.formRow}>
-                <label>Email</label>
+                <label className={styles.label}>Email</label>
                 <input
+                  className={styles.input}
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -566,9 +741,11 @@ const UsersManagement = () => {
                   disabled={modo === 'ver'}
                 />
               </div>
+
               <div className={styles.formRow}>
-                <label>Rol</label>
+                <label className={styles.label}>Rol</label>
                 <select
+                  className={styles.select}
                   value={form.rol}
                   onChange={(e) => setForm({ ...form, rol: e.target.value })}
                   disabled={modo === 'ver'}
@@ -580,16 +757,18 @@ const UsersManagement = () => {
                   ))}
                 </select>
               </div>
+
               {modo !== 'ver' && (
                 <>
                   <div className={styles.formRow}>
-                    <label>
+                    <label className={styles.label}>
                       Contraseña{' '}
                       {modo === 'crear'
                         ? '(requerida)'
                         : '(dejar en blanco para no cambiar)'}
                     </label>
                     <input
+                      className={styles.input}
                       type="password"
                       value={form.contraseña}
                       onChange={(e) =>
@@ -598,15 +777,20 @@ const UsersManagement = () => {
                       {...(modo === 'crear' ? { required: true } : {})}
                     />
                   </div>
+
                   <div className={styles.formRow}>
-                    <label>Foto de perfil (archivo)</label>
+                    <label className={styles.label}>
+                      Foto de perfil (archivo)
+                    </label>
                     <input type="file" accept="image/*" ref={fotoInputRef} />
                   </div>
                 </>
               )}
+
               <div className={styles.formRow}>
-                <label>Bio</label>
+                <label className={styles.label}>Bio</label>
                 <textarea
+                  className={styles.textarea}
                   value={form.bio}
                   onChange={(e) => setForm({ ...form, bio: e.target.value })}
                   disabled={modo === 'ver'}
@@ -642,17 +826,19 @@ const UsersManagement = () => {
             <header className={styles.modalHeader}>
               <h2>Confirmar acción</h2>
             </header>
-            <div className={styles.modalContent}>
+            <div className={styles.modalContent} style={{ padding: 16 }}>
               <p>{confirm.displayMensaje || '¿Estás seguro?'}</p>
-              {confirm.tipo === 'desactivar' || confirm.tipo === 'suspender' ? (
+              {(confirm.tipo === 'desactivar' ||
+                confirm.tipo === 'suspender') && (
                 <textarea
+                  className={styles.textarea}
                   placeholder="Motivo (opcional)"
                   value={confirm.mensaje}
                   onChange={(e) =>
                     setConfirm((c) => ({ ...c, mensaje: e.target.value }))
                   }
                 />
-              ) : null}
+              )}
             </div>
             <div className={styles.modalActions}>
               <button className={styles.cancelButton} onClick={cerrarConfirm}>

@@ -1,40 +1,37 @@
-/* Contenedor principal - SIN SCROLL */
 .registerContainer {
   min-height: 100vh;
-  max-height: 100vh; /* 🎯 NUEVO: Limita la altura máxima */
+  max-height: 100vh;
   width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center; /* 🎯 CAMBIO: De flex-start a center */
+  align-items: center;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-color: #f0f0f0;
   position: relative;
   padding: 1rem;
-  /* 🎯 REMOVIDO: padding-top y padding-bottom específicos */
+
   font-family: 'Poppins', sans-serif;
-  overflow: hidden; /* 🎯 CAMBIO: De overflow-x a overflow completo */
+  overflow: hidden;
 }
 
 @media (min-width: 576px) {
   .registerContainer {
     padding: 1.5rem;
-    /* 🎯 REMOVIDO: padding-top y padding-bottom específicos */
   }
 }
 
 @media (min-width: 768px) {
   .registerContainer {
     padding: 2rem;
-    /* 🎯 REMOVIDO: padding-top y padding-bottom específicos */
     background-attachment: fixed;
   }
 }
 
 @media (min-width: 992px) {
   .registerContainer {
-    padding: 2.5rem; /* 🎯 REDUCIDO: De 3rem a 2.5rem */
+    padding: 2.5rem;
     align-items: center;
   }
 }
@@ -43,7 +40,7 @@
 @media (max-width: 767px) {
   .registerContainer {
     background-attachment: scroll;
-    align-items: center; /* 🎯 NUEVO: Mantiene centrado en móvil */
+    align-items: center;
   }
 }
 
@@ -63,36 +60,34 @@
   z-index: 1;
 }
 
-/* Contenedor del contenido - AJUSTADO PARA SIN SCROLL */
+/* Contenedor del contenido */
 .contentContainer {
   position: relative;
   z-index: 2;
   max-width: 500px;
   width: 100%;
-  max-height: calc(
-    100vh - 2rem
-  ); /* 🎯 NUEVO: Limita altura considerando padding */
+  max-height: calc(100vh - 2rem);
   animation: slideInUp 0.6s ease-out;
 }
 
 @media (min-width: 576px) {
   .contentContainer {
     max-width: 550px;
-    max-height: calc(100vh - 3rem); /* 🎯 NUEVO: Ajustado para padding mayor */
+    max-height: calc(100vh - 3rem);
   }
 }
 
 @media (min-width: 768px) {
   .contentContainer {
     max-width: 600px;
-    max-height: calc(100vh - 4rem); /* 🎯 NUEVO: Ajustado para padding mayor */
+    max-height: calc(100vh - 4rem);
   }
 }
 
 @media (min-width: 992px) {
   .contentContainer {
     max-width: 500px;
-    max-height: calc(100vh - 5rem); /* 🎯 NUEVO: Ajustado para padding mayor */
+    max-height: calc(100vh - 5rem);
   }
 }
 
@@ -107,7 +102,6 @@
   }
 }
 
-/* Contenedor del formulario - CON SCROLL INTERNO SI ES NECESARIO */
 .formWrapper {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(15px);
@@ -115,9 +109,9 @@
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  overflow: auto; /* 🎯 CAMBIO: De hidden a auto para scroll interno */
+  overflow: auto;
   transition: all 0.3s ease;
-  max-height: 100%; /* 🎯 NUEVO: Respeta el contenedor padre */
+  max-height: 100%;
 }
 
 .formWrapper:hover {
@@ -188,13 +182,13 @@
 @media (max-width: 320px) {
   .registerContainer {
     padding: 0.5rem;
-    max-height: 100vh; /* 🎯 ASEGURADO: Sin scroll */
+    max-height: 100vh;
     overflow: hidden;
   }
 
   .contentContainer {
     max-width: 100%;
-    max-height: calc(100vh - 1rem); /* 🎯 NUEVO: Ajustado para padding mínimo */
+    max-height: calc(100vh - 1rem);
   }
 
   .formWrapper {
@@ -202,7 +196,6 @@
   }
 }
 
-/* 🎯 NUEVO: Para pantallas de altura muy limitada */
 @media (max-height: 600px) {
   .registerContainer {
     padding: 0.5rem;
@@ -218,11 +211,10 @@
   }
 }
 
-/* 🎯 NUEVO: Para landscape en móviles - SIN SCROLL */
 @media (max-width: 768px) and (orientation: landscape) {
   .registerContainer {
     padding: 0.5rem;
-    align-items: center; /* 🎯 CAMBIO: Centrado siempre */
+    align-items: center;
     max-height: 100vh;
     overflow: hidden;
   }
@@ -232,7 +224,6 @@
   }
 }
 
-/* 🎯 NUEVO: Para pantallas de altura muy pequeña en landscape */
 @media (max-height: 500px) and (orientation: landscape) {
   .registerContainer {
     padding: 0.25rem;
@@ -250,12 +241,12 @@
 /* Pantallas muy grandes */
 @media (min-width: 1400px) {
   .registerContainer {
-    padding: 3rem; /* 🎯 REDUCIDO: De 4rem a 3rem */
+    padding: 3rem;
   }
 
   .contentContainer {
     max-width: 600px;
-    max-height: calc(100vh - 6rem); /* 🎯 NUEVO: Ajustado */
+    max-height: calc(100vh - 6rem);
   }
 }
 
@@ -305,9 +296,9 @@
   .registerContainer {
     background: white !important;
     min-height: auto !important;
-    max-height: none !important; /* 🎯 NUEVO: Sin límite en print */
+    max-height: none !important;
     padding: 1rem !important;
-    overflow: visible !important; /* 🎯 NUEVO: Visible en print */
+    overflow: visible !important;
   }
 
   .overlay {
@@ -315,7 +306,7 @@
   }
 
   .contentContainer {
-    max-height: none; /* 🎯 NUEVO: Sin límite en print */
+    max-height: none;
   }
 
   .formWrapper {
@@ -323,7 +314,7 @@
     border: 1px solid #000;
     background: white;
     backdrop-filter: none;
-    overflow: visible; /* 🎯 NUEVO: Visible en print */
+    overflow: visible;
   }
 }
 
@@ -341,7 +332,6 @@
   }
 }
 
-/* 🎯 NUEVO: Scroll interno estilizado para el formWrapper */
 .formWrapper::-webkit-scrollbar {
   width: 6px;
 }
@@ -360,7 +350,6 @@
   background: rgba(90, 78, 124, 0.5);
 }
 
-/* 🎯 NUEVO: Para Firefox */
 .formWrapper {
   scrollbar-width: thin;
   scrollbar-color: rgba(90, 78, 124, 0.3) rgba(255, 255, 255, 0.1);

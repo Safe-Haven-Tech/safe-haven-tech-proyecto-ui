@@ -1,76 +1,123 @@
-// Routes.jsx
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import MainLayout from './layouts/MainLayout';
+import SecondLayout from './layouts/SecondLayout';
 
-import Home from './pages/home/HomePage';
+// Lazy loaded pages for faster initial bundle
+const Home = lazy(() => import('./pages/home/HomePage'));
 
-import Login from './pages/auth/SignIn';
-import Register from './pages/auth/RegisterPage';
+const Login = lazy(() => import('./pages/auth/SignIn'));
+const Register = lazy(() => import('./pages/auth/RegisterPage'));
 
-import Profile from './pages/profile/ProfilePage';
-import EditarPerfil from './pages/Profile/EditProfilePage';
-import ConfigurarPerfil from './pages/Profile/ConfigureProfilePage';
+const Profile = lazy(() => import('./pages/profile/ProfilePage'));
+const EditarPerfil = lazy(() => import('./pages/Profile/EditProfilePage'));
+const ConfigurarPerfil = lazy(
+  () => import('./pages/Profile/ConfigureProfilePage')
+);
 
-import SelfAssessment from './pages/AutoEvaluacion/assessmentsHome';
-import ViewSurvey from './pages/AutoEvaluacion/ViewSurvey';
-import MyEvaluations from './pages/AutoEvaluacion/MyEvaluations';
+const SelfAssessment = lazy(
+  () => import('./pages/AutoEvaluacion/assessmentsHome')
+);
+const ViewSurvey = lazy(() => import('./pages/AutoEvaluacion/ViewSurvey'));
+const MyEvaluations = lazy(
+  () => import('./pages/AutoEvaluacion/MyEvaluations')
+);
 
-import InformationalResourcesHome from './pages/InformationalResources/ResourcesHome';
-import ResourceDetail from './pages/InformationalResources/ResourceDetail';
+const InformationalResourcesHome = lazy(
+  () => import('./pages/InformationalResources/ResourcesHome')
+);
+const ResourceDetail = lazy(
+  () => import('./pages/InformationalResources/ResourceDetail')
+);
 
-import AdminPanel from './pages/admin/AdminPanel';
-import ResourcesManagement from './pages/admin/ResourcesManagement';
-import SurveysManagement from './pages/admin/SurveysManagement';
-import UserManagement from './pages/admin/UsersManagement';
+const AdminPanel = lazy(() => import('./pages/admin/AdminPanel'));
+const ResourcesManagement = lazy(
+  () => import('./pages/admin/ResourcesManagement')
+);
+const SurveysManagement = lazy(() => import('./pages/admin/SurveysManagement'));
+const UserManagement = lazy(() => import('./pages/admin/UsersManagement'));
+const Denuncias = lazy(() => import('./pages/admin/Denuncias'));
+const DenunciaDetail = lazy(() => import('./pages/admin/DenunciaDetail'));
+const PostulacionesAdmin = lazy(
+  () => import('./pages/admin/PostulacionesAdmin')
+);
 
-import PostDetail from './pages/Publicaciones/PostDetail';
-import Publicaciones from './pages/Publicaciones/FeedPublicaciones';
-import CrearPost from './pages/Publicaciones/CreatePostPage';
+const PostDetail = lazy(() => import('./pages/Publicaciones/PostDetail'));
+const Publicaciones = lazy(
+  () => import('./pages/Publicaciones/FeedPublicaciones')
+);
+const CrearPost = lazy(() => import('./pages/Publicaciones/CreatePostPage'));
 
-import ForoPage from './pages/foro/ForoPage';
-import CrearForo from './pages/foro/CreateForo';
+const ForoPage = lazy(() => import('./pages/foro/ForoPage'));
+const CrearForo = lazy(() => import('./pages/foro/CreateForo'));
+
+const Professionals = lazy(
+  () => import('./pages/profesionals/ProfessionalsPage')
+);
+const PostulacionPage = lazy(
+  () => import('./pages/profesionals/PostulacionPage')
+);
+
+const ChatPage = lazy(() => import('./pages/chat/ChatPage'));
+
+const NotFound = () => <div>Página no encontrada - 404</div>;
 
 export default function AppRoutes() {
   return (
-    <Routes>
-      {/* Rutas fuera de layout */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+    <Suspense fallback={<div>Cargando...</div>}>
+      <Routes>
+        {/* Rutas fuera de layout */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-      {/* Rutas dentro del layout */}
-      <Route element={<MainLayout />}>
+        {/* Rutas dentro del layout */}
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
 
-        <Route path="/" element={<Home />} />
+          <Route path="/perfil/:nickname" element={<Profile />} />
+          <Route path="/editar-perfil" element={<EditarPerfil />} />
+          <Route path="/configurar-perfil" element={<ConfigurarPerfil />} />
 
-        <Route path="/perfil/:nickname" element={<Profile />} />
-        <Route path="/editar-perfil" element={<EditarPerfil />} />
-        <Route path="/configurar-perfil" element={<ConfigurarPerfil />} />
+          <Route path="/autoevaluacion" element={<SelfAssessment />} />
+          <Route path="/encuesta/:id" element={<ViewSurvey />} />
+          <Route path="/mis-evaluaciones" element={<MyEvaluations />} />
 
-        <Route path="/autoevaluacion" element={<SelfAssessment />} />
-        <Route path="/encuesta/:id" element={<ViewSurvey />} />
-        <Route path="/mis-evaluaciones" element={<MyEvaluations />} />
+          <Route
+            path="/recursosinformativos"
+            element={<InformationalResourcesHome />}
+          />
+          <Route path="/recurso/:id" element={<ResourceDetail />} />
 
-        <Route path="/recursosinformativos"element={<InformationalResourcesHome />}/>
-        <Route path="/recurso/:id" element={<ResourceDetail />} />
+          <Route path="/publicacion/:id" element={<PostDetail />} />
+          <Route path="/publicaciones" element={<Publicaciones />} />
+          <Route path="/crear-post" element={<CrearPost />} />
 
-        <Route path="/admin/panel" element={<AdminPanel />} />
-        <Route path="/admin/recursos-informativos" element={<ResourcesManagement />}/>
-        <Route path="/admin/encuestas" element={<SurveysManagement />} />
-        <Route path="/admin/usuarios" element={<UserManagement />} />
+          <Route path="/foro" element={<ForoPage />} />
+          <Route path="/crear-foro" element={<CrearForo />} />
 
-        <Route path="/publicacion/:id" element={<PostDetail />} />
-        <Route path="/publicaciones" element={<Publicaciones />} />
-        <Route path="/crear-post" element={<CrearPost />} />
+          <Route path="/profesionales" element={<Professionals />} />
+          <Route path="/postular" element={<PostulacionPage />} />
+        </Route>
 
-        <Route path="/foro" element={<ForoPage />} />
-        <Route path="/crear-foro" element={<CrearForo />} />
+        <Route element={<SecondLayout />}>
+          <Route path="/admin/panel" element={<AdminPanel />} />
+          <Route
+            path="/admin/recursos-informativos"
+            element={<ResourcesManagement />}
+          />
+          <Route path="/admin/encuestas" element={<SurveysManagement />} />
+          <Route path="/admin/usuarios" element={<UserManagement />} />
+          <Route path="/admin/reportes" element={<Denuncias />} />
+          <Route path="/admin/reportes/:id" element={<DenunciaDetail />} />
+          <Route path="/admin/postulaciones" element={<PostulacionesAdmin />} />
 
-      </Route>
+          <Route path="/chat" element={<ChatPage />} />
+        </Route>
 
-      {/* Ruta 404 */}
-      <Route path="*" element={<div>Página no encontrada - 404</div>} />
-    </Routes>
+        {/* Ruta 404 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 }

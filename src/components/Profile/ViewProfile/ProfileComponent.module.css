@@ -840,8 +840,8 @@
 
 .fabCrearPost {
   position: fixed;
-  bottom: 32px;
-  right: 32px;
+  bottom: 25px;
+  right: 100px;
   z-index: 200;
   background: linear-gradient(90deg, #8e44ad 60%, #603c7e 100%);
   color: #fff;
@@ -850,18 +850,21 @@
   width: 60px;
   height: 60px;
   aspect-ratio: 1 / 1;
-  box-shadow: 0 4px 18px rgba(96,60,126,0.18);
+  box-shadow: 0 4px 18px rgba(96, 60, 126, 0.18);
   font-size: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+  transition:
+    background 0.18s,
+    box-shadow 0.18s,
+    transform 0.12s;
   padding: 0;
 }
 .fabCrearPost:hover {
   background: linear-gradient(90deg, #603c7e 60%, #8e44ad 100%);
-  box-shadow: 0 6px 28px rgba(96,60,126,0.28);
+  box-shadow: 0 6px 28px rgba(96, 60, 126, 0.28);
   transform: scale(1.07);
 }
 @media (max-width: 700px) {

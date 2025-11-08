@@ -1,0 +1,175 @@
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding-top: 80px;
+  margin-top: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  margin-right: 6px;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.select {
+  min-width: 180px;
+}
+
+/* Card contenedor */
+.card {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(35, 41, 54, 0.06);
+  border: 1px solid rgba(15, 23, 42, 0.04);
+}
+
+/* Lista con scroll si hay muchas denuncias */
+.list {
+  list-style: none;
+  padding: 8px;
+  margin: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Item */
+.item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+  margin-bottom: 12px;
+  align-items: center;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+  border-left: 4px solid transparent;
+}
+.item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(35, 41, 54, 0.08);
+}
+
+/* Bordes de color según tipo  */
+.item[data-tipo='publicacion'] {
+  border-left-color: #1e88e5;
+}
+.item[data-tipo='comentario'] {
+  border-left-color: #f59e0b;
+}
+.item[data-tipo='usuario'] {
+  border-left-color: #ef4444;
+}
+
+.left {
+  flex: 1;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.typeBadge {
+  background: #f1f1f1;
+  color: #333;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.motivo {
+  color: #603c7e;
+  margin-right: 8px;
+  font-size: 0.95rem;
+}
+
+.date {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.descripcion {
+  color: #444;
+  margin-bottom: 6px;
+  line-height: 1.35;
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.target {
+  color: #6c6c6c;
+  font-size: 0.85rem;
+}
+
+.actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* Botón pequeño */
+.actions .btn {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+
+/* Estado vacío */
+.empty {
+  padding: 28px;
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .select {
+    min-width: 140px;
+  }
+  .meta {
+    gap: 6px;
+  }
+  .item {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .actions {
+    margin-top: 8px;
+  }
+}

@@ -1,123 +1,229 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   fetchUsuarioPublico,
-  toggleSeguirUsuario,
   getUsuarioActual,
   fetchPostsPerfilByUserId,
 } from '../services/profileServices';
-
+import {
+  seguirUsuario,
+  dejarDeSeguirUsuario,
+  cancelarSolicitudSeguimiento,
+} from '../services/redSocialServices';
 import { mapearUsuario } from '../utils/mappers';
 
 /**
- * Hook personalizado para manejar la lógica de perfiles de usuario
- * @param {string} nickname - Nickname del usuario a cargar
- * @returns {Object} Estado y funciones del perfil
+ * useProfile
+ * - Hook que encapsula la carga y la gestión mínima de un perfil público.
+ * - Evita actualizaciones de estado tras el desmontado del componente.
+ * - Proporciona funciones estables para seguir / dejar de seguir y cancelar solicitudes.
+ *
+ * @param {string} nickname - Nickname del perfil a cargar
+ * @returns {Object} Estado y acciones del perfil
  */
 export const useProfile = (nickname) => {
   const [usuario, setUsuario] = useState(null);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [perfilPosts, setPerfilPosts] = useState([]); // Nuevo estado
+  const [perfilPosts, setPerfilPosts] = useState([]);
 
-  // Función memoizada para obtener el usuario actual
-  const getCurrentUser = useCallback(() => {
-    return getUsuarioActual();
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
-  // Función para cargar el perfil
+  /**
+   * Devuelve el usuario actualmente autenticado (si existe).
+   * El wrapper protege la llamada frente a excepciones internas de getUsuarioActual.
+   */
+  const getCurrentUser = useCallback(() => {
+    try {
+      return getUsuarioActual();
+    } catch {
+      return null;
+    }
+  }, []);
+
+  /**
+   * Normaliza posibles estructuras de respuesta para obtener un array de posts.
+   */
+  const normalizePostsResponse = useCallback((postsResp) => {
+    if (!postsResp) return [];
+    if (Array.isArray(postsResp)) return postsResp;
+    if (Array.isArray(postsResp.publicaciones)) return postsResp.publicaciones;
+    if (Array.isArray(postsResp.posts)) return postsResp.posts;
+    if (Array.isArray(postsResp.data)) return postsResp.data;
+    // Fallback conservador
+    return [];
+  }, []);
+
+  /**
+   * Carga el perfil público y sus publicaciones asociadas.
+   * - Protege actualizaciones de estado tras desmontado.
+   * - Separa errores de perfil y de posts para no bloquear la UX.
+   */
   const loadProfile = useCallback(async () => {
     if (!nickname || nickname.trim() === '') {
-      setError('Nickname inválido');
-      setIsLoading(false);
+      if (mountedRef.current) {
+        setError('Nickname inválido');
+        setIsLoading(false);
+      }
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
+    if (mountedRef.current) {
+      setIsLoading(true);
+      setError(null);
+    }
 
     try {
       const token = localStorage.getItem('token');
       const userData = await fetchUsuarioPublico(nickname, token);
+
+      if (!userData) {
+        throw new Error('Usuario no encontrado');
+      }
+
       const mappedUser = mapearUsuario(userData);
 
-      setUsuario(mappedUser);
+      if (mountedRef.current) {
+        setUsuario(mappedUser);
+      }
 
-      // Verificar si es el perfil propio
+      // Determinar si el perfil pertenece al usuario logueado
       const currentUser = getCurrentUser();
-      const ownProfile = currentUser && currentUser.id === userData._id;
-      setIsOwnProfile(ownProfile);
+      const currentUserId =
+        currentUser?.id ?? currentUser?._id ?? currentUser?.sub ?? null;
+      const userId = userData._id ?? userData.id ?? mappedUser?._id ?? null;
 
-      // Obtener los posts de tipo "perfil"
-      const postsPerfil = await fetchPostsPerfilByUserId(userData._id, token);
-      setPerfilPosts(postsPerfil);
+      if (mountedRef.current) {
+        setIsOwnProfile(
+          Boolean(
+            currentUserId && userId && String(currentUserId) === String(userId)
+          )
+        );
+      }
+
+      // Cargar posts del perfil: fallo aquí no debe abortar la carga del perfil
+      try {
+        const postsResp = await fetchPostsPerfilByUserId(userId, token);
+        const posts = normalizePostsResponse(postsResp);
+        if (mountedRef.current) {
+          setPerfilPosts(posts);
+        }
+      } catch (postsErr) {
+        // Loguear en consola para debugging sin bloquear la carga del perfil
+
+        console.error(
+          'useProfile: fetch posts error',
+          postsErr?.message || postsErr
+        );
+        if (mountedRef.current) setPerfilPosts([]);
+      }
     } catch (err) {
-      console.error('❌ Error cargando perfil:', err.message);
-      setError(err.message);
+      console.error('useProfile: loadProfile error', err?.message || err);
+      if (mountedRef.current) {
+        setError(err?.message || 'Error cargando perfil');
+        setUsuario(null);
+        setPerfilPosts([]);
+        setIsOwnProfile(false);
+      }
     } finally {
-      setIsLoading(false);
+      if (mountedRef.current) setIsLoading(false);
     }
-  }, [nickname, getCurrentUser]);
+  }, [nickname, getCurrentUser, normalizePostsResponse]);
 
-  // Función para seguir/dejar de seguir
+  /**
+   * Toggle follow / unfollow
+   * - Determina si el usuario actual ya sigue al perfil y ejecuta la acción inversa.
+   * - Refresca el perfil tras completar la operación.
+   * - Propaga el error para que los consumers puedan reaccionar (p. ej. navegación).
+   */
   const handleFollowToggle = useCallback(async () => {
     if (!usuario) return;
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token de autenticación requerido');
-      }
-
-      await toggleSeguirUsuario(usuario._id, token);
-
-      // Actualizar el estado local
       const currentUser = getCurrentUser();
-      const updatedUser = { ...usuario };
+      if (!currentUser) throw new Error('Usuario no autenticado');
 
-      if (updatedUser.seguidores?.includes(currentUser?.id)) {
-        updatedUser.seguidores = updatedUser.seguidores.filter(
-          (id) => id !== currentUser.id
-        );
+      const currentUserId =
+        currentUser?.id ?? currentUser?._id ?? currentUser?.sub ?? null;
+
+      const yaSigo = Array.isArray(usuario.seguidores)
+        ? usuario.seguidores.some((s) => {
+            const sid = typeof s === 'object' ? (s._id ?? s.id ?? null) : s;
+            return sid && String(sid) === String(currentUserId);
+          })
+        : false;
+
+      if (yaSigo) {
+        await dejarDeSeguirUsuario(usuario._id);
       } else {
-        updatedUser.seguidores = [
-          ...(updatedUser.seguidores || []),
-          currentUser.id,
-        ];
+        const res = await seguirUsuario(usuario._id);
+        // Si la API indica estado especial (por ejemplo solicitud enviada) actualizamos error/estado informativo.
+        if (res?.tipo === 'solicitud_enviada' && mountedRef.current) {
+          setError('Solicitud de seguimiento enviada');
+        }
       }
 
-      setUsuario(updatedUser);
+      // Refrescar perfil para reflejar cambio en seguidores / estado
+      await loadProfile();
     } catch (err) {
-      console.error('❌ Error al seguir/dejar de seguir:', err);
-      setError(err.message);
-      throw err; // Re-throw para que el componente pueda manejar el error si es necesario
+      console.error(
+        'useProfile: handleFollowToggle error',
+        err?.message || err
+      );
+      if (mountedRef.current)
+        setError(err?.message || 'Error al actualizar seguimiento');
+      throw err;
     }
-  }, [usuario, getCurrentUser]);
+  }, [usuario, getCurrentUser, loadProfile]);
 
-  // Función para refrescar el perfil
+  /**
+   * Cancela una solicitud de seguimiento pendiente.
+   * - Refresca el perfil tras completar la operación.
+   */
+  const handleCancelRequest = useCallback(async () => {
+    if (!usuario) return;
+    try {
+      await cancelarSolicitudSeguimiento(usuario._id);
+      await loadProfile();
+    } catch (err) {
+      console.error(
+        'useProfile: handleCancelRequest error',
+        err?.message || err
+      );
+      if (mountedRef.current)
+        setError(err?.message || 'Error al cancelar solicitud');
+      throw err;
+    }
+  }, [usuario, loadProfile]);
+
   const refreshProfile = useCallback(() => {
-    loadProfile();
+    void loadProfile();
   }, [loadProfile]);
 
-  // Cargar perfil cuando cambie el nickname
   useEffect(() => {
-    loadProfile();
+    void loadProfile();
   }, [loadProfile]);
 
   return {
-    // Estado
     usuario,
     isOwnProfile,
     isLoading,
     error,
-    perfilPosts, 
+    perfilPosts,
 
-    // Funciones
     getCurrentUser,
     handleFollowToggle,
     refreshProfile,
-
-   
-    setError, 
+    handleCancelRequest,
+    setError,
   };
 };
+
+export default useProfile;

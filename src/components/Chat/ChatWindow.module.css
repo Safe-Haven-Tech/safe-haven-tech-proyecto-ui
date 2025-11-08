@@ -1,0 +1,147 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  flex: 1 1 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.messages {
+  flex: 1 1 auto;
+  height: 0;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 1rem;
+  background: var(--chat-bg, #f8f9fa);
+}
+
+.messageRow {
+  display: flex;
+  margin-bottom: 0.75rem;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.messageBubble {
+  padding: 0.5rem 0.7rem;
+  border-radius: 12px;
+  max-width: 72%;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+  word-break: break-word;
+}
+
+.mine {
+  background: var(--bs-primary, #0d6efd);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.mineRow {
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.mineRow .messageBubble {
+  margin-left: auto;
+}
+
+.theirs {
+  background: #fff;
+  color: #212529;
+  border-bottom-left-radius: 4px;
+}
+
+.theirs {
+  background: #fff;
+  color: #212529;
+  border-bottom-left-radius: 4px;
+}
+
+.metaSmall {
+  font-size: 0.72rem;
+  color: rgba(0, 0, 0, 0.45);
+  margin-top: 0.35rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.attachments {
+  margin-top: 0.5rem;
+}
+
+.refreshHint {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-left: 0.5rem;
+}
+
+.attachments {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+.attachmentItem {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 160px;
+}
+.attachmentImg {
+  width: 140px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  display: block;
+  max-width: 100%;
+}
+
+/* pequeño texto debajo si se necesita */
+.attachmentItem a {
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.85rem;
+  margin-top: 6px;
+  display: inline-block;
+  max-width: 140px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.messageRow:global(.justify-content-end) {
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.messageRow:global(.justify-content-end) .messageBubble {
+  margin-left: auto;
+}
+
+.mineRow {
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.mineRow .messageBubble {
+  margin-left: auto;
+}

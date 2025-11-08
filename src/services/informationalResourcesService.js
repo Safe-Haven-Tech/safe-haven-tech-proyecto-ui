@@ -1,40 +1,85 @@
-const API_URL = import.meta.env.VITE_API_URL;
+/**
+ * Cliente HTTP para Recursos Informativos.
+ * Entorno: Vite (import.meta.env.VITE_API_URL).
+ */
 
-/** Obtener recurso por ID (público) */
-export const fetchRecursoById = async (id) => {
+const API_URL = import.meta.env.VITE_API_URL || '';
+
+/**
+ * Intenta parsear Response a JSON; si falla devuelve texto o null.
+ * @param {Response} res
+ * @returns {Promise<any|null>}
+ */
+const parseResponse = async (res) => {
   try {
-    const res = await fetch(`${API_URL}/api/recursos-informativos/${id}`);
-    const data = await res.json();
+    return await res.json();
+  } catch {
+    try {
+      const text = await res.text();
+      return text || null;
+    } catch {
+      return null;
+    }
+  }
+};
+
+/**
+ * Extrae mensaje útil del body si existe.
+ * @param {any} body
+ * @returns {string|null}
+ */
+const extractMessage = (body) => {
+  if (!body) return null;
+  if (typeof body === 'string') return body;
+  return body.mensaje || body.message || body.error || body.detalles || null;
+};
+
+/**
+ * Obtener recurso por ID (público).
+ * Retorna { data, status, mensaje } para compatibilidad con implementación previa.
+ * @param {string} id
+ * @returns {Promise<{data:any|null, status:number, mensaje:string}>}
+ */
+export const fetchRecursoById = async (id) => {
+  if (!id) throw new Error('ID requerido');
+
+  try {
+    const res = await fetch(
+      `${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}`
+    );
+    const body = await parseResponse(res);
 
     if (res.status === 404) {
       return {
         data: null,
         status: 404,
-        mensaje: data.message || 'Recurso no encontrado',
+        mensaje: extractMessage(body) || 'Recurso no encontrado',
       };
     }
+
     if (res.status === 400) {
       return {
         data: null,
         status: 400,
-        mensaje: data.message || 'Error en la solicitud',
+        mensaje: extractMessage(body) || 'Error en la solicitud',
       };
     }
+
     if (!res.ok) {
       return {
         data: null,
         status: res.status,
-        mensaje: data.message || 'Error al obtener el recurso',
+        mensaje: extractMessage(body) || 'Error al obtener el recurso',
       };
     }
 
     return {
-      data: data.data,
+      data: body?.data ?? null,
       status: 200,
-      mensaje: data.mensaje || 'Recurso obtenido exitosamente',
+      mensaje: extractMessage(body) || 'Recurso obtenido exitosamente',
     };
   } catch (error) {
-    console.error('Error en fetchRecursoById:', error);
+    console.error('fetchRecursoById error:', error.message || error);
     return {
       data: null,
       status: 500,
@@ -43,270 +88,302 @@ export const fetchRecursoById = async (id) => {
   }
 };
 
-// ==================== OBTENER RECURSOS ====================
+/* ==================== OBTENER RECURSOS ==================== */
 
+/**
+ * Lista recursos con filtros y paginación.
+ * @param {Object} filtros
+ * @returns {Promise<{recursos:Array, paginacion:Object}>}
+ */
 export const fetchRecursos = async (filtros = {}) => {
   try {
-    const queryParams = new URLSearchParams();
-
-    if (filtros.pagina) queryParams.append('pagina', filtros.pagina);
-    if (filtros.limite) queryParams.append('limite', filtros.limite);
+    const params = new URLSearchParams();
+    if (filtros.pagina) params.append('pagina', String(filtros.pagina));
+    if (filtros.limite) params.append('limite', String(filtros.limite));
     if (filtros.topico && filtros.topico !== 'Todos')
-      queryParams.append('topico', filtros.topico);
-    if (filtros.tipo) queryParams.append('tipo', filtros.tipo);
+      params.append('topico', filtros.topico);
+    if (filtros.tipo) params.append('tipo', filtros.tipo);
     if (filtros.destacado !== undefined)
-      queryParams.append('destacado', filtros.destacado);
-    if (filtros.busqueda) queryParams.append('busqueda', filtros.busqueda);
+      params.append('destacado', String(filtros.destacado));
+    if (filtros.busqueda) params.append('busqueda', filtros.busqueda);
 
-    const url = `${API_URL}/api/recursos-informativos${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `${API_URL}/api/recursos-informativos${params.toString() ? `?${params.toString()}` : ''}`;
     const res = await fetch(url);
 
     if (!res.ok) throw new Error('Error al obtener los recursos');
 
-    const data = await res.json();
+    const body = await parseResponse(res);
     return {
-      recursos: data.data || [],
-      paginacion: data.paginacion || {},
+      recursos: body?.data ?? [],
+      paginacion: body?.paginacion ?? {},
     };
   } catch (error) {
-    console.error('Error en fetchRecursos:', error);
+    console.error('fetchRecursos error:', error.message || error);
     throw error;
   }
 };
 
+/**
+ * Recursos destacados.
+ * @param {number} limite
+ * @returns {Promise<Array>}
+ */
 export const fetchRecursosDestacados = async (limite = 6) => {
   try {
-    const res = await fetch(
-      `${API_URL}/api/recursos-informativos/destacados?limite=${limite}`
-    );
+    const url = `${API_URL}/api/recursos-informativos/destacados?limite=${encodeURIComponent(String(limite))}`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error('Error al obtener recursos destacados');
-    const data = await res.json();
-    return data.data || [];
+    const body = await parseResponse(res);
+    return body?.data ?? [];
   } catch (error) {
-    console.error('Error en fetchRecursosDestacados:', error);
+    console.error('fetchRecursosDestacados error:', error.message || error);
     throw error;
   }
 };
 
+/**
+ * Buscar recursos por término y opciones.
+ * @param {string} termino
+ * @param {Object} opciones
+ * @returns {Promise<Array>}
+ */
 export const buscarRecursos = async (termino, opciones = {}) => {
+  if (!termino) return [];
   try {
-    const queryParams = new URLSearchParams();
-    queryParams.append('q', termino);
+    const params = new URLSearchParams();
+    params.append('q', termino);
+    if (opciones.topico) params.append('topico', opciones.topico);
+    if (opciones.limite) params.append('limite', String(opciones.limite));
 
-    if (opciones.topico) queryParams.append('topico', opciones.topico);
-    if (opciones.limite) queryParams.append('limite', opciones.limite);
-
-    const res = await fetch(
-      `${API_URL}/api/recursos-informativos/buscar?${queryParams.toString()}`
-    );
+    const url = `${API_URL}/api/recursos-informativos/buscar?${params.toString()}`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error('Error al buscar recursos');
-    const data = await res.json();
-    return data.data || [];
+    const body = await parseResponse(res);
+    return body?.data ?? [];
   } catch (error) {
-    console.error('Error en buscarRecursos:', error);
+    console.error('buscarRecursos error:', error.message || error);
     throw error;
   }
 };
 
+/**
+ * Obtener recursos por tópico.
+ * @param {string} topico
+ * @param {Object} opciones
+ * @returns {Promise<Array>}
+ */
 export const fetchRecursosPorTopico = async (topico, opciones = {}) => {
+  if (!topico) return [];
   try {
-    const queryParams = new URLSearchParams();
-    if (opciones.limite) queryParams.append('limite', opciones.limite);
-    if (opciones.ordenarPor)
-      queryParams.append('ordenarPor', opciones.ordenarPor);
+    const params = new URLSearchParams();
+    if (opciones.limite) params.append('limite', String(opciones.limite));
+    if (opciones.ordenarPor) params.append('ordenarPor', opciones.ordenarPor);
 
-    const url = `${API_URL}/api/recursos-informativos/buscar/topico/${encodeURIComponent(topico)}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `${API_URL}/api/recursos-informativos/buscar/topico/${encodeURIComponent(topico)}${params.toString() ? `?${params.toString()}` : ''}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error('Error al obtener recursos por tópico');
-    const data = await res.json();
-    return data.data || [];
+    const body = await parseResponse(res);
+    return body?.data ?? [];
   } catch (error) {
-    console.error('Error en fetchRecursosPorTopico:', error);
+    console.error('fetchRecursosPorTopico error:', error.message || error);
     throw error;
   }
 };
 
+/**
+ * Obtener recursos por tipo.
+ * @param {string} tipo
+ * @param {Object} opciones
+ * @returns {Promise<Array>}
+ */
 export const fetchRecursosPorTipo = async (tipo, opciones = {}) => {
+  if (!tipo) return [];
   try {
-    const queryParams = new URLSearchParams();
-    if (opciones.limite) queryParams.append('limite', opciones.limite);
-    if (opciones.ordenarPor)
-      queryParams.append('ordenarPor', opciones.ordenarPor);
+    const params = new URLSearchParams();
+    if (opciones.limite) params.append('limite', String(opciones.limite));
+    if (opciones.ordenarPor) params.append('ordenarPor', opciones.ordenarPor);
 
-    const url = `${API_URL}/api/recursos-informativos/tipo/${tipo}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `${API_URL}/api/recursos-informativos/tipo/${encodeURIComponent(tipo)}${params.toString() ? `?${params.toString()}` : ''}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error('Error al obtener recursos por tipo');
-    const data = await res.json();
-    return data.data || [];
+    const body = await parseResponse(res);
+    return body?.data ?? [];
   } catch (error) {
-    console.error('Error en fetchRecursosPorTipo:', error);
+    console.error('fetchRecursosPorTipo error:', error.message || error);
     throw error;
   }
 };
 
-// ==================== OBTENER METADATOS ====================
+/* ==================== OBTENER METADATOS ==================== */
 
+/**
+ * Tópicos disponibles.
+ * @returns {Promise<Array>}
+ */
 export const fetchTopicosDisponibles = async () => {
   try {
     const res = await fetch(
       `${API_URL}/api/recursos-informativos/topicos/disponibles`
     );
     if (!res.ok) throw new Error('Error al obtener tópicos disponibles');
-    const data = await res.json();
-    return data.data || [];
+    const body = await parseResponse(res);
+    return body?.data ?? [];
   } catch (error) {
-    console.error('Error en fetchTopicosDisponibles:', error);
+    console.error('fetchTopicosDisponibles error:', error.message || error);
     throw error;
   }
 };
 
+/**
+ * Tipos disponibles.
+ * @returns {Promise<Array>}
+ */
 export const fetchTiposDisponibles = async () => {
   try {
     const res = await fetch(
       `${API_URL}/api/recursos-informativos/tipos/disponibles`
     );
     if (!res.ok) throw new Error('Error al obtener tipos disponibles');
-    const data = await res.json();
-    return data.data || [];
+    const body = await parseResponse(res);
+    return body?.data ?? [];
   } catch (error) {
-    console.error('Error en fetchTiposDisponibles:', error);
+    console.error('fetchTiposDisponibles error:', error.message || error);
     throw error;
   }
 };
 
+/**
+ * Obtener estadísticas públicas.
+ * @returns {Promise<any>}
+ */
 export const fetchEstadisticas = async () => {
   try {
-    console.log('📊 Solicitando estadísticas al servidor...');
-
-    // Hacer la petición SIN token ya que es público
-    const response = await fetch(
+    const res = await fetch(
       `${API_URL}/api/recursos-informativos/estadisticas`,
       {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       }
     );
 
-    console.log(
-      '📡 Respuesta del servidor:',
-      response.status,
-      response.statusText
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('❌ Error del servidor:', {
-        status: response.status,
-        statusText: response.statusText,
-        errorData,
-      });
-
-      throw new Error(errorData.mensaje || `Error HTTP: ${response.status}`);
+    if (!res.ok) {
+      const body = await parseResponse(res).catch(() => null);
+      throw new Error(extractMessage(body) || `Error HTTP: ${res.status}`);
     }
 
-    const data = await response.json();
-    console.log('✅ Estadísticas recibidas correctamente');
-
-    return data.data;
+    const body = await parseResponse(res);
+    return body?.data ?? null;
   } catch (error) {
-    console.error('❌ Error al obtener estadísticas:', error);
+    console.error('fetchEstadisticas error:', error.message || error);
     throw error;
   }
 };
 
-// ==================== INTERACCIONES ====================
+/* ==================== INTERACCIONES ==================== */
 
+/**
+ * Incrementar contador de visitas para un recurso.
+ * @param {string} id
+ * @returns {Promise<any>}
+ */
 export const incrementarVisitas = async (id) => {
+  if (!id) throw new Error('ID requerido');
   try {
     const res = await fetch(
-      `${API_URL}/api/recursos-informativos/${id}/visitas`,
+      `${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}/visitas`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       }
     );
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      console.error('Error response:', errorData);
-      throw new Error(
-        errorData.message || errorData.error || 'Error al incrementar visitas'
-      );
+      const body = await parseResponse(res).catch(() => null);
+      throw new Error(extractMessage(body) || 'Error al incrementar visitas');
     }
 
-    return await res.json();
+    return await parseResponse(res);
   } catch (error) {
-    console.error('Error en incrementarVisitas:', error);
+    console.error('incrementarVisitas error:', error.message || error);
     throw error;
   }
 };
 
+/**
+ * Incrementar contador de descargas para un recurso.
+ * @param {string} id
+ * @returns {Promise<any>}
+ */
 export const incrementarDescargas = async (id) => {
+  if (!id) throw new Error('ID requerido');
   try {
     const res = await fetch(
-      `${API_URL}/api/recursos-informativos/${id}/descargas`,
+      `${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}/descargas`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       }
     );
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(
-        errorData.detalles ||
-          errorData.mensaje ||
-          'Error al incrementar descargas'
-      );
+      const body = await parseResponse(res).catch(() => null);
+      throw new Error(extractMessage(body) || 'Error al incrementar descargas');
     }
 
-    return await res.json();
+    return await parseResponse(res);
   } catch (error) {
-    console.error('Error en incrementarDescargas:', error);
+    console.error('incrementarDescargas error:', error.message || error);
     throw error;
   }
 };
 
+/**
+ * Incrementar contador de compartidos para un recurso.
+ * @param {string} id
+ * @returns {Promise<any>}
+ */
 export const incrementarCompartidos = async (id) => {
+  if (!id) throw new Error('ID requerido');
   try {
     const res = await fetch(
-      `${API_URL}/api/recursos-informativos/${id}/compartidos`,
+      `${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}/compartidos`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       }
     );
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
+      const body = await parseResponse(res).catch(() => null);
       throw new Error(
-        errorData.detalles ||
-          errorData.mensaje ||
-          'Error al incrementar compartidos'
+        extractMessage(body) || 'Error al incrementar compartidos'
       );
     }
 
-    return await res.json();
+    return await parseResponse(res);
   } catch (error) {
-    console.error('Error en incrementarCompartidos:', error);
+    console.error('incrementarCompartidos error:', error.message || error);
     throw error;
   }
 };
 
-// ==================== CALIFICACIONES (requiere token) ====================
+/* ==================== CALIFICACIONES (requiere token) ==================== */
 
+/**
+ * Calificar recurso (requiere token).
+ * @param {string} id
+ * @param {number} calificacion
+ * @param {string} token
+ * @returns {Promise<any>}
+ */
 export const calificarRecurso = async (id, calificacion, token) => {
+  if (!id) throw new Error('ID requerido');
+  if (calificacion == null) throw new Error('Calificación requerida');
+  if (!token) throw new Error('Token requerido');
+
   try {
     const res = await fetch(
-      `${API_URL}/api/recursos-informativos/${id}/calificar`,
+      `${API_URL}/api/recursos-informativos/${encodeURIComponent(id)}/calificar`,
       {
         method: 'POST',
         headers: {
@@ -318,15 +395,13 @@ export const calificarRecurso = async (id, calificacion, token) => {
     );
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(
-        errorData.detalles || errorData.mensaje || 'Error al calificar recurso'
-      );
+      const body = await parseResponse(res).catch(() => null);
+      throw new Error(extractMessage(body) || 'Error al calificar recurso');
     }
 
-    return await res.json();
+    return await parseResponse(res);
   } catch (error) {
-    console.error('Error en calificarRecurso:', error);
+    console.error('calificarRecurso error:', error.message || error);
     throw error;
   }
 };

@@ -34,6 +34,68 @@ const getResourceColorClass = (tipo) => {
   return colorClassMap[tipo] || styles.colorDefault;
 };
 
+/**
+ * Modal informativo
+ */
+const InfoModal = ({ show, title, message, onClose, okText = 'Aceptar' }) => {
+  if (!show) return null;
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0,0,0,0.25)',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        style={{
+          background: '#fff',
+          borderRadius: 12,
+          padding: '20px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          minWidth: 300,
+          maxWidth: 560,
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <h5 style={{ marginTop: 0, marginBottom: 8, color: '#603c7e' }}>
+          {title}
+        </h5>
+        <div
+          style={{ marginBottom: 18, color: '#333', whiteSpace: 'pre-wrap' }}
+        >
+          {message}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: '#603c7e',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '8px 14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {okText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function ResourceDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -50,7 +112,13 @@ export default function ResourceDetail() {
   const [selectedImage, setSelectedImage] = useState('');
   const [imageTitle, setImageTitle] = useState('');
 
-  // Ref para controlar el incremento de visitas
+  // Estado para mensajes informativos (reemplaza alert)
+  const [infoModal, setInfoModal] = useState({
+    show: false,
+    title: '',
+    message: '',
+  });
+
   const visitaIncrementada = useRef(false);
 
   useEffect(() => {
@@ -81,7 +149,6 @@ export default function ResourceDetail() {
 
         setResource(response.data);
 
-        // Si el usuario está autenticado, obtener su calificación actual
         if (
           usuario &&
           response.data.calificacion &&
@@ -95,7 +162,6 @@ export default function ResourceDetail() {
           }
         }
 
-        // Incrementar visitas solo una vez usando ref
         const visitaKey = `visita_${id}`;
         const yaVisitado = sessionStorage.getItem(visitaKey);
 
@@ -106,14 +172,13 @@ export default function ResourceDetail() {
             await incrementarVisitas(id);
             sessionStorage.setItem(visitaKey, 'true');
 
-            // Actualizar contador local
             setResource((prev) => ({
               ...prev,
               visitas: (prev.visitas || 0) + 1,
             }));
           } catch (visitasError) {
             console.error('Error al incrementar visitas:', visitasError);
-            visitaIncrementada.current = false; // Resetear en caso de error
+            visitaIncrementada.current = false;
           }
         }
       } catch (error) {
@@ -144,29 +209,43 @@ export default function ResourceDetail() {
         });
       } else {
         await navigator.clipboard.writeText(url);
-        alert('Enlace copiado al portapapeles');
+        // Mostrar confirmación en la UI en vez de alert
+        setInfoModal({
+          show: true,
+          title: 'Enlace copiado',
+          message: 'Enlace copiado al portapapeles',
+        });
       }
 
-      // Incrementar contador de compartidos (no bloquear si falla)
       incrementarCompartidos(id)
         .then(() => {
-          // Actualizar el recurso para mostrar el nuevo contador
           setResource((prev) => ({
             ...prev,
             compartidos: (prev.compartidos || 0) + 1,
           }));
         })
         .catch(() => {
-          // Silenciar errores de compartidos
+          // Silenciar errores de incremento de métricas
         });
     } catch (error) {
-      if (error.name !== 'AbortError') {
-        alert('Error al compartir. El enlace se ha copiado al portapapeles.');
-        try {
-          await navigator.clipboard.writeText(window.location.href);
-        } catch (clipboardError) {
-          console.error('Error al copiar al portapapeles:', clipboardError);
-        }
+      console.error('Error al compartir:', error);
+      // Intentar copiar al portapapeles y notificar en UI
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        setInfoModal({
+          show: true,
+          title: 'Error al compartir',
+          message:
+            'No fue posible usar la API de compartir. El enlace se ha copiado al portapapeles.',
+        });
+      } catch (clipboardError) {
+        console.error('Error al copiar al portapapeles:', clipboardError);
+        setInfoModal({
+          show: true,
+          title: 'Error al compartir',
+          message:
+            'No se pudo compartir ni copiar el enlace. Intenta manualmente.',
+        });
       }
     }
   };
@@ -194,8 +273,13 @@ export default function ResourceDetail() {
         }
       }
     } catch (error) {
-      alert('Error al enviar la calificación. Por favor, intenta de nuevo.');
-      console.error('Error en handleRating:', error);
+      console.error('Error al enviar la calificación:', error);
+      setInfoModal({
+        show: true,
+        title: 'Error',
+        message:
+          'Error al enviar la calificación. Por favor, intenta de nuevo.',
+      });
     } finally {
       setSubmittingRating(false);
     }
@@ -549,6 +633,13 @@ export default function ResourceDetail() {
           </div>
         </div>
       )}
+
+      <InfoModal
+        show={infoModal.show}
+        title={infoModal.title}
+        message={infoModal.message}
+        onClose={() => setInfoModal({ show: false, title: '', message: '' })}
+      />
     </>
   );
 }

@@ -1,9 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import styles from './PostDetail.module.css';
 import placeholderImage from '../../assets/perfil_placeholder.png';
-import { fetchPublicacionPorId, likePublicacion, unlikePublicacion, comentarPublicacion, eliminarComentario } from '../../services/publicacionesService';
+import {
+  fetchPublicacionPorId,
+  likePublicacion,
+  unlikePublicacion,
+  comentarPublicacion,
+  eliminarComentario,
+  deletePublicacion,
+  denunciarPublicacion,
+  denunciarComentario,
+} from '../../services/publicacionesService';
 
+import DenunciaModal from '../../components/Publicaciones/Denuncia';
+
+/**
+ * Decodifica el token JWT para obtener el id del usuario.
+ * Devuelve null si el token no es válido o no existe.
+ */
 function getUsuarioIdFromToken(token) {
   if (!token) return null;
   try {
@@ -15,27 +30,104 @@ function getUsuarioIdFromToken(token) {
   }
 }
 
-// Extrae el rol del usuario desde el token JWT
-function getUsuarioRolFromToken(token) {
-  if (!token) return null;
-  try {
-    const payload = token.split('.')[1];
-    const decoded = JSON.parse(atob(payload));
-    return decoded.rol || null;
-  } catch {
-    return null;
-  }
-}
+/**
+ * Toast ligero para mensajes transitorios.
+ * Cierra automáticamente tras timeout ms.
+ */
+const Toast = ({ message, show, onClose, timeout = 3500 }) => {
+  useEffect(() => {
+    if (!show) return;
+    const t = setTimeout(onClose, timeout);
+    return () => clearTimeout(t);
+  }, [show, onClose, timeout]);
 
+  if (!show) return null;
+  return (
+    <div className={styles.toastContainer} role="status" aria-live="polite">
+      <div className={styles.toast}>{message}</div>
+    </div>
+  );
+};
+
+/**
+ * Modal de confirmación reutilizable.
+ * Uso: acciones críticas (eliminar, confirmar, etc.).
+ */
+const ConfirmModal = ({
+  show,
+  title,
+  message,
+  onCancel,
+  onConfirm,
+  confirmText = 'Confirmar',
+}) => {
+  if (!show) return null;
+  return (
+    <div className={styles.modalBackdrop} role="dialog" aria-modal="true">
+      <div className={styles.modalCard}>
+        <h5 className={styles.modalTitle}>{title}</h5>
+        <p className={styles.modalMessage}>{message}</p>
+        <div className={styles.modalActions}>
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={onCancel}
+          >
+            Cancelar
+          </button>
+          <button type="button" className="btn btn-danger" onClick={onConfirm}>
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Modal informativo para mostrar confirmaciones (por ejemplo: "Denuncia enviada").
+ * Este modal reemplaza confirm() del navegador para ofrecer mejor UX.
+ */
+const InfoModal = ({ show, title, message, onClose, okText = 'Aceptar' }) => {
+  if (!show) return null;
+  return (
+    <div className={styles.modalBackdrop} role="dialog" aria-modal="true">
+      <div className={styles.modalCard}>
+        <h5 className={styles.modalTitle}>{title}</h5>
+        <p className={styles.modalMessage}>{message}</p>
+        <div
+          className={styles.modalActions}
+          style={{ justifyContent: 'flex-end' }}
+        >
+          <button type="button" className="btn btn-primary" onClick={onClose}>
+            {okText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Carrusel ligero para imágenes / video.
+ * Detecta video por extensión y muestra controles nativos cuando corresponde.
+ */
 const ImagenesCarrusel = ({ imagenes }) => {
   const [indice, setIndice] = useState(0);
-  if (!imagenes || imagenes.length === 0) return null;
-  const siguiente = () => setIndice((indice + 1) % imagenes.length);
-  const anterior = () => setIndice((indice - 1 + imagenes.length) % imagenes.length);
 
-  // Detecta si es video por extensión
-  const esVideo = (url) => {
-    const ext = url.split('.').pop().toLowerCase();
+  if (!imagenes || imagenes.length === 0) return null;
+
+  const siguiente = useCallback(
+    () => setIndice((i) => (i + 1) % imagenes.length),
+    [imagenes.length]
+  );
+  const anterior = useCallback(
+    () => setIndice((i) => (i - 1 + imagenes.length) % imagenes.length),
+    [imagenes.length]
+  );
+
+  const esVideo = (url = '') => {
+    const ext = url.split('.').pop()?.toLowerCase();
     return ['mp4', 'webm', 'ogg', 'mov'].includes(ext);
   };
 
@@ -56,6 +148,7 @@ const ImagenesCarrusel = ({ imagenes }) => {
             className={styles.carruselImg}
           />
         )}
+
         {imagenes.length > 1 && (
           <>
             <button
@@ -64,7 +157,7 @@ const ImagenesCarrusel = ({ imagenes }) => {
               className={`btn btn-light ${styles.carruselBtn} ${styles.carruselBtnLeft}`}
               aria-label="Anterior"
             >
-              <i className="bi bi-chevron-left"></i>
+              <i className="bi bi-chevron-left" />
             </button>
             <button
               type="button"
@@ -72,74 +165,119 @@ const ImagenesCarrusel = ({ imagenes }) => {
               className={`btn btn-light ${styles.carruselBtn} ${styles.carruselBtnRight}`}
               aria-label="Siguiente"
             >
-              <i className="bi bi-chevron-right"></i>
+              <i className="bi bi-chevron-right" />
             </button>
+
+            <div className={styles.carruselIndicators}>
+              {imagenes.map((_, idx) => (
+                <span
+                  key={imagenes[idx] || idx}
+                  className={
+                    idx === indice
+                      ? `${styles.carruselIndicator} ${styles.carruselIndicatorActive}`
+                      : styles.carruselIndicator
+                  }
+                  aria-hidden
+                />
+              ))}
+            </div>
           </>
-        )}
-        {imagenes.length > 1 && (
-          <div className={styles.carruselIndicators}>
-            {imagenes.map((_, idx) => (
-              <span
-                key={idx}
-                className={
-                  idx === indice
-                    ? `${styles.carruselIndicator} ${styles.carruselIndicatorActive}`
-                    : styles.carruselIndicator
-                }
-              />
-            ))}
-          </div>
         )}
       </div>
     </div>
   );
 };
 
+/* ------------------------------
+   Componente principal
+   ------------------------------ */
+
 const PostDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [publicacion, setPublicacion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [likeLoading, setLikeLoading] = useState(false);
 
-  // Obtener token, usuarioId y rol desde el token JWT
   const token = localStorage.getItem('token');
   const usuarioId = getUsuarioIdFromToken(token);
-  const usuarioRol = getUsuarioRolFromToken(token);
 
-  // Estado para likes
+  // Likes
   const [yaDioLike, setYaDioLike] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
 
-  // Estado para comentarios
+  // Comentarios
   const [comentarioTexto, setComentarioTexto] = useState('');
   const [comentarioLoading, setComentarioLoading] = useState(false);
   const [comentarioError, setComentarioError] = useState('');
 
-  // Estado para modal de login
+  // UI modals / toasts / menus
   const [showLoginModal, setShowLoginModal] = useState(false);
-
-  // Estado para menú de opciones de comentario
   const [comentarioMenuOpen, setComentarioMenuOpen] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
+  // Denuncias
+  const [showDenunciaModal, setShowDenunciaModal] = useState(false);
+  const [denunciaTarget, setDenunciaTarget] = useState(null); // { tipo: 'publicacion'|'comentario', id }
+
+  // Confirm modal state centralizado para eliminar publicación/comentario
+  const [confirmState, setConfirmState] = useState({
+    show: false,
+    tipo: null,
+    payload: null,
+    title: '',
+    message: '',
+  });
+
+  // Info modal para confirmar envío de denuncia (reemplaza confirm del navegador)
+  const [infoDenuncia, setInfoDenuncia] = useState({
+    show: false,
+    title: '',
+    message: '',
+  });
+
+  // Toast global
+  const [toast, setToast] = useState({ show: false, message: '' });
+
+  const puedeBorrar = Boolean(
+    publicacion &&
+      usuarioId &&
+      publicacion.autorId &&
+      (publicacion.autorId._id === usuarioId ||
+        publicacion.autorId === usuarioId)
+  );
+
+  /* Cargar publicación por id y establecer estados relacionados */
   useEffect(() => {
+    let mounted = true;
     const cargarPublicacion = async () => {
       try {
         setLoading(true);
         setError('');
         const data = await fetchPublicacionPorId(id);
+        if (!mounted) return;
         setPublicacion(data);
         setLikesCount(data.likes ? data.likes.length : 0);
-        setYaDioLike(data.likes ? data.likes.some(uid => uid === usuarioId) : false);
+        setYaDioLike(
+          data.likes ? data.likes.some((uid) => uid === usuarioId) : false
+        );
       } catch (err) {
-        setError(err.message || 'Error al cargar la publicación');
+        if (!mounted) return;
+        setError(err?.message || 'Error al cargar la publicación');
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
     cargarPublicacion();
+    return () => {
+      mounted = false;
+    };
   }, [id, usuarioId]);
 
+  /* Manejo de like/unlike con retroalimentación */
   const handleLike = async () => {
     if (!token || !usuarioId) {
       setShowLoginModal(true);
@@ -149,62 +287,156 @@ const PostDetail = () => {
     try {
       if (yaDioLike) {
         const res = await unlikePublicacion(id, token);
-        setLikesCount(res.likes ? res.likes.length : 0); 
+        setLikesCount(res.likes ? res.likes.length : 0);
         setYaDioLike(false);
       } else {
         const res = await likePublicacion(id, token);
-        setLikesCount(res.likes ? res.likes.length : 0); 
+        setLikesCount(res.likes ? res.likes.length : 0);
         setYaDioLike(true);
       }
     } catch (err) {
-      console.error(err);
+      setToast({
+        show: true,
+        message: err?.message || 'Error al procesar like',
+      });
     } finally {
       setLikeLoading(false);
     }
   };
 
+  /* Enviar comentario */
   const handleComentar = async (e) => {
     e.preventDefault();
     if (!comentarioTexto.trim()) return;
+    if (!token || !usuarioId) {
+      setShowLoginModal(true);
+      return;
+    }
     setComentarioLoading(true);
     setComentarioError('');
     try {
       await comentarPublicacion(id, comentarioTexto, token);
       setComentarioTexto('');
-      // Recargar publicación para mostrar el nuevo comentario
+      // recargar comentarios
       const data = await fetchPublicacionPorId(id);
       setPublicacion(data);
     } catch (err) {
-      setComentarioError(err.message || 'Error al comentar');
+      setComentarioError(err?.message || 'Error al comentar');
     } finally {
       setComentarioLoading(false);
     }
   };
 
-const handleEliminarComentario = async (comentarioId) => {
-  if (!window.confirm('¿Seguro que deseas eliminar este comentario?')) return;
-  try {
-    await eliminarComentario(id, comentarioId, token); // <-- CORREGIDO: agrega el id de la publicación
-    // Recargar publicación para mostrar los comentarios actualizados
-    const data = await fetchPublicacionPorId(id);
-    setPublicacion(data);
-  } catch (err) {
-    alert(err.message || 'Error al eliminar el comentario');
-  }
-};
+  /*
+   * Solicita confirmación para eliminar comentario/publicacion.
+   * La acción concreta se ejecuta en handleConfirmAction tras confirmación.
+   */
+  const openConfirm = ({ tipo, payload, title, message }) => {
+    setConfirmState({ show: true, tipo, payload, title, message });
+  };
 
-  // Cierra el menú si se hace click fuera
+  /* Ejecuta la acción confirmada por el usuario */
+  const handleConfirmAction = async () => {
+    const { tipo, payload } = confirmState;
+    setConfirmState((s) => ({ ...s, show: false }));
+    try {
+      if (tipo === 'eliminarComentario') {
+        await eliminarComentario(id, payload, token);
+        const data = await fetchPublicacionPorId(id);
+        setPublicacion(data);
+        setToast({ show: true, message: 'Comentario eliminado' });
+      } else if (tipo === 'eliminarPublicacion') {
+        await deletePublicacion(id, token);
+        setToast({ show: true, message: 'Publicación eliminada' });
+        setTimeout(() => navigate('/publicaciones'), 600);
+      }
+    } catch (err) {
+      setToast({
+        show: true,
+        message: err?.message || 'Error en la operación',
+      });
+    }
+  };
+
+  /* Manejo de clic fuera del menú para cerrarlo */
+  useEffect(() => {
+    const handleClickOutsideMenu = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    if (menuOpen) {
+      window.addEventListener('mousedown', handleClickOutsideMenu);
+      return () =>
+        window.removeEventListener('mousedown', handleClickOutsideMenu);
+    }
+    return undefined;
+  }, [menuOpen]);
+
+  /* Cierre global del menú de comentario si se hace click fuera */
   useEffect(() => {
     const handleClickOutside = () => setComentarioMenuOpen(null);
     if (comentarioMenuOpen !== null) {
       window.addEventListener('click', handleClickOutside);
       return () => window.removeEventListener('click', handleClickOutside);
     }
+    return undefined;
   }, [comentarioMenuOpen]);
 
-  if (loading) return <div className="container my-5 text-center">Cargando publicación...</div>;
-  if (error) return <div className="container my-5 alert alert-danger">{error}</div>;
+  /* Preparar denuncia: abrir modal de denuncia con el objetivo */
+  const prepararDenuncia = (target) => {
+    setDenunciaTarget(target);
+    setShowDenunciaModal(true);
+    setMenuOpen(false);
+    setComentarioMenuOpen(null);
+  };
+
+  /**
+   * Envía la denuncia al servidor y muestra un modal informativo al usuario.
+   * Se evita el uso de confirm() nativo para mantener consistencia visual.
+   */
+  const handleDenunciar = async ({ motivo, descripcion }) => {
+    try {
+      if (!denunciaTarget)
+        throw new Error('Objetivo de denuncia no especificado');
+
+      if (denunciaTarget.tipo === 'publicacion') {
+        await denunciarPublicacion(denunciaTarget.id, motivo, descripcion);
+      } else if (denunciaTarget.tipo === 'comentario') {
+        await denunciarComentario(denunciaTarget.id, motivo, descripcion);
+      } else {
+        throw new Error('Tipo de denuncia no soportado');
+      }
+
+      // Cerrar formulario y mostrar confirmación en modal (mejor UX que alert/confirm del navegador)
+      setShowDenunciaModal(false);
+      setDenunciaTarget(null);
+      setInfoDenuncia({
+        show: true,
+        title: 'Denuncia enviada',
+        message:
+          'Tu denuncia se ha enviado correctamente. El equipo de moderación revisará el caso y tomará las acciones pertinentes si corresponde.',
+      });
+
+      // refrescar publicación para reflejar cambios
+      const data = await fetchPublicacionPorId(id);
+      setPublicacion(data);
+    } catch (err) {
+      setToast({
+        show: true,
+        message: err?.message || 'Error al enviar denuncia',
+      });
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="container my-5 text-center">Cargando publicación...</div>
+    );
+  if (error)
+    return <div className="container my-5 alert alert-danger">{error}</div>;
   if (!publicacion) return null;
+
   return (
     <>
       <section className={`container ${styles.pageOffset} my-5`}>
@@ -213,11 +445,13 @@ const handleEliminarComentario = async (comentarioId) => {
             <div className={`${styles.cardContainer} shadow-sm border-0`}>
               <div className="card-body">
                 {/* Autor y fecha */}
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                <div className={styles.cardHeader}>
                   {publicacion.autorId?.anonimo ? (
                     <>
                       <img
-                        src={publicacion.autorId?.fotoPerfil || placeholderImage}
+                        src={
+                          publicacion.autorId?.fotoPerfil || placeholderImage
+                        }
                         alt="Avatar"
                         className={styles.cardAutorImg}
                       />
@@ -226,49 +460,117 @@ const handleEliminarComentario = async (comentarioId) => {
                   ) : (
                     <a
                       href={`/perfil/${publicacion.autorId?.nombreUsuario}`}
-                      style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}
+                      className={styles.cardAutorLink}
                       aria-label={`Ir al perfil de ${publicacion.autorId?.nombreCompleto || publicacion.autorId?.nombreUsuario || 'usuario'}`}
                     >
                       <img
-                        src={publicacion.autorId?.fotoPerfil || placeholderImage}
+                        src={
+                          publicacion.autorId?.fotoPerfil || placeholderImage
+                        }
                         alt="Avatar"
                         className={styles.cardAutorImg}
                       />
                       <span className={styles.cardAutorNombre}>
-                        {publicacion.autorId?.nombreCompleto || publicacion.autorId?.nombreUsuario}
+                        {publicacion.autorId?.nombreCompleto ||
+                          publicacion.autorId?.nombreUsuario}
                       </span>
                     </a>
                   )}
-                  <div style={{ marginLeft: 12 }}>
+
+                  <div className={styles.cardFechaWrapper}>
                     <div className={styles.cardAutorFecha}>
                       {new Date(publicacion.fecha).toLocaleString()}
                     </div>
                   </div>
+
+                  {/* Botón de tres puntos - menú de publicación */}
+                  <div ref={menuRef} className={styles.cardMenuContainer}>
+                    <div className={styles.cardMenuWrapper}>
+                      <button
+                        type="button"
+                        className={styles.cardMenuBtn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMenuOpen((prev) => !prev);
+                        }}
+                        aria-label="Abrir opciones"
+                      >
+                        <i className="bi bi-three-dots-vertical" />
+                      </button>
+
+                      {menuOpen && (
+                        <div
+                          className={styles.cardMenu}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {puedeBorrar ? (
+                            <button
+                              type="button"
+                              className={styles.cardMenuButtonDanger}
+                              onClick={() =>
+                                openConfirm({
+                                  tipo: 'eliminarPublicacion',
+                                  payload: id,
+                                  title: 'Eliminar publicación',
+                                  message:
+                                    '¿Seguro que deseas eliminar esta publicación?',
+                                })
+                              }
+                              aria-label="Eliminar publicación"
+                            >
+                              <span className={styles.cardMenuButtonText}>
+                                Eliminar publicación
+                              </span>
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className={styles.cardMenuButton}
+                              onClick={() =>
+                                prepararDenuncia({
+                                  tipo: 'publicacion',
+                                  id: publicacion._id || id,
+                                })
+                              }
+                              aria-label="Denunciar publicación"
+                            >
+                              <span className={styles.cardMenuButtonText}>
+                                Denunciar publicación
+                              </span>
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                {/* Carrusel de imágenes */}
+
+                {/* Carrusel */}
                 <ImagenesCarrusel imagenes={publicacion.multimedia || []} />
-                {/* Contenido completo */}
-                <div className={styles.cardContenido} style={{ background: '#f6f2fa', borderRadius: 12, padding: 16 }}>
+
+                {/* Contenido */}
+                <div className={styles.cardContenidoBox}>
                   {publicacion.contenido}
                 </div>
-                {/* Likes y comentarios */}
+
+                {/* Likes y contador de comentarios */}
                 <div className={styles.cardStats}>
                   <button
                     className={styles.cardLikes}
                     style={{
-                      background: yaDioLike ? '#603c7e' : '#603c7e',
+                      background: '#603c7e',
                       color: '#fff',
                       border: 'none',
-                      borderRadius: '8px',
+                      borderRadius: 8,
                       cursor: likeLoading ? 'wait' : 'pointer',
-                      outline: 'none',
                       fontWeight: 'bold',
-                      fontSize: '1rem',
                       display: 'flex',
                       alignItems: 'center',
                       padding: '8px 20px',
-                      marginRight: '16px',
-                      boxShadow: yaDioLike ? '0 2px 8px rgba(96,60,126,0.10)' : 'none',
+                      marginRight: 16,
+                      boxShadow: yaDioLike
+                        ? '0 2px 8px rgba(96,60,126,0.10)'
+                        : 'none',
                       transition: 'background 0.2s, box-shadow 0.2s',
                     }}
                     disabled={likeLoading}
@@ -276,32 +578,67 @@ const handleEliminarComentario = async (comentarioId) => {
                     aria-label={yaDioLike ? 'Quitar like' : 'Dar like'}
                     title={yaDioLike ? 'Quitar like' : 'Dar like'}
                   >
-                    <i className={`bi ${yaDioLike ? 'bi-heart-fill' : 'bi-heart'}`} style={{ marginRight: 8, fontSize: '1.4rem' }}></i>
+                    <i
+                      className={`bi ${yaDioLike ? 'bi-heart-fill' : 'bi-heart'}`}
+                      style={{ marginRight: 8, fontSize: '1.4rem' }}
+                    />
                     {likesCount} Me gusta
                   </button>
+
                   <span className={styles.cardComentarios}>
-                    <i className="bi bi-chat-left-text" style={{ marginRight: 6, fontSize: '1.2rem', color: '#603c7e' }}></i>
+                    <i
+                      className="bi bi-chat-left-text"
+                      style={{
+                        marginRight: 6,
+                        fontSize: '1.2rem',
+                        color: '#603c7e',
+                      }}
+                    />
                     {publicacion.comentarios?.length !== undefined
                       ? `${publicacion.comentarios.length} comentarios`
                       : '0 comentarios'}
                   </span>
                 </div>
+
                 {/* Etiquetas de usuarios */}
-                {publicacion.etiquetasUsuarios && publicacion.etiquetasUsuarios.length > 0 && (
+                {publicacion.etiquetasUsuarios?.length > 0 && (
                   <div className={styles.cardEtiquetas}>
-                    {publicacion.etiquetasUsuarios.map((user, idx) => (
-                      <span key={idx} className={`badge bg-secondary ${styles.cardEtiqueta}`}>
+                    {publicacion.etiquetasUsuarios.map((user) => (
+                      <span
+                        key={user._id || user.nombreUsuario}
+                        className={`badge bg-secondary ${styles.cardEtiqueta}`}
+                      >
                         @{user.nombreCompleto}
                       </span>
                     ))}
                   </div>
                 )}
-                {/* Comentarios */}
+
                 <hr />
-                <h5 className="mb-3" style={{ color: '#603c7e' }}>Comentarios</h5>
+
+                <h5 className="mb-3" style={{ color: '#603c7e' }}>
+                  Comentarios
+                </h5>
+
                 {!token || !usuarioId ? (
-                  <div className="alert alert-warning mb-3" style={{ borderRadius: 10 }}>
-                    Para participar y comentar <a href="/register" style={{ color: '#603c7e', fontWeight: 'bold' }}>registrate</a> o  <a href="/login" style={{ color: '#603c7e', fontWeight: 'bold' }}>inicia sesión</a>
+                  <div
+                    className="alert alert-warning mb-3"
+                    style={{ borderRadius: 10 }}
+                  >
+                    Para participar y comentar{' '}
+                    <a
+                      href="/register"
+                      style={{ color: '#603c7e', fontWeight: 'bold' }}
+                    >
+                      registrate
+                    </a>{' '}
+                    o{' '}
+                    <a
+                      href="/login"
+                      style={{ color: '#603c7e', fontWeight: 'bold' }}
+                    >
+                      inicia sesión
+                    </a>
                   </div>
                 ) : (
                   <form onSubmit={handleComentar} className="mb-3">
@@ -311,10 +648,14 @@ const handleEliminarComentario = async (comentarioId) => {
                         className="form-control"
                         placeholder="Escribe un comentario..."
                         value={comentarioTexto}
-                        onChange={e => setComentarioTexto(e.target.value)}
+                        onChange={(e) => setComentarioTexto(e.target.value)}
                         disabled={comentarioLoading}
                         maxLength={500}
-                        style={{ border: '1px solid #603c7e', borderRadius: '8px 0 0 8px' }}
+                        style={{
+                          border: '1px solid #603c7e',
+                          borderRadius: '8px 0 0 8px',
+                        }}
+                        aria-label="Escribe un comentario"
                       />
                       <button
                         type="submit"
@@ -326,10 +667,12 @@ const handleEliminarComentario = async (comentarioId) => {
                           color: '#fff',
                           borderRadius: '0 8px 8px 0',
                           fontWeight: 'bold',
-                          transition: 'background 0.2s',
                         }}
                       >
-                        <i className="bi bi-send" style={{ marginRight: 6, fontSize: '1.2rem' }}></i>
+                        <i
+                          className="bi bi-send"
+                          style={{ marginRight: 6, fontSize: '1.2rem' }}
+                        />
                         {comentarioLoading ? 'Comentando...' : 'Comentar'}
                       </button>
                     </div>
@@ -338,115 +681,109 @@ const handleEliminarComentario = async (comentarioId) => {
                     )}
                   </form>
                 )}
-                {publicacion.comentarios && publicacion.comentarios.length > 0 ? (
-                  publicacion.comentarios.map((comentario, idx) => (
-                    <div
-                      key={idx}
-                      className={styles.comentarioCard}
-                      style={{
-                        background: '#f8f6fc',
-                        borderRadius: '12px',
-                        boxShadow: '0 1px 6px rgba(96,60,126,0.07)',
-                        padding: '12px 16px',
-                        marginBottom: '14px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
+
+                {/* Lista de comentarios (usar ids como key en lugar de index) */}
+                {publicacion.comentarios &&
+                publicacion.comentarios.length > 0 ? (
+                  publicacion.comentarios.map((comentario) => (
+                    <div key={comentario._id} className={styles.comentarioCard}>
+                      <div className={styles.comentarioHeader}>
                         {comentario.usuarioId?.anonimo ? (
                           <>
                             <img
-                              src={comentario.usuarioId?.fotoPerfil || placeholderImage}
+                              src={
+                                comentario.usuarioId?.fotoPerfil ||
+                                placeholderImage
+                              }
                               alt="Avatar"
                               className={styles.comentarioAutorImg}
-                              style={{ boxShadow: '0 2px 8px rgba(96,60,126,0.10)' }}
                             />
-                            <span className={styles.comentarioAutorNombre} style={{ marginLeft: 8 }}>
+                            <span className={styles.comentarioAutorNombre}>
                               Anónimo
                             </span>
                           </>
                         ) : (
                           <a
                             href={`/perfil/${comentario.usuarioId?.nombreUsuario}`}
-                            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}
+                            className={styles.comentarioAutorLink}
                             aria-label={`Ir al perfil de ${comentario.usuarioId?.nombreCompleto || comentario.usuarioId?.nombreUsuario || 'usuario'}`}
                           >
                             <img
-                              src={comentario.usuarioId?.fotoPerfil || placeholderImage}
+                              src={
+                                comentario.usuarioId?.fotoPerfil ||
+                                placeholderImage
+                              }
                               alt="Avatar"
                               className={styles.comentarioAutorImg}
-                              style={{ boxShadow: '0 2px 8px rgba(96,60,126,0.10)' }}
                             />
-                            <span className={styles.comentarioAutorNombre} style={{ marginLeft: 8 }}>
-                              {comentario.usuarioId?.nombreCompleto || comentario.usuarioId?.nombreUsuario}
+                            <span className={styles.comentarioAutorNombre}>
+                              {comentario.usuarioId?.nombreCompleto ||
+                                comentario.usuarioId?.nombreUsuario}
                             </span>
                           </a>
                         )}
-                        <span className={styles.comentarioAutorFecha} style={{ marginLeft: 'auto' }}>
+
+                        <span className={styles.comentarioFecha}>
                           {new Date(comentario.fecha).toLocaleString()}
                         </span>
-                        {(usuarioRol === 'administrador' || comentario.usuarioId?._id === usuarioId) && (
-                          <div style={{ position: 'relative', marginLeft: 8 }}>
+
+                        {usuarioId && (
+                          <div className={styles.comentarioMenuWrapper}>
                             <button
                               type="button"
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: 4,
-                                fontSize: 22,
-                                color: '#603c7e'
-                              }}
-                              onClick={e => {
+                              className={styles.comentarioMenuBtn}
+                              onClick={(e) => {
                                 e.stopPropagation();
                                 setComentarioMenuOpen(comentario._id);
                               }}
-                              aria-label="Abrir menú de opciones"
+                              aria-label="Abrir menú de comentario"
                             >
-                              <i className="bi bi-three-dots-vertical"></i>
+                              <i className="bi bi-three-dots-vertical" />
                             </button>
                             {comentarioMenuOpen === comentario._id && (
                               <div
-                                style={{
-                                  position: 'absolute',
-                                  top: 28,
-                                  right: 0,
-                                  background: '#fff',
-                                  borderRadius: 8,
-                                  boxShadow: '0 2px 12px rgba(96,60,126,0.13)',
-                                  zIndex: 10,
-                                  minWidth: 140,
-                                  padding: '8px 0'
-                                }}
-                                onClick={e => e.stopPropagation()}
+                                className={styles.comentarioMenu}
+                                onClick={(e) => e.stopPropagation()}
                               >
-                                <button
-                                  type="button"
-                                  style={{
-                                    width: '100%',
-                                    background: 'none',
-                                    border: 'none',
-                                    color: '#d32f2f',
-                                    fontWeight: 'bold',
-                                    padding: '8px 18px',
-                                    textAlign: 'left',
-                                    cursor: 'pointer'
-                                  }}
-                                  onClick={() => {
-                                    setComentarioMenuOpen(null);
-                                    handleEliminarComentario(comentario._id);
-                                  }}
-                                >
-                                  Eliminar comentario
-                                </button>
-                                {/* Aquí puedes agregar más opciones en el futuro */}
+                                {comentario.usuarioId?._id === usuarioId ? (
+                                  <button
+                                    type="button"
+                                    className={styles.comentarioMenuEliminar}
+                                    onClick={() => {
+                                      setComentarioMenuOpen(null);
+                                      openConfirm({
+                                        tipo: 'eliminarComentario',
+                                        payload: comentario._id,
+                                        title: 'Eliminar comentario',
+                                        message:
+                                          '¿Seguro que deseas eliminar este comentario?',
+                                      });
+                                    }}
+                                  >
+                                    Eliminar comentario
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className={styles.comentarioMenuDenunciar}
+                                    onClick={() => {
+                                      setComentarioMenuOpen(null);
+                                      prepararDenuncia({
+                                        tipo: 'comentario',
+                                        id: comentario._id,
+                                      });
+                                    }}
+                                  >
+                                    Denunciar comentario
+                                  </button>
+                                )}
                               </div>
                             )}
                           </div>
                         )}
                       </div>
-                      <div className={styles.comentarioContenido} style={{ marginLeft: 0, marginTop: 2 }}>
+
+                      <div className={styles.comentarioContenido}>
                         {comentario.contenido}
                       </div>
                     </div>
@@ -459,60 +796,82 @@ const handleEliminarComentario = async (comentarioId) => {
           </div>
         </div>
       </section>
-      {/* Modal para login/registro */}
+
+      {/* Modal para login/registro (simple) */}
       {showLoginModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.25)',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <div style={{
-            background: '#fff',
-            borderRadius: 16,
-            padding: '32px 28px',
-            boxShadow: '0 6px 32px rgba(96,60,126,0.13)',
-            textAlign: 'center',
-            minWidth: 320,
-            maxWidth: 360
-          }}>
-            <h4 style={{ color: '#603c7e', marginBottom: 16 }}>¡Únete a la comunidad!</h4>
-            <p style={{ color: '#444', marginBottom: 24 }}>
-              Para participar y dar "Me gusta" debes iniciar sesión o registrarte.
+        <div className={styles.modalBackdrop} role="dialog" aria-modal="true">
+          <div className={styles.modalCard}>
+            <h4 className={styles.modalTitle} style={{ color: '#603c7e' }}>
+              ¡Únete a la comunidad!
+            </h4>
+            <p className={styles.modalMessage}>
+              Para participar y dar "Me gusta" debes iniciar sesión o
+              registrarte.
             </p>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-              <a href="/login" className="btn btn-primary" style={{
-                background: '#603c7e',
-                border: 'none',
-                borderRadius: 8,
-                fontWeight: 'bold'
-              }}>Iniciar sesión</a>
-              <a href="/register" className="btn btn-outline-primary" style={{
-                borderColor: '#603c7e',
-                color: '#603c7e',
-                borderRadius: 8,
-                fontWeight: 'bold'
-              }}>Registrarse</a>
+            <div className={styles.modalActions}>
+              <a
+                href="/login"
+                className="btn btn-primary"
+                style={{ background: '#603c7e', border: 'none' }}
+              >
+                Iniciar sesión
+              </a>
+              <a
+                href="/register"
+                className="btn btn-outline-primary"
+                style={{ borderColor: '#603c7e', color: '#603c7e' }}
+              >
+                Registrarse
+              </a>
             </div>
             <button
+              type="button"
+              className="btn btn-link"
               onClick={() => setShowLoginModal(false)}
-              style={{
-                marginTop: 18,
-                background: 'none',
-                border: 'none',
-                color: '#603c7e',
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}
             >
               Cancelar
             </button>
           </div>
         </div>
       )}
+
+      {/* Modal para confirmaciones */}
+      <ConfirmModal
+        show={confirmState.show}
+        title={confirmState.title}
+        message={confirmState.message}
+        onCancel={() => setConfirmState((s) => ({ ...s, show: false }))}
+        onConfirm={handleConfirmAction}
+        confirmText="Eliminar"
+      />
+
+      {/* Modal de denuncia reutilizado */}
+      {showDenunciaModal && (
+        <DenunciaModal
+          show={showDenunciaModal}
+          onClose={() => {
+            setShowDenunciaModal(false);
+            setDenunciaTarget(null);
+          }}
+          onSubmit={handleDenunciar}
+        />
+      )}
+
+      {/* Modal informativo tras enviar denuncia */}
+      <InfoModal
+        show={infoDenuncia.show}
+        title={infoDenuncia.title}
+        message={infoDenuncia.message}
+        onClose={() => setInfoDenuncia({ show: false, title: '', message: '' })}
+        okText="Aceptar"
+      />
+
+      {/* Toast global */}
+      <Toast
+        message={toast.message}
+        show={toast.show}
+        onClose={() => setToast({ show: false, message: '' })}
+      />
     </>
   );
 };

@@ -18,7 +18,6 @@ const MyEvaluations = () => {
   const [busqueda, setBusqueda] = useState('');
   const [pdfLoading, setPdfLoading] = useState(false);
 
-  // Filtros
   const [filtroNivel, setFiltroNivel] = useState('');
   const [filtroFecha, setFiltroFecha] = useState('');
   const [filtroPuntaje, setFiltroPuntaje] = useState('');

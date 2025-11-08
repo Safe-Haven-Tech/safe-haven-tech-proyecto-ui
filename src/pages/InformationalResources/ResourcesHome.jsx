@@ -1,4 +1,3 @@
-/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\pages\InformationalResources\ResourcesHome.jsx */
 import React, { useState, Suspense } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './ResourcesHome.module.css';
@@ -28,7 +27,6 @@ export default function InformationalResourcesHome() {
 
   return (
     <div className={styles.resourcesHome}>
-      {/* Espaciado para navbar */}
       <div className={styles.navbarSpacer}>
         {/* Welcome Card */}
         <div className={styles.welcomeContainer}>
@@ -46,7 +44,6 @@ export default function InformationalResourcesHome() {
 
         {/* Contenedor principal */}
         <div className={`container ${styles.mainContainer}`}>
-          {/* Benefits Section - 🎯 YA SIN ${styles.section} */}
           <div className={styles.benefitsSection}>
             <Suspense
               fallback={<LoadingFallback text="Cargando beneficios..." />}
@@ -55,10 +52,8 @@ export default function InformationalResourcesHome() {
             </Suspense>
           </div>
 
-          {/* Separador visual */}
           <hr className={styles.sectionDivider} aria-hidden="true" />
 
-          {/* Topics Filter - 🎯 REMOVIDO: ${styles.section} */}
           <div className={styles.topicsSection}>
             <Suspense fallback={<LoadingFallback text="Cargando filtros..." />}>
               <TopicsFilter
@@ -75,7 +70,6 @@ export default function InformationalResourcesHome() {
           <div className={styles.resourcesSection}>
             <h3 className={styles.resourcesTitle}>Recursos disponibles</h3>
 
-            {/* 🎯 MANTENER: ${styles.section} solo en ResourcesSection si quieres hover effect */}
             <div className={styles.section}>
               <Suspense
                 fallback={<LoadingFallback text="Cargando recursos..." />}

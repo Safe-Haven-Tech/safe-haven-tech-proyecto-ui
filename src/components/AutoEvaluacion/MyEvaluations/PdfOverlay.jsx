@@ -10,10 +10,8 @@ const PdfOverlay = () => (
     tabIndex={-1}
   >
     <div className={styles.content}>
-      {/* Spinner personalizado */}
       <div className={styles.spinner} role="status" aria-hidden="true" />
 
-      {/* Texto de carga */}
       <p className={styles.loadingText} id="pdf-loading-text">
         Generando PDF...
       </p>

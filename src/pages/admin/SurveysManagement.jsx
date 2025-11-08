@@ -27,6 +27,75 @@ const validCategories = [
   { value: 'otro', label: 'Otro' },
 ];
 
+// Reutilizable: modal de confirmación
+const ConfirmModal = ({
+  show,
+  title,
+  message,
+  onCancel,
+  onConfirm,
+  confirmText = 'Confirmar',
+  cancelText = 'Cancelar',
+}) => {
+  if (!show) return null;
+  return (
+    <div className={styles.modalOverlay} role="dialog" aria-modal="true">
+      <div className={styles.modal}>
+        <div className={styles.modalHeader}>
+          <h2>{title}</h2>
+          <button
+            className={styles.closeButton}
+            onClick={onCancel}
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+        <div className={styles.modalContent}>
+          <p>{message}</p>
+        </div>
+        <div className={styles.modalActions}>
+          <button className={styles.cancelButton} onClick={onCancel}>
+            {cancelText}
+          </button>
+          <button className={styles.saveButton} onClick={onConfirm}>
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Reutilizable: modal informativo / de éxito / error
+const InfoModal = ({ show, title, message, onClose, okText = 'Aceptar' }) => {
+  if (!show) return null;
+  return (
+    <div className={styles.modalOverlay} role="dialog" aria-modal="true">
+      <div className={styles.modal}>
+        <div className={styles.modalHeader}>
+          <h2>{title}</h2>
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+        <div className={styles.modalContent}>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{message}</p>
+        </div>
+        <div className={styles.modalActions}>
+          <button className={styles.saveButton} onClick={onClose}>
+            {okText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const SurveysManagement = () => {
   const { usuario } = useAuth();
   const navigate = useNavigate();
@@ -67,6 +136,20 @@ const SurveysManagement = () => {
   const [datosInicializados, setDatosInicializados] = useState(false);
   const inicializandoRef = useRef(false);
   const estadisticasCargadasRef = useRef(false);
+
+  // Estados de modal globales (confirmación + info)
+  const [confirmState, setConfirmState] = useState({
+    show: false,
+    title: '',
+    message: '',
+    onConfirm: null,
+  });
+  const [infoState, setInfoState] = useState({
+    show: false,
+    title: '',
+    message: '',
+    onClose: null,
+  });
 
   // Modal: animación, cerrar con Esc y enfocar primer campo
   const tituloInputRef = useRef(null);
@@ -388,6 +471,12 @@ const SurveysManagement = () => {
       const errores = validarFormulario();
       if (Object.keys(errores).length > 0) {
         setErroresValidacion(errores);
+        setInfoState({
+          show: true,
+          title: 'Errores en el formulario',
+          message: 'Por favor corrija los errores antes de continuar.',
+          onClose: null,
+        });
         return;
       }
       setLoading(true);
@@ -414,8 +503,24 @@ const SurveysManagement = () => {
       setMostrarModal(false);
       estadisticasCargadasRef.current = false;
       await Promise.all([cargarEncuestas(false), cargarEstadisticas()]);
+
+      setInfoState({
+        show: true,
+        title: 'Encuesta guardada',
+        message:
+          modoModal === 'crear'
+            ? 'Encuesta creada correctamente.'
+            : 'Encuesta actualizada correctamente.',
+        onClose: null,
+      });
     } catch (error) {
       setError(error.message || 'Error al guardar la encuesta');
+      setInfoState({
+        show: true,
+        title: 'Error',
+        message: error.message || 'Error al guardar la encuesta.',
+        onClose: null,
+      });
     } finally {
       setLoading(false);
     }
@@ -430,8 +535,20 @@ const SurveysManagement = () => {
       await cargarEncuestas(false);
       estadisticasCargadasRef.current = false;
       await cargarEstadisticas();
+      setInfoState({
+        show: true,
+        title: 'Encuesta desactivada',
+        message: 'La encuesta se desactivó correctamente.',
+        onClose: null,
+      });
     } else {
       setError(res.mensaje || 'No se pudo desactivar la encuesta');
+      setInfoState({
+        show: true,
+        title: 'Error',
+        message: res.mensaje || 'No se pudo desactivar la encuesta.',
+        onClose: null,
+      });
     }
     setLoading(false);
   };
@@ -445,26 +562,74 @@ const SurveysManagement = () => {
       await cargarEncuestas(false);
       estadisticasCargadasRef.current = false;
       await cargarEstadisticas();
+      setInfoState({
+        show: true,
+        title: 'Encuesta activada',
+        message: 'La encuesta se activó correctamente.',
+        onClose: null,
+      });
     } else {
       setError(res.mensaje || 'No se pudo activar la encuesta');
+      setInfoState({
+        show: true,
+        title: 'Error',
+        message: res.mensaje || 'No se pudo activar la encuesta.',
+        onClose: null,
+      });
     }
     setLoading(false);
   };
 
-  const handleEliminarEncuesta = async (encuestaId) => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    if (!window.confirm('¿Seguro que deseas eliminar esta encuesta?')) return;
-    setLoading(true);
-    const res = await eliminarEncuesta(encuestaId, token);
-    if (res.success) {
-      await cargarEncuestas(false);
-      estadisticasCargadasRef.current = false;
-      await cargarEstadisticas();
-    } else {
-      setError(res.mensaje || 'No se pudo eliminar la encuesta');
+  // Ejecuta la eliminación real (llamada por el modal de confirmación)
+  const ejecutarEliminarEncuesta = async (encuestaId) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Token no encontrado');
+
+      const res = await eliminarEncuesta(encuestaId, token);
+      if (res && res.success) {
+        await cargarEncuestas(false);
+        estadisticasCargadasRef.current = false;
+        await cargarEstadisticas();
+        setInfoState({
+          show: true,
+          title: 'Encuesta eliminada',
+          message: 'La encuesta se eliminó correctamente.',
+          onClose: null,
+        });
+      } else {
+        const msg = (res && res.mensaje) || 'No se pudo eliminar la encuesta';
+        setError(msg);
+        setInfoState({
+          show: true,
+          title: 'Error',
+          message: msg,
+          onClose: null,
+        });
+      }
+    } catch (err) {
+      setError(err.message || 'Error eliminando encuesta');
+      setInfoState({
+        show: true,
+        title: 'Error',
+        message: err.message || 'Error eliminando encuesta.',
+        onClose: null,
+      });
+    } finally {
+      setLoading(false);
+      setConfirmState((s) => ({ ...s, show: false, onConfirm: null }));
     }
-    setLoading(false);
+  };
+
+  const handleEliminarEncuesta = (encuestaId) => {
+    setConfirmState({
+      show: true,
+      title: 'Eliminar encuesta',
+      message:
+        '¿Estás seguro de que deseas eliminar esta encuesta? Esta acción no se puede deshacer.',
+      onConfirm: () => ejecutarEliminarEncuesta(encuestaId),
+    });
   };
 
   if (
@@ -690,7 +855,7 @@ const SurveysManagement = () => {
         )}
       </section>
 
-      {/* Modal */}
+      {/* Modal principal de creación/edición */}
       {mostrarModal && (
         <div
           className={styles.modalOverlay}
@@ -918,6 +1083,43 @@ const SurveysManagement = () => {
           </div>
         </div>
       )}
+
+      {/* Confirmación global */}
+      <ConfirmModal
+        show={confirmState.show}
+        title={confirmState.title}
+        message={confirmState.message}
+        onCancel={() =>
+          setConfirmState((s) => ({ ...s, show: false, onConfirm: null }))
+        }
+        onConfirm={() => {
+          setConfirmState((s) => ({ ...s, show: false }));
+          if (typeof confirmState.onConfirm === 'function')
+            confirmState.onConfirm();
+        }}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+      />
+
+      {/* Modal de información / éxito */}
+      <InfoModal
+        show={infoState.show}
+        title={infoState.title}
+        message={infoState.message}
+        onClose={() => {
+          if (typeof infoState.onClose === 'function') {
+            infoState.onClose();
+          } else {
+            setInfoState({
+              show: false,
+              title: '',
+              message: '',
+              onClose: null,
+            });
+          }
+        }}
+        okText="Aceptar"
+      />
     </div>
   );
 };

@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import styles from './ProfileComponent.module.css';
 import perfilPlaceholder from '../../../assets/perfil_placeholder.png';
+import FollowersList from './FollowersList';
+import SolicitudesModal from './SolicitudesModal'; // Importa el modal
+import DenunciaModal from '../../Publicaciones/Denuncia';
+import { denunciarUsuario } from '../../../services/userServices';
 
 // Utilidad para obtener un thumbnail de video
 const getVideoThumbnail = (url) =>
@@ -17,13 +21,74 @@ const getVideoThumbnail = (url) =>
       canvas.height = video.videoHeight;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob((blob) => {
-        resolve(URL.createObjectURL(blob));
-        URL.revokeObjectURL(video.src);
-      }, 'image/jpeg', 0.8);
+      canvas.toBlob(
+        (blob) => {
+          resolve(URL.createObjectURL(blob));
+          URL.revokeObjectURL(video.src);
+        },
+        'image/jpeg',
+        0.8
+      );
     };
     video.onerror = () => resolve('');
   });
+
+const InfoModal = ({ show, title, message, onClose, okText = 'Aceptar' }) => {
+  if (!show) return null;
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0,0,0,0.25)',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        style={{
+          background: '#fff',
+          borderRadius: 16,
+          padding: '24px 20px',
+          boxShadow: '0 6px 32px rgba(96,60,126,0.13)',
+          minWidth: 300,
+          maxWidth: 520,
+        }}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <h4 style={{ marginTop: 0, marginBottom: 8, color: '#603c7e' }}>
+          {title}
+        </h4>
+        <p style={{ marginTop: 0, marginBottom: 20, color: '#333' }}>
+          {message}
+        </p>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: '#603c7e',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '8px 16px',
+              fontWeight: '600',
+              cursor: 'pointer',
+            }}
+          >
+            {okText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ProfileComponent = React.memo(
   ({
@@ -34,13 +99,25 @@ const ProfileComponent = React.memo(
     nicknameParam,
     getCurrentUser,
     onFollowToggle,
+    onCancelRequest,
     onEditProfile,
     perfilPosts,
     onConfigureProfile,
   }) => {
     const navigate = useNavigate();
+    const [showSolicitudes, setShowSolicitudes] = useState(false); // Estado para el modal
 
-    /** Estados de carga o error */
+    // Estados para denuncia de usuario
+    const [showDenunciaModal, setShowDenunciaModal] = useState(false);
+    const [denunciaLoading, setDenunciaLoading] = useState(false);
+
+    // Estado para mostrar mensajes informativos en la UI (reemplaza alert)
+    const [infoModal, setInfoModal] = useState({
+      show: false,
+      title: '',
+      message: '',
+    });
+
     if (isLoading)
       return (
         <div className={styles.loadingContainer}>
@@ -79,7 +156,6 @@ const ProfileComponent = React.memo(
         </div>
       );
 
-    // Validar que el usuario existe antes de renderizar
     if (!usuario) {
       return (
         <div className={styles.errorContainer}>
@@ -90,9 +166,14 @@ const ProfileComponent = React.memo(
       );
     }
 
-    /** Contenido privado */
     const isPrivateProfile = usuario.visibilidadPerfil === 'privado';
     const currentUser = getCurrentUser();
+    const yaSigo = usuario.seguidores?.some(
+      (id) => String(id) === String(currentUser?.id)
+    );
+    const solicitudPendiente = usuario.solicitudesSeguidores?.some(
+      (sol) => String(sol.usuarioId) === String(currentUser?.id)
+    );
 
     return (
       <div className={styles.profileContainer}>
@@ -139,39 +220,60 @@ const ProfileComponent = React.memo(
                       >
                         <i className="bi bi-gear"></i>
                       </button>
+                      {/* Botón para abrir el modal de solicitudes */}
+                      {usuario.visibilidadPerfil === 'privado' && (
+                        <button
+                          className={`btn btn-outline-dark btn-sm ${styles.actionButton}`}
+                          onClick={() => setShowSolicitudes(true)}
+                        >
+                          Solicitudes de seguidores
+                        </button>
+                      )}
                     </div>
                   ) : (
                     <div className={styles.actionButtons}>
-                      <button
-                        className={`btn btn-sm ${
-                          usuario.seguidores?.includes(currentUser?.id)
-                            ? 'btn-outline-dark'
-                            : 'btn-primary'
-                        } ${styles.actionButton}`}
-                        onClick={onFollowToggle}
-                      >
-                        {usuario.seguidores?.includes(currentUser?.id)
-                          ? 'Siguiendo'
-                          : 'Seguir'}
-                      </button>
-                      <button
-                        className={`btn btn-outline-dark btn-sm ${styles.actionButton}`}
-                      >
-                        Mensaje
-                      </button>
-                      <button
-                        className={`btn btn-outline-dark btn-sm ${styles.actionButton} ${styles.iconButton}`}
-                      >
-                        <i className="bi bi-person-plus"></i>
-                      </button>
+                      {yaSigo ? (
+                        <button
+                          className={`btn btn-outline-dark btn-sm ${styles.actionButton}`}
+                          onClick={onFollowToggle}
+                        >
+                          Siguiendo
+                        </button>
+                      ) : solicitudPendiente ? (
+                        <button
+                          className={`btn btn-warning btn-sm ${styles.actionButton}`}
+                          onClick={onCancelRequest}
+                        >
+                          Pendiente
+                        </button>
+                      ) : (
+                        <button
+                          className={`btn btn-primary btn-sm ${styles.actionButton}`}
+                          onClick={onFollowToggle}
+                        >
+                          Seguir
+                        </button>
+                      )}
+
+                      {/* Denunciar usuario (solo si estoy autenticado y NO es mi propio perfil) */}
+                      {currentUser && !isOwnProfile && (
+                        <button
+                          className={`btn btn-outline-danger btn-sm ${styles.actionButton}`}
+                          onClick={() => setShowDenunciaModal(true)}
+                          disabled={denunciaLoading}
+                          title="Denunciar usuario"
+                        >
+                          {denunciaLoading ? 'Enviando...' : 'Denunciar'}
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
 
-                {/* Fila 2: Estadísticas */}
+                {/* Estadísticas SIEMPRE visibles */}
                 <div className={styles.statsRow}>
                   <span className={styles.statItem}>
-                    <strong>{usuario.posts?.length || 0}</strong>{' '}
+                    <strong>{perfilPosts ? perfilPosts.length : 0}</strong>{' '}
                     <span className="d-none d-sm-inline">publicaciones</span>
                     <span className="d-inline d-sm-none">posts</span>
                   </span>
@@ -183,6 +285,8 @@ const ProfileComponent = React.memo(
                     <strong>{usuario.seguidos?.length || 0}</strong> seguidos
                   </span>
                 </div>
+
+                <FollowersList usuarioId={usuario._id} />
 
                 {/* Fila 3: Bio y detalles */}
                 <div className={styles.bioSection}>
@@ -238,10 +342,9 @@ const ProfileComponent = React.memo(
         </div>
 
         {/* Contenido del perfil */}
-        {/* Cambia container por container-fluid para el grid de posts */}
         <div className={`container-fluid ${styles.profileContent}`}>
-          {isPrivateProfile && !isOwnProfile ? (
-            // PERFIL PRIVADO - No es el mío
+          {isPrivateProfile && !isOwnProfile && !yaSigo ? (
+            // PERFIL PRIVADO - No es el mío y no lo sigo
             <div className={styles.privateProfile}>
               <div className={styles.privateIcon}>🔒</div>
               <h4 className={styles.privateTitle}>Este perfil es privado</h4>
@@ -250,17 +353,22 @@ const ProfileComponent = React.memo(
                   ? `Sigue a @${usuario.nickname || usuario.nombreUsuario} para ver sus fotos y videos.`
                   : `Inicia sesión y sigue a @${usuario.nickname || usuario.nombreUsuario} para ver su contenido.`}
               </p>
-
-              {/* Botones según estado del usuario */}
               {currentUser ? (
-                <button
-                  className={`btn btn-primary ${styles.privateButton}`}
-                  onClick={onFollowToggle}
-                >
-                  {usuario.seguidores?.includes(currentUser?.id)
-                    ? 'Dejar de seguir'
-                    : 'Seguir'}
-                </button>
+                solicitudPendiente ? (
+                  <button
+                    className={`btn btn-warning ${styles.privateButton}`}
+                    onClick={onCancelRequest}
+                  >
+                    Pendiente
+                  </button>
+                ) : (
+                  <button
+                    className={`btn btn-primary ${styles.privateButton}`}
+                    onClick={onFollowToggle}
+                  >
+                    Seguir
+                  </button>
+                )
               ) : (
                 <div className={styles.privateButtons}>
                   <button
@@ -279,7 +387,6 @@ const ProfileComponent = React.memo(
               )}
             </div>
           ) : (
-            // PERFIL PÚBLICO O PROPIO - Mostrar contenido
             <ProfileContent
               usuario={usuario}
               isOwnProfile={isOwnProfile}
@@ -296,12 +403,55 @@ const ProfileComponent = React.memo(
             <i className="bi bi-plus-lg"></i>
           </button>
         )}
+        {/* Modal de solicitudes de seguidores */}
+        <SolicitudesModal
+          show={showSolicitudes}
+          onClose={() => setShowSolicitudes(false)}
+        />
+
+        {/* Modal de denuncia de usuario */}
+        {showDenunciaModal && (
+          <DenunciaModal
+            show={showDenunciaModal}
+            onClose={() => setShowDenunciaModal(false)}
+            onSubmit={async ({ motivo, descripcion }) => {
+              try {
+                setDenunciaLoading(true);
+                const token = localStorage.getItem('token');
+                await denunciarUsuario(token, usuario._id, motivo, descripcion);
+
+                setInfoModal({
+                  show: true,
+                  title: 'Denuncia enviada',
+                  message:
+                    'La denuncia se ha enviado correctamente. El equipo de moderación la revisará.',
+                });
+
+                setShowDenunciaModal(false);
+              } catch (err) {
+                console.error('Error al denunciar usuario:', err);
+                setInfoModal({
+                  show: true,
+                  title: 'Error',
+                  message: err?.message || 'Error al enviar denuncia',
+                });
+              } finally {
+                setDenunciaLoading(false);
+              }
+            }}
+          />
+        )}
+        <InfoModal
+          show={infoModal.show}
+          title={infoModal.title}
+          message={infoModal.message}
+          onClose={() => setInfoModal({ show: false, title: '', message: '' })}
+        />
       </div>
     );
   }
 );
 
-// Componente separado para el contenido de publicaciones
 const ProfileContent = React.memo(({ usuario, isOwnProfile, perfilPosts }) => {
   return (
     <>
@@ -324,7 +474,11 @@ const ProfileContent = React.memo(({ usuario, isOwnProfile, perfilPosts }) => {
       {perfilPosts && perfilPosts.length > 0 && (
         <div className={`row justify-content-center ${styles.postsGrid}`}>
           {perfilPosts.map((post, index) => (
-            <PostGridItem key={post._id || index} post={post} usuario={usuario} />
+            <PostGridItem
+              key={post._id || index}
+              post={post}
+              usuario={usuario}
+            />
           ))}
         </div>
       )}
@@ -332,7 +486,6 @@ const ProfileContent = React.memo(({ usuario, isOwnProfile, perfilPosts }) => {
   );
 });
 
-// PostGridItem con preview de video si corresponde
 const PostGridItem = React.memo(({ post, usuario }) => {
   const [thumb, setThumb] = React.useState('');
   const multimedia = Array.isArray(post.multimedia) ? post.multimedia : [];
@@ -355,13 +508,14 @@ const PostGridItem = React.memo(({ post, usuario }) => {
   const imagenSrc =
     esVideo && thumb
       ? thumb
-      : primerArchivo ||
-        usuario.avatar ||
-        perfilPlaceholder;
+      : primerArchivo || usuario.avatar || perfilPlaceholder;
 
   return (
     <div className="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
-      <div className={styles.postItem} style={{ cursor: 'pointer', position: 'relative' }}>
+      <div
+        className={styles.postItem}
+        style={{ cursor: 'pointer', position: 'relative' }}
+      >
         <Link to={`/publicacion/${post._id}`}>
           <img
             src={imagenSrc}
@@ -393,11 +547,17 @@ const PostGridItem = React.memo(({ post, usuario }) => {
         <div className={styles.postOverlay}>
           <div className={styles.postStat}>
             <i className="bi bi-heart-fill"></i>
-            <span>{Array.isArray(post.likes) ? post.likes.length : post.likes || 0}</span>
+            <span>
+              {Array.isArray(post.likes) ? post.likes.length : post.likes || 0}
+            </span>
           </div>
           <div className={styles.postStat}>
             <i className="bi bi-chat-fill"></i>
-            <span>{Array.isArray(post.comentarios) ? post.comentarios.length : post.comentarios || 0}</span>
+            <span>
+              {Array.isArray(post.comentarios)
+                ? post.comentarios.length
+                : post.comentarios || 0}
+            </span>
           </div>
         </div>
       </div>

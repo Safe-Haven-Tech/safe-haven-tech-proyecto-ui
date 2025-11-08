@@ -34,7 +34,6 @@
   margin: 0;
 }
 
-/* 🌟 NUEVO: Imagen de fondo SOLO EN DESKTOP - OCULTA EN MOBILE/TABLET */
 .welcomeCard::before {
   content: '';
   position: absolute;
@@ -57,7 +56,7 @@
   }
 }
 
-/* Formas decorativas - SOLO en la zona de texto */
+/* Formas decorativas*/
 .decorativeShape {
   position: absolute;
   z-index: 2;
@@ -129,7 +128,7 @@
   }
 }
 
-/* Contenedor de texto - AJUSTADO SEGÚN LA PANTALLA */
+/* Contenedor de texto  */
 .textContainer {
   flex: 1;
   padding: 1.5rem;
@@ -162,7 +161,7 @@
   }
 }
 
-/* Títulos y texto - RESPONSIVE MEJORADO */
+/* Títulos y texto */
 .title {
   font-family: 'Poppins', sans-serif;
   font-weight: bold;

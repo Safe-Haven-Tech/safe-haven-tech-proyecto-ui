@@ -1,58 +1,53 @@
-/* Contenedor principal - EXACTO al CSS inline */
 .surveysContainer {
-  border-radius: 1.5rem; /* 🎯 EXACTO */
+  border-radius: 1.5rem;
   background: linear-gradient(
     135deg,
     rgba(251, 232, 245, 0.8),
     rgba(230, 240, 250, 0.8),
     rgba(208, 230, 255, 0.8)
-  ); /* 🎯 EXACTO */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* 🎯 EXACTO */
-  padding: 1rem; /* 🎯 p-3 de Bootstrap */
-  margin: 3rem 0; /* 🎯 my-5 de Bootstrap */
+  );
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  margin: 3rem 0;
 }
 
 @media (min-width: 768px) {
   .surveysContainer {
-    padding: 1.5rem; /* 🎯 p-md-4 de Bootstrap */
+    padding: 1.5rem;
   }
 }
 
-/* Mensaje de no hay encuestas - EXACTO al inline */
 .noSurveysMessage {
-  text-align: center; /* 🎯 text-center */
-  font-weight: bold; /* 🎯 fw-bold */
-  font-family: 'Poppins', sans-serif; /* 🎯 EXACTO */
-  color: #5a4e7c; /* 🎯 EXACTO */
-  font-size: 1.1rem; /* 🎯 EXACTO */
-  padding: 2rem; /* 🎯 EXACTO */
+  text-align: center;
+  font-weight: bold;
+  font-family: 'Poppins', sans-serif;
+  color: #5a4e7c;
+  font-size: 1.1rem;
+  padding: 2rem;
   margin: 0;
 }
 
-/* Grid de encuestas - REPLICANDO row g-4 EXACTO */
 .surveysGrid {
   display: grid;
-  gap: 1.5rem; /* 🎯 g-4 de Bootstrap = 1.5rem */
-  grid-template-columns: 1fr; /* 🎯 col-12 por defecto */
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
 }
 
 @media (min-width: 768px) {
   .surveysGrid {
-    grid-template-columns: repeat(2, 1fr); /* 🎯 col-md-6 */
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 992px) {
   .surveysGrid {
-    grid-template-columns: repeat(3, 1fr); /* 🎯 col-lg-4 */
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* 🎯 CORREGIDO: Wrapper de cada tarjeta */
 .surveyCardWrapper {
   opacity: 0;
   transform: translateY(10px);
-  /* 🎯 NUEVO: Asegurar que todas tengan la misma altura */
   display: flex;
   flex-direction: column;
 }
@@ -62,7 +57,7 @@
   transform: translateY(0);
   transition:
     opacity 0.5s ease-in-out,
-    transform 0.5s ease-in-out; /* 🎯 EXACTO */
+    transform 0.5s ease-in-out;
 }
 
 /* Delays dinámicos */
@@ -103,22 +98,18 @@
   transition-delay: 1200ms;
 }
 
-/* 🎯 CORREGIDO: Tarjetas más redondeadas y mismo tamaño */
 .surveyCard {
-  /* 🎯 PROBLEMA: Bordes más redondeados como en el original */
-  border-radius: 1.5rem !important; /* 🎯 MÁS REDONDEADAS + !important para override Bootstrap */
-  background: white !important; /* 🎯 !important para override Bootstrap */
-  transition: all 0.3s ease !important; /* 🎯 Del <style> inline + !important */
+  border-radius: 1.5rem !important;
+  background: white !important;
+  transition: all 0.3s ease !important;
   cursor: pointer;
 
-  /* 🎯 CORREGIDO: Altura uniforme */
   height: 100%; /* h-100 */
-  min-height: 200px; /* 🎯 NUEVO: Altura mínima para uniformidad */
+  min-height: 200px;
 
-  /* 🎯 CORREGIDO: Sombra más sutil como Bootstrap shadow-sm */
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important; /* shadow-sm exacto */
   border: none !important; /* border-0 */
-  padding: 1.5rem !important; /* 🎯 CORREGIDO: p-3 de Bootstrap es 1rem, pero visualmente se ve 1.5rem */
+  padding: 1.5rem !important;
 
   /* Layout para altura uniforme */
   display: flex !important;
@@ -127,47 +118,42 @@
 
 @media (min-width: 768px) {
   .surveyCard {
-    padding: 1.5rem !important; /* 🎯 Mantiene padding consistente */
-    min-height: 220px; /* 🎯 Altura mínima mayor en desktop */
+    padding: 1.5rem !important;
+    min-height: 220px;
   }
 }
 
 /* 🎯 CORREGIDO: Hover effect exacto */
 .surveyCard:hover {
-  transform: translateY(-5px) !important; /* 🎯 EXACTO */
-  box-shadow: 0 8px 25px rgba(90, 78, 124, 0.3) !important; /* 🎯 EXACTO */
+  transform: translateY(-5px) !important;
+  box-shadow: 0 8px 25px rgba(90, 78, 124, 0.3) !important;
 }
 
 .surveyCard:active {
   transform: translateY(-2px) !important;
 }
 
-/* Títulos de las encuestas - EXACTO al inline */
 .surveyTitle {
   font-weight: bold !important; /* fw-bold */
-  font-family: 'Poppins', sans-serif !important; /* 🎯 EXACTO */
-  color: #5a4e7c !important; /* 🎯 EXACTO */
-  margin-bottom: 0.5rem !important; /* 🎯 EXACTO */
+  font-family: 'Poppins', sans-serif !important;
+  color: #5a4e7c !important;
+  margin-bottom: 0.5rem !important;
   font-size: 1.25rem !important; /* h5 de Bootstrap */
   line-height: 1.3 !important;
-  /* 🎯 NUEVO: Evitar que el título se estire */
   flex-shrink: 0;
 }
 
-/* Descripciones de las encuestas - EXACTO al inline */
 .surveyDescription {
-  color: #6c757d !important; /* text-muted de Bootstrap */
-  font-family: 'Poppins', sans-serif !important; /* 🎯 EXACTO */
-  font-size: clamp(0.85rem, 1.5vw, 0.95rem) !important; /* 🎯 EXACTO */
+  color: #6c757d !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem) !important;
   margin: 0 !important;
   line-height: 1.5 !important;
-  /* 🎯 NUEVO: Que la descripción tome el espacio restante */
   flex-grow: 1;
   display: flex;
   align-items: flex-start; /* Texto arriba */
 }
 
-/* 🎯 CORREGIDO: Contenedor del botón cargar más */
 .loadMoreWrapper {
   text-align: center !important; /* text-center */
   margin-top: 1.5rem !important; /* mt-4 = 1.5rem */
@@ -181,49 +167,39 @@
     transform 0.5s ease-in-out;
 }
 
-/* 🎯 CORREGIDO: Botón cargar más MÁS REDONDEADO y CON FONDO AZUL SUTIL */
 .loadMoreButton {
-  /* 🎯 PROBLEMA SOLUCIONADO: Bootstrap btn-outline-primary pero más redondeado */
   border: 1px solid #0d6efd !important;
-  background: rgba(
-    13,
-    110,
-    253,
-    0.1
-  ) !important; /* 🎯 NUEVO: Fondo azul muy sutil */
+  background: rgba(13, 110, 253, 0.1) !important;
   color: #0d6efd !important;
 
-  /* 🎯 CORREGIDO: MÁS REDONDEADO */
-  border-radius: 2.5rem !important; /* 🎯 ERA 2rem, ahora MÁS REDONDEADO */
+  border-radius: 2.5rem !important;
 
   /* px-4 py-2 */
-  padding: 0.75rem 1.5rem !important; /* 🎯 CORREGIDO: Era 0.5rem 1rem, ahora más grande */
+  padding: 0.75rem 1.5rem !important;
 
   /* Estilos adicionales */
   font-family: 'Poppins', sans-serif !important;
-  font-weight: 600 !important; /* 🎯 CORREGIDO: Más bold */
+  font-weight: 600 !important;
   transition: all 0.3s ease !important;
   cursor: pointer !important;
   font-size: 1rem !important;
-  /* 🎯 NUEVO: Eliminar estilos de botón por defecto */
   outline: none !important;
-  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.15) !important; /* 🎯 NUEVO: Sombra sutil */
+  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.15) !important;
 }
 
 @media (min-width: 576px) {
   .loadMoreButton {
-    padding: 0.8rem 1.8rem !important; /* 🎯 Aún más grande en pantallas más grandes */
+    padding: 0.8rem 1.8rem !important;
     font-size: 1.05rem !important;
   }
 }
 
-/* 🎯 CORREGIDO: Hover del botón con fondo más intenso */
 .loadMoreButton:hover {
-  background: #0d6efd !important; /* 🎯 Fondo azul completo */
+  background: #0d6efd !important;
   color: white !important;
   border-color: #0d6efd !important;
-  transform: translateY(-3px) !important; /* 🎯 CORREGIDO: Más movimiento */
-  box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4) !important; /* 🎯 Sombra más intensa */
+  transform: translateY(-3px) !important;
+  box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4) !important;
 }
 
 .loadMoreButton:active {
@@ -252,7 +228,7 @@
   }
 
   .surveyCard {
-    padding: 1.25rem !important; /* 🎯 CORREGIDO: Padding consistente en móvil */
+    padding: 1.25rem !important;
     min-height: 180px !important;
   }
 

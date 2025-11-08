@@ -1,8 +1,6 @@
-/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\components\RecursosInformativos\Home\BenefitsSection.jsx */
 import React from 'react';
 import styles from './BenefitsSection.module.css';
 
-// Iconos SVG personalizados (ajusta la importación según tu setup)
 import BookIcon from '../../../assets/icons/Book.svg?react';
 import SearchIcon from '../../../assets/icons/Search.svg?react';
 import TrustedIcon from '../../../assets/icons/Trusted.svg?react';
@@ -35,7 +33,6 @@ const items = [
 
 export default function BenefitsSection() {
   return (
-    // 🎯 REMOVIDO: container text-center y clases Bootstrap
     <section className={styles.benefitsSection}>
       <h2 className={styles.sectionTitle}>
         ¿Por qué elegir nuestros recursos informativos?
@@ -48,7 +45,6 @@ export default function BenefitsSection() {
 
       <div className={styles.benefitsGrid}>
         {items.map((item, idx) => (
-          // 🎯 REMOVIDO: clase "card" de Bootstrap
           <div key={idx} className={styles.benefitCard}>
             <div className={styles.iconWrapper}>{item.icon}</div>
             <h5 className={styles.benefitTitle}>{item.title}</h5>

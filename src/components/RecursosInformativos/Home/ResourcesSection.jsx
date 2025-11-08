@@ -1,4 +1,3 @@
-/* filepath: f:\SafeHaven\safe-haven-tech-proyecto-ui\src\components\RecursosInformativos\Home\ResourcesSection.jsx */
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -121,7 +120,6 @@ export default function ResourcesSection({ selectedTopic, batchSize = 9 }) {
     }
   };
 
-  // Loading state - Mostrando 9 skeletons (3x3)
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
@@ -153,7 +151,6 @@ export default function ResourcesSection({ selectedTopic, batchSize = 9 }) {
     );
   }
 
-  // No resources state
   if (displayedResources.length === 0) {
     return (
       <div className={styles.noResourcesContainer}>
@@ -179,7 +176,6 @@ export default function ResourcesSection({ selectedTopic, batchSize = 9 }) {
     );
   }
 
-  // Main content - Grid personalizado sin Bootstrap
   return (
     <div className={styles.resourcesSection}>
       <div className={styles.resourcesGrid}>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './QuestionCard.module.css';
 
-// Componente para preguntas de escala
 const ScaleQuestion = ({ question, answer, onAnswer }) => {
   const scaleLength = question.opciones ? question.opciones.length : 10;
   const scaleValues =

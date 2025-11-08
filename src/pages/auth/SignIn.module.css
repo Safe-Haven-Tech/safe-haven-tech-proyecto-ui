@@ -22,7 +22,6 @@
   }
 }
 
-/* En móviles, usamos scroll para mejor performance */
 @media (max-width: 767px) {
   .signInContainer {
     background-attachment: scroll;

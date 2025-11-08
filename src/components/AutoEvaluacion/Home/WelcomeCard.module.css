@@ -34,7 +34,6 @@
   margin: 0;
 }
 
-/* 🌟 NUEVO: Imagen de fondo SOLO EN DESKTOP - OCULTA EN MOBILE/TABLET */
 .welcomeCard::before {
   content: '';
   position: absolute;
@@ -48,17 +47,14 @@
   background-repeat: no-repeat;
   z-index: 0;
   border-radius: 0 1.5rem 1.5rem 0;
-  /* 🎯 NUEVO: Solo visible en desktop (1200px+) */
   display: none;
 }
 
 @media (min-width: 1200px) {
   .welcomeCard::before {
-    display: block; /* 🎯 NUEVO: Mostrar imagen solo en desktop */
+    display: block;
   }
 }
-
-/* Formas decorativas - SOLO en la zona de texto */
 .decorativeShape {
   position: absolute;
   z-index: 2;
@@ -101,15 +97,14 @@
   border-radius: 45% / 55%;
 }
 
-/* 🎯 NUEVO: Formas decorativas adicionales para móvil/tablet (cuando no hay imagen) */
 @media (max-width: 1199px) {
   .shape2 {
-    right: -10%; /* 🎯 Vuelve a la derecha cuando no hay imagen */
+    right: -10%;
     left: auto;
   }
 
   .shape3 {
-    right: 5%; /* 🎯 Vuelve a la derecha cuando no hay imagen */
+    right: 5%;
     left: auto;
   }
 }
@@ -120,25 +115,24 @@
   z-index: 3;
   height: 100%;
   display: flex;
-  flex-direction: column; /* 🎯 CAMBIO: Por defecto columna para móvil/tablet */
+  flex-direction: column;
   align-items: center;
 }
 
 @media (min-width: 1200px) {
   .mainContainer {
-    flex-direction: row; /* 🎯 Solo horizontal en desktop cuando hay imagen */
+    flex-direction: row;
     align-items: stretch;
   }
 }
 
-/* Contenedor de texto - AJUSTADO SEGÚN LA PANTALLA */
 .textContainer {
   flex: 1;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: 100%; /* 🎯 CAMBIO: 100% por defecto en móvil/tablet */
+  width: 100%;
   position: relative;
   z-index: 4;
   background: transparent;
@@ -158,26 +152,25 @@
 
 @media (min-width: 1200px) {
   .textContainer {
-    flex: 0 0 60%; /* 🎯 Solo 60% en desktop cuando hay imagen */
+    flex: 0 0 60%;
     width: 60%;
     padding: 3rem;
   }
 }
 
-/* 🎯 NUEVO: Espacio reservado para la imagen - SOLO EN DESKTOP */
 .imageSpace {
   flex: 0 0 40%;
   position: relative;
-  display: none; /* 🎯 OCULTO por defecto */
+  display: none;
 }
 
 @media (min-width: 1200px) {
   .imageSpace {
-    display: block; /* 🎯 Solo visible en desktop */
+    display: block;
   }
 }
 
-/* Títulos y texto - RESPONSIVE MEJORADO */
+/* Títulos y texto */
 .title {
   font-family: 'Poppins', sans-serif;
   font-weight: bold;
@@ -187,12 +180,12 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 1rem;
-  text-align: center; /* 🎯 CAMBIO: Centrado por defecto */
+  text-align: center;
 }
 
 @media (min-width: 1200px) {
   .title {
-    text-align: left; /* 🎯 Solo alineado a la izquierda en desktop */
+    text-align: left;
   }
 }
 
@@ -202,12 +195,12 @@
   font-size: clamp(0.9rem, 2.5vw, 1.4rem);
   color: #6b5fa5;
   margin-bottom: 1rem;
-  text-align: center; /* 🎯 CAMBIO: Centrado por defecto */
+  text-align: center;
 }
 
 @media (min-width: 1200px) {
   .subtitle {
-    text-align: left; /* 🎯 Solo alineado a la izquierda en desktop */
+    text-align: left;
   }
 }
 
@@ -217,16 +210,16 @@
   color: #555;
   margin-bottom: 1rem;
   line-height: 1.5;
-  text-align: center; /* 🎯 CAMBIO: Centrado por defecto */
+  text-align: center;
 }
 
 @media (min-width: 1200px) {
   .description {
-    text-align: left; /* 🎯 Solo alineado a la izquierda en desktop */
+    text-align: left;
   }
 }
 
-/* Mini cajas - SIN CAMBIOS */
+/* Mini cajas */
 .miniBoxesContainer {
   display: flex;
   gap: 0.75rem;
@@ -303,8 +296,6 @@
   }
 }
 
-/* 🎯 REMOVIDO: Media queries específicas para móvil ya que la imagen no aparece */
-
 /* Animaciones */
 @keyframes slideInFromLeft {
   0% {
@@ -332,14 +323,12 @@
   animation: slideInFromLeft 0.8s ease-out;
 }
 
-/* 🎯 CAMBIO: Animación de imagen solo en desktop */
 @media (min-width: 1200px) {
   .welcomeCard::before {
     animation: slideInFromRight 1.2s ease-out;
   }
 }
 
-/* Accesibilidad */
 @media (prefers-reduced-motion: reduce) {
   .textContainer,
   .welcomeCard::before {

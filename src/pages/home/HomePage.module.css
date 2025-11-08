@@ -434,14 +434,10 @@
   }
 }
 
-
-
-
-/* Foro */
 .foroSectionContainer {
   background: #fff;
   border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(96,60,126,0.07);
+  box-shadow: 0 2px 12px rgba(96, 60, 126, 0.07);
   padding: 0;
   overflow: hidden;
   margin-bottom: 2.5rem;
@@ -449,7 +445,7 @@
 
 .foroHeaderRow {
   display: grid;
-  grid-template-columns: 40px 1fr 120px 100px 120px;
+  grid-template-columns: 1fr 140px 90px 110px 110px 50px;
   background: #f3e9fa;
   color: #603c7e;
   font-weight: 600;
@@ -460,14 +456,14 @@
 
 .foroRow {
   display: grid;
-  grid-template-columns: 40px 1fr 120px 100px 120px;
+  grid-template-columns: 1fr 140px 90px 110px 110px 50px;
   align-items: center;
   padding: 18px 18px;
   border-bottom: 1px solid #f3e9fa;
-  text-decoration: none;
   background: #fafbfc;
   transition: background 0.18s;
   cursor: pointer;
+  position: relative;
 }
 
 .foroRowAlt {
@@ -476,12 +472,6 @@
 
 .foroRow:hover {
   background: #f3e9fa !important;
-}
-
-.foroIcon {
-  text-align: center;
-  font-size: 22px;
-  color: #8e44ad;
 }
 
 .foroTema {
@@ -511,16 +501,40 @@
   font-size: 0.98rem;
 }
 
+.foroFecha {
+  color: #888;
+  font-size: 0.98rem;
+  text-align: left;
+}
+
 .foroLikes {
   color: #8e44ad;
   font-weight: 600;
   font-size: 1.08rem;
+  text-align: left;
 }
 
 .foroComentarios {
   color: #603c7e;
   font-weight: 600;
   font-size: 1.08rem;
+  text-align: left;
+}
+
+.foroAcciones {
+  position: relative;
+  z-index: 2;
+}
+
+.foroDropdownBtn {
+  border-radius: 50%;
+  padding: 6px;
+}
+
+.foroDropdownMenu {
+  min-width: 140px;
+  z-index: 9999 !important;
+  box-shadow: 0 6px 32px rgba(96, 60, 126, 0.13);
 }
 
 .foroEmpty,
@@ -533,4 +547,176 @@
 
 .foroError {
   margin: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .foroHeaderRow,
+  .foroRow {
+    grid-template-columns: 1fr 60px 60px 60px 40px;
+    font-size: 0.97rem;
+    padding: 10px 6px;
+  }
+  .foroAutorNombre {
+    display: none;
+  }
+  .foroAutorImg {
+    margin-right: 0;
+  }
+  .foroTema {
+    font-size: 1rem;
+  }
+}
+
+/* Responsive: apila todo en una columna en móvil pequeño */
+@media (max-width: 500px) {
+  .foroHeaderRow,
+  .foroRow {
+    grid-template-columns: 1fr 40px;
+    font-size: 0.93rem;
+    padding: 8px 2px;
+  }
+  .foroAutor,
+  .foroFecha,
+  .foroLikes,
+  .foroComentarios {
+    display: none;
+  }
+  .foroTema {
+    font-size: 0.98rem;
+    word-break: break-word;
+  }
+}
+
+/* Badges visuales para temas */
+.foroBadge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 14px; /* Más separación a la izquierda */
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+  vertical-align: middle;
+  gap: 3px;
+}
+.foroBadgePopular {
+  background: #ffe082;
+  color: #b26a00;
+}
+.foroBadgeNuevo {
+  background: #b9f6ca;
+  color: #00695c;
+}
+.foroBadgeSinRespuesta {
+  background: #ececec;
+  color: #666;
+}
+
+/* Mensaje de bienvenida (mantengo estilo del ForoPage) */
+.foroPageContainer {
+  margin-top: 80px;
+}
+
+/* Mensaje de bienvenida */
+.foroBienvenida {
+  background: linear-gradient(90deg, #f3e9fa 60%, #f8e6ff 100%);
+  border-radius: 14px;
+  padding: 26px 28px;
+  color: #603c7e;
+  font-weight: 600;
+  font-size: 1.15rem;
+  box-shadow: 0 2px 12px rgba(96, 60, 126, 0.07);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.foroBienvenidaIcon {
+  font-size: 2.1rem;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+/* Sidebar de tópicos */
+.foroTopicosSidebar {
+  background: #f8f6fc;
+  border-radius: 12px;
+  padding: 18px 0 10px 0;
+  box-shadow: 0 2px 12px rgba(96, 60, 126, 0.04);
+}
+
+.foroTopicoBtn {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 12px 24px;
+  color: #603c7e;
+  font-size: 1.04rem;
+  font-weight: 500;
+  border-radius: 0;
+  transition:
+    background 0.13s,
+    color 0.13s;
+  cursor: pointer;
+}
+
+.foroTopicoBtn:hover,
+.foroTopicoBtnActive {
+  background: #e5d1f2;
+  color: #8e44ad;
+  font-weight: 700;
+}
+
+/* Sección de expertos */
+.expertsGrid {
+  margin-top: 8px;
+}
+
+/* Tarjeta de experto */
+.expertCard {
+  border-radius: 12px;
+  overflow: hidden;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.expertCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 36px rgba(96, 60, 126, 0.12);
+}
+
+.expertName {
+  font-weight: 700;
+  color: #2b2540;
+  font-size: 1rem;
+}
+
+.expertSpecialty {
+  color: #6b7280;
+  font-size: 0.92rem;
+}
+
+.expertBadge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+}
+
+.expertAvailable {
+  background: linear-gradient(90deg, #dcfce7, #bbf7d0);
+  color: #065f46;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .expertCard .card-img-top {
+    height: 140px;
+  }
 }

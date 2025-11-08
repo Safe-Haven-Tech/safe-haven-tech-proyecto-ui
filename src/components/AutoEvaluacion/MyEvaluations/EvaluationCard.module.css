@@ -59,23 +59,6 @@
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
 }
 
-/* 🎯 REMOVIDO: Efecto decorativo superior morado */
-/* .evaluationCard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #5A4E7C, #A17CCA);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.evaluationCard:hover::before {
-  opacity: 1;
-} */
-
 /* Contenido principal */
 .cardContent {
   flex-grow: 1;
@@ -172,7 +155,6 @@
   }
 }
 
-/* 🎯 CORREGIDO: Texto de tip/recomendación SIN borde morado */
 .tipText {
   font-family: 'Poppins', sans-serif;
   font-style: italic;
@@ -182,9 +164,8 @@
   margin: 0;
   flex-grow: 1;
   padding: 1rem;
-  background: rgba(90, 78, 124, 0.05); /* 🎯 MANTENER: Fondo sutil */
+  background: rgba(90, 78, 124, 0.05);
   border-radius: 12px;
-  /* 🎯 REMOVIDO: border-left: 3px solid #A17CCA; */
 }
 
 /* Botón de descarga */

@@ -1,7 +1,7 @@
 import { useReducer, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LIMITES } from '../utils/validators';
-import { parseJwt } from '../utils/token';
+import { parseJwt, getToken as getStoredToken } from '../utils/token';
 import { useAuth } from '../context/useAuth';
 import {
   fetchUsuarioCompleto,
@@ -135,11 +135,18 @@ export const useEditarPerfil = () => {
       if (!refreshToken) throw new Error('No refresh token available');
 
       const tokens = await renovarToken(refreshToken);
-      localStorage.setItem('token', tokens.accessToken);
+      // tokens puede venir con distintas keys; manejar varios casos
+      if (tokens?.accessToken)
+        localStorage.setItem('token', tokens.accessToken);
+      else if (tokens?.nuevoToken)
+        localStorage.setItem('token', tokens.nuevoToken);
+      if (tokens?.refreshToken)
+        localStorage.setItem('refreshToken', tokens.refreshToken);
+
       window.dispatchEvent(new Event('tokenChanged'));
       return true;
     } catch (error) {
-      console.error('Error renovando token:', error);
+      console.error('handleTokenInvalidation error:', error?.message || error);
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       navigate('/login');
@@ -150,35 +157,40 @@ export const useEditarPerfil = () => {
   // Obtener datos del usuario
   const fetchUsuario = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = getStoredToken();
       if (!token) {
         navigate('/login', { replace: true });
         return;
       }
 
       const decoded = parseJwt(token);
-      if (!decoded?.id) {
+      const userId = decoded?.id ?? decoded?._id ?? decoded?.sub;
+      if (!userId) {
         throw new Error('Token inválido');
       }
 
-      const usuario = await fetchUsuarioCompleto(decoded.id, token);
+      const usuario = await fetchUsuarioCompleto(userId, token);
       dispatch({ type: 'SET_USUARIO', usuario });
     } catch (error) {
-      console.error('Error fetching user:', error);
+      console.error('fetchUsuario error:', error?.message || error);
 
-      if (
-        error.message.includes('Token') ||
-        error.message.includes('401') ||
-        error.message.includes('403')
-      ) {
+      const msg = String(error?.message || '').toLowerCase();
+
+      if (msg.includes('token') || msg.includes('401') || msg.includes('403')) {
         const success = await handleTokenInvalidation();
         if (success) {
-          // Reintentar después de renovar token
-          const newToken = localStorage.getItem('token');
+          const newToken = getStoredToken();
           const decoded = parseJwt(newToken);
-          const usuario = await fetchUsuarioCompleto(decoded.id, newToken);
-          dispatch({ type: 'SET_USUARIO', usuario });
-          return;
+          const userId = decoded?.id ?? decoded?._id ?? decoded?.sub;
+          if (userId) {
+            try {
+              const usuario = await fetchUsuarioCompleto(userId, newToken);
+              dispatch({ type: 'SET_USUARIO', usuario });
+              return;
+            } catch (err) {
+              console.error('fetchUsuario retry error:', err?.message || err);
+            }
+          }
         }
       }
 
@@ -187,7 +199,7 @@ export const useEditarPerfil = () => {
         error: 'Error al cargar los datos del usuario',
       });
     }
-  }, [navigate, handleTokenInvalidation]);
+  }, [handleTokenInvalidation, navigate]);
 
   // Cargar datos del usuario al montar
   useEffect(() => {
@@ -195,72 +207,83 @@ export const useEditarPerfil = () => {
   }, [fetchUsuario]);
 
   // Handler para seleccionar imagen
-  const handleImagenSeleccionada = useCallback((event) => {
-    const archivo = event.target.files[0];
-    if (!archivo) return;
+  const handleImagenSeleccionada = useCallback(
+    (event) => {
+      const archivo = event?.target?.files?.[0];
+      if (!archivo) return;
 
-    // Validar tipo
-    const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png'];
-    if (!tiposPermitidos.includes(archivo.type)) {
-      dispatch({
-        type: 'SET_ERROR',
-        error: 'Solo se permiten imágenes JPG o PNG',
-      });
-      return;
-    }
-
-    // Validar tamaño (2MB máximo)
-    const maxSize = 2 * 1024 * 1024;
-    if (archivo.size > maxSize) {
-      dispatch({ type: 'SET_ERROR', error: 'La imagen no puede superar 2MB' });
-      return;
-    }
-
-    dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.src = e.target.result;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxDim = 300; // ancho/alto máximo para preview
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height && width > maxDim) {
-          height *= maxDim / width;
-          width = maxDim;
-        } else if (height >= width && height > maxDim) {
-          width *= maxDim / height;
-          height = maxDim;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
+      // Validar tipo
+      const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!tiposPermitidos.includes(archivo.type)) {
         dispatch({
-          type: 'SET_IMAGEN_SELECCIONADA',
-          imagen: archivo,
-          previsualizacion: canvas.toDataURL('image/png'),
+          type: 'SET_ERROR',
+          error: 'Solo se permiten imágenes JPG o PNG',
         });
+        return;
+      }
 
-        // Sincroniza los datos del formulario para el PreviewCard
+      // Validar tamaño (2MB máximo)
+      const maxSize = 2 * 1024 * 1024;
+      if (archivo.size > maxSize) {
         dispatch({
-          type: 'SET_FORM_DATA',
-          payload: {
-            nombreCompleto: state.nombreCompleto,
-            nombreUsuario: state.nombreUsuario,
-            biografia: state.biografia,
-            pronombres: state.pronombres,
-          },
+          type: 'SET_ERROR',
+          error: 'La imagen no puede superar 2MB',
         });
+        return;
+      }
+
+      dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 300; // ancho/alto máximo para preview
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height && width > maxDim) {
+            height *= maxDim / width;
+            width = maxDim;
+          } else if (height >= width && height > maxDim) {
+            width *= maxDim / height;
+            height = maxDim;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          dispatch({
+            type: 'SET_IMAGEN_SELECCIONADA',
+            imagen: archivo,
+            previsualizacion: canvas.toDataURL('image/png'),
+          });
+
+          // Sincroniza los datos del formulario para el PreviewCard
+          dispatch({
+            type: 'SET_FORM_DATA',
+            payload: {
+              nombreCompleto: state.nombreCompleto,
+              nombreUsuario: state.nombreUsuario,
+              biografia: state.biografia,
+              pronombres: state.pronombres,
+            },
+          });
+        };
       };
-    };
-    reader.readAsDataURL(archivo);
-  }, [state.nombreCompleto, state.nombreUsuario, state.biografia, state.pronombres]);
+      reader.readAsDataURL(archivo);
+    },
+    [
+      state.nombreCompleto,
+      state.nombreUsuario,
+      state.biografia,
+      state.pronombres,
+    ]
+  );
 
   // Eliminar imagen seleccionada
   const eliminarImagenSeleccionada = useCallback(() => {
@@ -283,8 +306,10 @@ export const useEditarPerfil = () => {
     dispatch({ type: 'LIMPIAR_ALERTAS' });
 
     try {
-      const token = localStorage.getItem('token');
+      const token = getStoredToken();
       const decoded = parseJwt(token);
+      const userId = decoded?.id ?? decoded?._id ?? decoded?.sub;
+      if (!userId) throw new Error('Token inválido');
 
       let datosActualizacion;
       let esFormData = false;
@@ -311,25 +336,31 @@ export const useEditarPerfil = () => {
       }
 
       const resultado = await actualizarPerfil(
-        decoded.id,
+        userId,
         datosActualizacion,
         token,
         esFormData
       );
 
-      const nicknameAnterior = state.usuario?.nombreUsuario;
-
-      if (resultado.nuevoToken) {
+      // Guardar tokens si vienen
+      if (resultado?.accessToken)
+        localStorage.setItem('token', resultado.accessToken);
+      if (resultado?.refreshToken)
+        localStorage.setItem('refreshToken', resultado.refreshToken);
+      if (resultado?.nuevoToken)
         localStorage.setItem('token', resultado.nuevoToken);
 
-        try {
-          const nuevoDecoded = parseJwt(resultado.nuevoToken);
-          actualizarUsuario(nuevoDecoded);
-        } catch (err) {
-          console.error('Error al decodificar nuevo token:', err);
-        }
-
-        window.dispatchEvent(new Event('tokenChanged'));
+      // Actualizar contexto de auth si es necesario
+      const tokenParaDecodificar =
+        resultado?.accessToken ?? resultado?.nuevoToken ?? token;
+      try {
+        const nuevoDecoded = parseJwt(tokenParaDecodificar);
+        if (nuevoDecoded && actualizarUsuario) actualizarUsuario(nuevoDecoded);
+      } catch (err) {
+        console.error(
+          'Decodificar token tras actualizar perfil error:',
+          err?.message || err
+        );
       }
 
       dispatch({
@@ -339,8 +370,10 @@ export const useEditarPerfil = () => {
 
       const usuarioActualizado = {
         ...state.usuario,
-        ...resultado.usuario,
-        fotoPerfil: state.fotoEliminada ? null : resultado.usuario?.fotoPerfil,
+        ...(resultado.usuario || {}),
+        fotoPerfil: state.fotoEliminada
+          ? null
+          : (resultado.usuario?.fotoPerfil ?? state.usuario?.fotoPerfil),
       };
 
       dispatch({
@@ -351,6 +384,8 @@ export const useEditarPerfil = () => {
       dispatch({ type: 'LIMPIAR_IMAGEN' });
       dispatch({ type: 'SET_FOTO_ELIMINADA', eliminada: false });
 
+      // Redirigir si cambió el nickname
+      const nicknameAnterior = state.usuario?.nombreUsuario;
       if (
         resultado.usuario?.nombreUsuario &&
         resultado.usuario.nombreUsuario !== nicknameAnterior
@@ -359,19 +394,25 @@ export const useEditarPerfil = () => {
           navigate(`/perfil/${resultado.usuario.nombreUsuario}`, {
             replace: true,
           });
-        }, 1500);
+        }, 1200);
       }
     } catch (error) {
-      console.error('Error actualizando perfil:', error);
+      console.error('handleGuardar error:', error?.message || error);
 
-      if (error.response?.status === 413) {
+      const status = error?.status ?? null;
+      const body = error?.body ?? null;
+      if (status === 413) {
         dispatch({
           type: 'SET_ERROR',
           error: 'La imagen es demasiado grande, máximo 2MB',
         });
-      } else if (error.response?.data?.message) {
-        dispatch({ type: 'SET_ERROR', error: error.response.data.message });
-      } else if (error.message.includes('nickname')) {
+      } else if (body && (body.message || body.mensaje)) {
+        dispatch({ type: 'SET_ERROR', error: body.message || body.mensaje });
+      } else if (
+        String(error?.message || '')
+          .toLowerCase()
+          .includes('nickname')
+      ) {
         dispatch({
           type: 'SET_ERROR',
           error: 'El nickname no está disponible',

@@ -1,38 +1,86 @@
-const API_URL = import.meta.env.VITE_API_URL;
+/**
+ * Servicios de autenticación (registro / login).
+ * Entorno: Vite (import.meta.env.VITE_API_URL).
+ */
 
-export const registrarUsuario = async (data) => {
-  const response = await fetch(`${API_URL}/api/usuarios/registro`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
+const API_URL = import.meta.env.VITE_API_URL || '';
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Error al registrar usuario');
+const parseResponse = async (res) => {
+  try {
+    return await res.json();
+  } catch {
+    try {
+      const text = await res.text();
+      return text || null;
+    } catch {
+      return null;
+    }
   }
-
-  return await response.json();
 };
 
-export async function iniciarSesion({ correo, contraseña }) {
-  const response = await fetch(`${API_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ correo, contraseña }),
-  });
+const extractMessage = (body, fallback) => {
+  if (!body) return fallback;
+  if (typeof body === 'string') return body;
+  return (
+    body.message || body.mensaje || body.error || body.detalles || fallback
+  );
+};
 
-  const data = await response.json();
+/**
+ * Registrar usuario.
+ * @param {Object} data
+ * @returns {Promise<any>}
+ * @throws {Error}
+ */
+export const registrarUsuario = async (data) => {
+  try {
+    const response = await fetch(`${API_URL}/api/usuarios/registro`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
 
-  if (!response.ok) {
-    throw new Error(
-      data.detalles || data.error || data.message || 'Error al iniciar sesión'
-    );
+    const payload = await parseResponse(response);
+
+    if (!response.ok) {
+      throw new Error(extractMessage(payload, 'Error al registrar usuario'));
+    }
+
+    return payload;
+  } catch (err) {
+    console.error('registrarUsuario error:', err.message || err);
+    throw err;
   }
+};
 
-  // Guardar tokens en localStorage
-  localStorage.setItem('token', data.accessToken);
-  localStorage.setItem('refreshToken', data.refreshToken);
+/**
+ * Iniciar sesión.
+ * Guarda tokens en localStorage si la respuesta los incluye.
+ * @param {{ correo: string, contraseña: string }} creds
+ * @returns {Promise<any>}
+ * @throws {Error}
+ */
+export async function iniciarSesion({ correo, contraseña }) {
+  try {
+    const response = await fetch(`${API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ correo, contraseña }),
+    });
 
-  return data;
+    const data = await parseResponse(response);
+
+    if (!response.ok) {
+      throw new Error(extractMessage(data, 'Error al iniciar sesión'));
+    }
+
+    if (data?.accessToken) localStorage.setItem('token', data.accessToken);
+    if (data?.refreshToken)
+      localStorage.setItem('refreshToken', data.refreshToken);
+
+    return data;
+  } catch (err) {
+    console.error('iniciarSesion error:', err.message || err);
+    throw err;
+  }
 }
