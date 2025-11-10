@@ -45,8 +45,6 @@ export default function SelfAssessment() {
       )}
 
       <div className="container py-5">
-        {/* Benefits Section */}
-        <BenefitsSection />
 
         {/* Topics Filter */}
         <div className={styles.topicsContainer}>

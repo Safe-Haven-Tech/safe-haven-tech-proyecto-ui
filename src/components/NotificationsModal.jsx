@@ -12,8 +12,7 @@ export default function NotificationsModal({ open, onClose, onUpdateBadge }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [notifs, setNotifs] = useState([]);
-  const [page, setPage] = useState(1);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (!open) return;
@@ -23,11 +22,14 @@ export default function NotificationsModal({ open, onClose, onUpdateBadge }) {
       try {
         const res = await obtenerNotificaciones(1, 50);
         if (!mounted) return;
-        const items = res.notificaciones || [];
+        const items = Array.isArray(res.notificaciones) ? res.notificaciones : [];
         setNotifs(items);
+
+        // intentar leer contador desde respuesta, si no está calcularlo
         const noLeidas =
-          (res.meta && (res.meta.noLeidas ?? res.meta.unreadCount)) ??
-          items.filter((i) => !i.leida).length;
+          (res.paginacion && (res.paginacion.noLeidas ?? res.paginacion.unreadCount)) ??
+          (Array.isArray(items) ? items.filter((i) => !i.leida).length : 0);
+
         setUnreadCount(noLeidas);
         if (onUpdateBadge) onUpdateBadge(noLeidas);
       } catch (e) {
@@ -40,7 +42,7 @@ export default function NotificationsModal({ open, onClose, onUpdateBadge }) {
     return () => {
       mounted = false;
     };
-  }, [open]);
+  }, [open, onUpdateBadge]);
 
   const handleOpenNotification = async (n) => {
     try {
@@ -51,20 +53,29 @@ export default function NotificationsModal({ open, onClose, onUpdateBadge }) {
             x._id === n._id || x.id === n.id ? { ...x, leida: true } : x
           )
         );
-        setUnreadCount((c) => Math.max(0, c - 1));
-        if (onUpdateBadge) onUpdateBadge(Math.max(0, unreadCount - 1));
+        // actualizar badge sin usar valor stale
+        setUnreadCount((c) => {
+          const nc = Math.max(0, c - 1);
+          if (onUpdateBadge) onUpdateBadge(nc);
+          return nc;
+        });
       }
     } catch (e) {
       console.error('Error marcando notificación leída', e);
     }
 
-    // Navegar al recurso notificado
+    // preferir ruta provista por backend
+    if (n.ruta) {
+      onClose?.();
+      return navigate(n.ruta);
+    }
+
     if (n.url) {
       onClose?.();
       return navigate(n.url);
     }
 
-    // reglas por tipo comunes
+    // reglas por tipo (fallbacks)
     if (n.tipo === 'publicacion' && n.referencia) {
       onClose?.();
       return navigate(`/publicacion/${n.referencia}`);
@@ -135,58 +146,61 @@ export default function NotificationsModal({ open, onClose, onUpdateBadge }) {
           <div className="p-3 text-muted">Sin notificaciones</div>
         )}
         {!loading &&
-          notifs.map((n, i) => (
-            <div
-              key={n._id || n.id || i}
-              onClick={() => handleOpenNotification(n)}
-              style={{
-                padding: '0.6rem 0.8rem',
-                borderBottom: '1px solid rgba(0,0,0,0.04)',
-                cursor: 'pointer',
-                background: n.leida ? '#fff' : '#eef6ff',
-              }}
-            >
-              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <div
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 8,
-                    background: '#f0f0f0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {n.icon ? (
-                    <img
-                      src={n.icon}
-                      alt=""
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                      }}
-                    />
-                  ) : (
-                    <span style={{ fontSize: 18 }}>🔔</span>
-                  )}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: n.leida ? 500 : 700 }}>
-                    {n.titulo || n.texto || n.mensaje || 'Notificación'}
+          notifs.map((n, i) => {
+            const avatar = n.icon || (n.usuarioId && n.usuarioId.fotoPerfil) || null;
+            const message = n.descripcion || n.titulo || n.texto || n.mensaje || 'Notificación';
+            const when = n.fecha || n.createdAt || null;
+            return (
+              <div
+                key={n._id || n.id || i}
+                onClick={() => handleOpenNotification(n)}
+                style={{
+                  padding: '0.6rem 0.8rem',
+                  borderBottom: '1px solid rgba(0,0,0,0.04)',
+                  cursor: 'pointer',
+                  background: n.leida ? '#fff' : '#eef6ff',
+                }}
+              >
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <div
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 8,
+                      background: '#f0f0f0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {avatar ? (
+                      <img
+                        src={avatar}
+                        alt=""
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: 18 }}>🔔</span>
+                    )}
                   </div>
-                  <div style={{ fontSize: 12, color: '#666' }}>
-                    {n.subtexto ||
-                      (n.createdAt
-                        ? new Date(n.createdAt).toLocaleString()
-                        : '')}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: n.leida ? 500 : 700 }}>
+                      {message}
+                    </div>
+                    <div style={{ fontSize: 12, color: '#666' }}>
+                      {n.subtexto ||
+                        (when ? new Date(when).toLocaleString() : '')}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
       </div>
     </div>
   );

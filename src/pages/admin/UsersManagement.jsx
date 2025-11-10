@@ -10,6 +10,7 @@ const emptyForm = {
   nombreCompleto: '',
   username: '',
   email: '',
+  fechaNacimiento: '', 
   rol: 'usuario',
   contraseña: '',
   bio: '',
@@ -255,6 +256,7 @@ const UsersManagement = () => {
         nombreCompleto: u.nombreCompleto,
         username: u.username,
         email: u.email,
+        fechaNacimiento: (u.raw && (u.raw.fechaNacimiento || u.raw.fecha_nacimiento)) || '',
         rol: u.rol,
         contraseña: '',
         bio: u.bio,
@@ -294,6 +296,7 @@ const UsersManagement = () => {
         nombreCompleto: u.nombreCompleto,
         username: u.username,
         email: u.email,
+        fechaNacimiento: (u.raw && (u.raw.fechaNacimiento || u.raw.fecha_nacimiento)) || '',
         rol: u.rol,
         contraseña: '',
         bio: u.bio,
@@ -325,41 +328,90 @@ const UsersManagement = () => {
         fotoInputRef.current &&
         fotoInputRef.current.files &&
         fotoInputRef.current.files.length > 0;
+
+      // Determinar si el usuario en sesión es admin POR SU ROL (no por token)
+      const isAdmin = !!(usuario && usuario.rol === 'administrador');
+
+    // DEBUG temporal: inspeccionar token/isAdmin/usuario antes de enviar
+     // Quitar o comentar en producción
+     // eslint-disable-next-line no-console
+     console.log('DEBUG submitForm:', { isAdmin, token, usuario, hasFile, modo, editingId });
+
       if (hasFile) {
         payload = new FormData();
-        payload.append('nombreCompleto', form.nombreCompleto);
-        payload.append('username', form.username);
-        payload.append('email', form.email);
-        payload.append('rol', form.rol);
-        if (form.contraseña) payload.append('password', form.contraseña);
-        payload.append('bio', form.bio || '');
+        payload.append('nombreCompleto', form.nombreCompleto || '');
+        payload.append('nombreUsuario', form.username || '');
+        payload.append('correo', form.email || '');
+        if (form.contraseña) payload.append('contraseña', form.contraseña);
+        if (form.fechaNacimiento) payload.append('fechaNacimiento', form.fechaNacimiento);
+        if (isAdmin && form.rol) payload.append('rol', form.rol);
+        payload.append('biografia', form.bio || '');
         payload.append('activo', String(Boolean(form.activo)));
         payload.append('fotoPerfil', fotoInputRef.current.files[0]);
       } else {
         payload = {
-          nombreCompleto: form.nombreCompleto,
-          username: form.username,
-          email: form.email,
-          rol: form.rol,
-          password: form.contraseña || undefined,
-          bio: form.bio || '',
+          nombreCompleto: form.nombreCompleto || undefined,
+          nombreUsuario: form.username || undefined,
+          correo: form.email || undefined,
+          contraseña: form.contraseña || undefined,
+          fechaNacimiento: form.fechaNacimiento || undefined,
+          biografia: form.bio || undefined,
           activo: Boolean(form.activo),
           fotoPerfilUrl: form.fotoPerfilUrl || undefined,
         };
-        if (!payload.password) delete payload.password;
-        if (!payload.fotoPerfilUrl) delete payload.fotoPerfilUrl;
+        if (isAdmin && form.rol) payload.rol = form.rol;
+        Object.keys(payload).forEach((k) => payload[k] === undefined && delete payload[k]);
       }
 
+     // DEBUG temporal: mostrar payload (si no es FormData) o keys de FormData
+     // eslint-disable-next-line no-console
+     if (payload instanceof FormData) {
+       const keys = [];
+       for (const pair of payload.entries()) keys.push(pair[0]);
+       // eslint-disable-next-line no-console
+       console.log('DEBUG payload FormData keys:', keys);
+     } else {
+       // eslint-disable-next-line no-console
+       console.log('DEBUG payload JSON:', payload);
+     }
+      
       if (modo === 'crear') {
-        await usersService.createUser(token, payload);
+        if (isAdmin) {
+          // Si el usuario es admin, necesitamos un token válido para usar el endpoint /admin
+          if (!token) {
+            const msg = 'Token de administrador ausente. Reautentícate.';
+            setToast({ tipo: 'error', texto: msg });
+            throw new Error(msg);
+          }
+          // Preferir el endpoint admin (createUserAdmin) cuando exista
+          if (typeof usersService.createUserAdmin === 'function') {
+            await usersService.createUserAdmin(token, payload);
+          } else {
+            // fallback: llamar a createUser con token (backend público aún puede rechazar rol)
+            await usersService.createUser(token, payload);
+          }
+        } else {
+          // No es admin: asegurarse de no enviar rol al endpoint público
+          if (hasFile) payload.delete && payload.delete('rol');
+          else delete payload.rol;
+          await usersService.createUser(token, payload);
+        }
         setToast({ tipo: 'success', texto: 'Usuario creado' });
       } else if (modo === 'editar' && editingId) {
+        // Para editar, validar token si se va a enviar rol
+        if (!isAdmin) {
+          if (hasFile) payload.delete && payload.delete('rol');
+          else delete payload.rol;
+        } else if (isAdmin && !token) {
+          const msg = 'Token de administrador ausente. Reautentícate.';
+          setToast({ tipo: 'error', texto: msg });
+          throw new Error(msg);
+        }
         await usersService.updateUser(token, editingId, payload);
         setToast({ tipo: 'success', texto: 'Usuario actualizado' });
       }
       closeModal();
       loadUsers(paginacion.pagina || 1);
-      // refrescar estadísticas
       cargarEstadisticas();
     } catch (err) {
       const msg = getErrorMessage(err);
@@ -738,6 +790,21 @@ const UsersManagement = () => {
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
+                  disabled={modo === 'ver'}
+                />
+              </div>
+
+              {/* Nuevo campo fechaNacimiento */}
+              <div className={styles.formRow}>
+                <label className={styles.label}>Fecha de nacimiento</label>
+                <input
+                  className={styles.input}
+                  type="date"
+                  value={form.fechaNacimiento}
+                  onChange={(e) =>
+                    setForm({ ...form, fechaNacimiento: e.target.value })
+                  }
+                  required={modo === 'crear'}
                   disabled={modo === 'ver'}
                 />
               </div>

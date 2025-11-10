@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import styles from '../../pages/profesionals/Postulacion.module.css';
-//import Illo from './DecorativeSVGs';
 
 export default function HeroCard({ onStart }) {
   const { usuario } = useAuth();

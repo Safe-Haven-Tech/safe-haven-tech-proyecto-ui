@@ -1,11 +1,12 @@
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './WelcomeCard.module.css';
 
 import evaluationWelcome from '../../../assets/ResourcesHome.png';
 
-import LightningIcon from '../../../assets/icons/Lightning.svg';
-import BookIcon from '../../../assets/icons/Book.svg';
+import BookIcon from '../../../assets/icons/Book.svg?react';
+import SearchIcon from '../../../assets/icons/Search.svg?react';
+import TrustedIcon from '../../../assets/icons/Trusted.svg?react';
+import AlertIcon from '../../../assets/icons/Alert.svg?react';
 
 export default function WelcomeCard({
   title = 'Autoevaluaciones de Salud Mental',
@@ -15,14 +16,26 @@ export default function WelcomeCard({
 }) {
   const miniBoxes = [
     {
-      icon: LightningIcon,
-      title: 'Fácil búsqueda',
-      description: 'Encuentra rápidamente evaluaciones específicas.',
+      icon: <BookIcon />,
+      title: 'Contenido especializado',
+      description: 'Información curada por profesionales de la salud mental.',
     },
     {
-      icon: BookIcon,
-      title: 'Contenido variado',
-      description: 'Diferentes tipos de autoevaluaciones disponibles.',
+      icon: <SearchIcon />,
+      title: 'Encuentra lo que necesitas',
+      description:
+        'Herramientas de búsqueda avanzada para encontrar recursos específicos.',
+    },
+    {
+      icon: <TrustedIcon />,
+      title: 'Información confiable',
+      description: 'Recursos verificados y actualizados constantemente.',
+    },
+    {
+      icon: <AlertIcon />,
+      title: 'Nota importante',
+      description:
+        'Nuestros recursos están diseñados para complementar, no reemplazar, la atención profesional de salud mental.',
     },
   ];
 
@@ -35,32 +48,22 @@ export default function WelcomeCard({
         '--welcome-image': `url(${evaluationWelcome})`,
       }}
     >
-      {/* Fondos decorativos */}
       <div className={`${styles.decorativeShape} ${styles.shape1}`} />
       <div className={`${styles.decorativeShape} ${styles.shape2}`} />
       <div className={`${styles.decorativeShape} ${styles.shape3}`} />
       <div className={`${styles.decorativeShape} ${styles.shape4}`} />
 
-      {/* Contenido principal */}
       <div className={styles.mainContainer}>
-        {/* Texto */}
         <div className={styles.textContainer}>
           <h1 className={styles.title}>{title}</h1>
-
           <h4 className={styles.subtitle}>{subtitle}</h4>
-
           <p className={styles.description}>{description}</p>
 
-          {/* Mini-cajas con iconos */}
           <div className={styles.miniBoxesContainer}>
             {miniBoxes.map((box, idx) => (
               <div key={idx} className={styles.miniBox}>
-                <div className={styles.miniBoxIcon}>
-                  <img
-                    src={box.icon}
-                    alt={box.title}
-                    style={{ width: '100%', height: '100%' }}
-                  />
+                <div className={styles.miniBoxIcon} aria-hidden>
+                  {box.icon}
                 </div>
                 <div className={styles.miniBoxContent}>
                   <h6>{box.title}</h6>

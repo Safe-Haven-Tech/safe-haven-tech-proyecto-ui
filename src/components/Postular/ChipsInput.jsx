@@ -35,7 +35,8 @@ export default function ChipsInput({
     });
   };
 
-  const addTag = (raw) => {
+  // Cambiado: permitir añadir sin forzar focus (focus default true)
+  const addTag = (raw, opts = { focus: true }) => {
     const text = String(raw || '').trim();
     if (!text) return;
     const parts = text
@@ -57,7 +58,8 @@ export default function ChipsInput({
     });
 
     setInput('');
-    if (inputRef.current) inputRef.current.focus();
+    // solo enfocar si opts.focus === true
+    if (opts && opts.focus && inputRef.current) inputRef.current.focus();
   };
 
   const removeAt = (index) => {
@@ -129,6 +131,10 @@ export default function ChipsInput({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           onPaste={onPaste}
+          // Añadido: al perder foco añadir el contenido actual sin volver a enfocar
+          onBlur={() => {
+            if (!disabled && input.trim()) addTag(input, { focus: false });
+          }}
           placeholder={placeholder}
           disabled={disabled || tags.length >= max}
           aria-label={placeholder || 'Añadir elemento'}

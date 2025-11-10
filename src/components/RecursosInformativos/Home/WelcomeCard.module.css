@@ -248,17 +248,60 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
+/* Contenedor del icono: asegurar tamaño y centrado consistente con BenefitsSection */
 .miniBoxIcon {
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #8e7aa6; /* color del icono (se usará con fill:currentColor en los SVG) */
 }
 
 @media (min-width: 576px) {
   .miniBoxIcon {
-    width: 24px;
-    height: 24px;
+    width: 48px;
+    height: 48px;
   }
+}
+
+@media (min-width: 768px) {
+  .miniBoxIcon {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+/* SVGs dentro de miniBoxIcon: forzar tamaño, color y efecto similar a BenefitsSection */
+.miniBoxIcon svg {
+  width: 60%;
+  height: 60%;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  fill: currentColor; /* permite usar la propiedad color del contenedor */
+  transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  filter: drop-shadow(0 2px 4px rgba(142, 122, 166, 0.18));
+}
+
+@media (min-width: 576px) {
+  .miniBoxIcon svg {
+    width: 64%;
+    height: 64%;
+  }
+}
+
+@media (min-width: 768px) {
+  .miniBoxIcon svg {
+    width: 70%;
+    height: 70%;
+  }
+}
+
+.miniBox:hover .miniBoxIcon {
+  transform: translateY(-3px);
+  color: #6b5fa5;
 }
 
 .miniBoxContent h6 {
@@ -286,6 +329,7 @@
     font-size: 0.8rem;
   }
 }
+
 
 /* Animaciones */
 @keyframes slideInFromLeft {

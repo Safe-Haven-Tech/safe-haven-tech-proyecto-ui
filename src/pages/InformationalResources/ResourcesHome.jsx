@@ -44,17 +44,9 @@ export default function InformationalResourcesHome() {
 
         {/* Contenedor principal */}
         <div className={`container ${styles.mainContainer}`}>
-          <div className={styles.benefitsSection}>
-            <Suspense
-              fallback={<LoadingFallback text="Cargando beneficios..." />}
-            >
-              <BenefitsSection />
-            </Suspense>
-          </div>
 
-          <hr className={styles.sectionDivider} aria-hidden="true" />
 
-          <div className={styles.topicsSection}>
+          <div>
             <Suspense fallback={<LoadingFallback text="Cargando filtros..." />}>
               <TopicsFilter
                 onSelect={setSelectedTopic}

@@ -6,6 +6,7 @@ import {
   sanitizeInput,
   validateNickname,
   validateEmail,
+  LIMITES,
 } from '../../utils/validators.js';
 
 const RegisterForm = React.memo(
@@ -30,7 +31,12 @@ const RegisterForm = React.memo(
     const handleInputChange = useCallback(
       (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: sanitizeInput(value) }));
+        const sanitized = sanitizeInput(value);
+        setFormData((prev) => ({
+          ...prev,
+          [name]: sanitized,
+          ...(name === 'nombreUsuario' ? { nickname: sanitized } : {}),
+        }));
       },
       [setFormData]
     );
@@ -52,6 +58,8 @@ const RegisterForm = React.memo(
     };
 
     const nicknameFeedback = useMemo(() => {
+      const value = (formData.nombreUsuario || '').trim();
+
       if (validationErrors.nombreUsuario) {
         return (
           <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
@@ -59,34 +67,54 @@ const RegisterForm = React.memo(
           </div>
         );
       }
-      if (!formData.nombreUsuario) return null;
-      if (!validateNickname(formData.nombreUsuario)) {
+      if (!value) return null;
+
+      if (value.length < LIMITES.NICKNAME.MIN) {
         return (
           <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
-            Nickname inválido (solo letras, números y guiones bajos)
+            El nickname debe tener al menos {LIMITES.NICKNAME.MIN} caracteres
           </div>
         );
       }
-      if (validatingNickname)
+      if (value.length > LIMITES.NICKNAME.MAX) {
+        return (
+          <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+            El nickname no puede superar los {LIMITES.NICKNAME.MAX} caracteres
+          </div>
+        );
+      }
+      if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+        return (
+          <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
+            El nickname solo puede contener letras, números y guion bajo (_)
+          </div>
+        );
+      }
+
+      if (validatingNickname) {
         return (
           <div className={`${styles.feedbackMessage} ${styles.feedbackInfo}`}>
             Verificando disponibilidad...
           </div>
         );
-      if (!validatingNickname && nicknameAvailable)
+      }
+
+      if (!validatingNickname && nicknameAvailable) {
         return (
-          <div
-            className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}
-          >
-            Nickname disponible ✅
+          <div className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}>
+            Nickname disponible
           </div>
         );
-      if (!validatingNickname && !nicknameAvailable)
+      }
+
+      if (!validatingNickname && !nicknameAvailable) {
         return (
           <div className={`${styles.feedbackMessage} ${styles.feedbackError}`}>
             Nickname ya en uso
           </div>
         );
+      }
+
       return null;
     }, [
       formData.nombreUsuario,
@@ -134,7 +162,7 @@ const RegisterForm = React.memo(
               <div
                 className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}
               >
-                Correo válido ✅
+                Correo válido 
               </div>
             );
           },
@@ -162,7 +190,7 @@ const RegisterForm = React.memo(
               <div
                 className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}
               >
-                Contraseña válida ✅
+                Contraseña válida 
               </div>
             ) : (
               <div
@@ -198,7 +226,7 @@ const RegisterForm = React.memo(
               <div
                 className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}
               >
-                Las contraseñas coinciden ✅
+                Las contraseñas coinciden 
               </div>
             ) : (
               <div
@@ -238,7 +266,6 @@ const RegisterForm = React.memo(
 
     return (
       <div className={styles.registerFormContainer}>
-        {/* Header */}
         <div className={styles.formHeader}>
           <img src={Logo} alt="SafeHaven Logo" className={styles.logo} />
           <h2 className={styles.formTitle}>Crear Cuenta</h2>
@@ -247,7 +274,6 @@ const RegisterForm = React.memo(
           </p>
         </div>
 
-        {/* Formulario */}
         <form
           onSubmit={handleSubmit}
           className={styles.registerForm}
@@ -301,6 +327,9 @@ const RegisterForm = React.memo(
                     onBlur={() => {
                       setFocusedField(null);
                       handleFieldBlur(input.name);
+                      if (input.name === 'nombreUsuario') {
+                        handleFieldBlur('nickname');
+                      }
                     }}
                     onMouseEnter={() => setHoveredField(input.name)}
                     onMouseLeave={() => setHoveredField(null)}
@@ -316,12 +345,13 @@ const RegisterForm = React.memo(
                         ? 254
                         : input.name.includes('password')
                           ? 128
-                          : 50
+                          : input.name === 'nombreUsuario'
+                            ? LIMITES.NICKNAME.MAX
+                            : 50
                     }
                     aria-describedby={`${input.name}-feedback`}
                   />
 
-                  {/* Tick de validación */}
                   {input.showTick &&
                     fieldValidation[input.name] === 'valid' && (
                       <i
@@ -329,7 +359,6 @@ const RegisterForm = React.memo(
                       ></i>
                     )}
 
-                  {/* Botón toggle */}
                   {input.hasToggle && (
                     <button
                       type="button"
@@ -349,7 +378,6 @@ const RegisterForm = React.memo(
                 </div>
               )}
 
-              {/* Feedback */}
               <div
                 id={`${input.name}-feedback`}
                 role="region"
@@ -360,7 +388,6 @@ const RegisterForm = React.memo(
             </div>
           ))}
 
-          {/* Mensajes de estado */}
           {error && (
             <div
               className={`${styles.alert} ${styles.alertError}`}
@@ -380,7 +407,6 @@ const RegisterForm = React.memo(
             </div>
           )}
 
-          {/* Botón de envío */}
           <button
             type="submit"
             className={styles.submitButton}
@@ -391,7 +417,6 @@ const RegisterForm = React.memo(
           </button>
         </form>
 
-        {/* Footer */}
         <div className={styles.formFooter}>
           <p className={styles.footerText}>
             ¿Ya tienes una cuenta?{' '}

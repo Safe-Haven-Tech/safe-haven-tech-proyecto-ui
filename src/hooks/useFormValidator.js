@@ -50,7 +50,9 @@ export const useFormValidator = (
     (name, value) => {
       switch (name) {
         case 'nombreUsuario':
-          return validators.validateName(value) ? null : 'Nombre inválido';
+          return validators.validateNickname(value)
+            ? null
+            : `Nickname inválido (entre ${validators.LIMITES.NICKNAME.MIN}-${validators.LIMITES.NICKNAME.MAX} caracteres, solo letras, números y _)`;
         case 'email':
           return validators.validateEmail(value) ? null : 'Email inválido';
         case 'password':
@@ -128,11 +130,8 @@ export const useFormValidator = (
     const errors = {};
 
     // nombreUsuario
-    if (
-      !formData.nombreUsuario ||
-      !validators.validateName(formData.nombreUsuario)
-    ) {
-      errors.nombreUsuario = 'Nombre inválido';
+    if (!formData.nombreUsuario || !validators.validateNickname(formData.nombreUsuario)) {
+      errors.nombreUsuario = `Nickname inválido (entre ${validators.LIMITES.NICKNAME.MIN}-${validators.LIMITES.NICKNAME.MAX} caracteres, solo letras, números y _)`;
     }
 
     // nickname
