@@ -121,13 +121,58 @@ export const getUserById = async (token, id) => {
 
 /**
  * Crea un nuevo usuario. `data` puede ser JSON o FormData (cuando incluye archivos).
+ * Elimina cualquier 'rol' si no se proporciona token (endpoint público no permite admins).
  * @param {string|null} token
  * @param {Object|FormData} data
  * @returns {Promise<Object>}
  */
 export const createUser = async (token, data) => {
   const isForm = data instanceof FormData;
+  let body = data;
+
+  if (isForm) {
+    // Si no hay token, eliminar 'rol' de FormData para evitar el error del backend
+    if (!token && typeof data.delete === 'function') {
+      data.delete('rol');
+      data.delete('role');
+    }
+    body = data;
+  } else {
+    // Copiar y limpiar objeto JSON antes de enviar
+    const obj = { ...(data || {}) };
+    if (!token) {
+      delete obj.rol;
+      delete obj.role;
+    }
+    body = JSON.stringify(obj);
+  }
+
   const res = await fetch(`${API_URL}/api/usuarios/registro`, {
+    method: 'POST',
+    headers: buildHeaders(token, isForm),
+    body: isForm ? body : body,
+  });
+
+  if (!res.ok) {
+    const errBody = await parseResponse(res).catch(() => null);
+    throw errBody || new Error('Error al crear usuario');
+  }
+
+  return res.json();
+};
+
+/**
+ * Crear usuario como admin (ruta protegida /admin) — exige token y permite rol.
+ * @param {string} token
+ * @param {Object|FormData} data
+ */
+export const createUserAdmin = async (token, data) => {
+  if (!token) throw new Error('Token requerido para crear usuario admin');
+
+  const isForm = data instanceof FormData;
+  const url = `${API_URL}/api/usuarios/admin`;
+
+  const res = await fetch(url, {
     method: 'POST',
     headers: buildHeaders(token, isForm),
     body: isForm ? data : JSON.stringify(data),
@@ -135,10 +180,8 @@ export const createUser = async (token, data) => {
 
   if (!res.ok) {
     const errBody = await parseResponse(res).catch(() => null);
-    // Conserva comportamiento previo: lanzar el body (si existe) o Error genérico.
-    throw errBody || new Error('Error al crear usuario');
+    throw errBody || new Error('Error al crear usuario (admin)');
   }
-
   return res.json();
 };
 

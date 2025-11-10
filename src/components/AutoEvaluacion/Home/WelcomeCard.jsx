@@ -3,10 +3,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './WelcomeCard.module.css';
 import evaluationWelcome from '../../../assets/EvaluationWelcome.png';
 
-// Importamos los SVGs como imágenes normales
-import LightningIcon from '../../../assets/icons/Lightning.svg';
-import BookIcon from '../../../assets/icons/Book.svg';
-import LockIcon from '../../../assets/icons/Lock.svg';
+// Importar todos los SVG como componentes React
+import LightningIcon from '../../../assets/icons/Lightning.svg?react';
+import BookIcon from '../../../assets/icons/Book.svg?react';
+import LockIcon from '../../../assets/icons/Lock.svg?react';
+
+import UsersIcon from '../../../assets/icons/Users.svg?react';
+import GrowthIcon from '../../../assets/icons/Growth.svg?react';
+import AlertIcon from '../../../assets/icons/Alert.svg?react';
 
 export default function WelcomeCard({
   title,
@@ -16,19 +20,26 @@ export default function WelcomeCard({
 }) {
   const miniBoxes = [
     {
-      icon: LightningIcon,
-      title: 'Feedback inmediato',
-      description: 'Sabrás tu estado emocional al instante.',
+      icon: <BookIcon aria-hidden="true" />,
+      title: 'Conócete mejor',
+      description:
+        'Reflexiona sobre tus emociones y cómo manejas situaciones cotidianas.',
     },
     {
-      icon: BookIcon,
-      title: 'Recursos confiables',
-      description: 'Accede a guías y apoyo confiable.',
+      icon: <UsersIcon aria-hidden="true" />,
+      title: 'Evalúa tus vínculos',
+      description: 'Comprende mejor la dinámica con las personas cercanas a ti.',
     },
     {
-      icon: LockIcon,
-      title: 'Seguro y privado',
-      description: 'Tus respuestas son completamente confidenciales.',
+      icon: <GrowthIcon aria-hidden="true" />,
+      title: 'Identifica oportunidades',
+      description: 'Encuentra pequeños pasos para fortalecer tu bienestar.',
+    },
+    {
+      icon: <AlertIcon aria-hidden="true" />,
+      title: 'Nota importante',
+      description:
+        'Esto no sustituye la ayuda profesional, pero puede orientarte a dar el siguiente paso.',
     },
   ];
 
@@ -61,12 +72,8 @@ export default function WelcomeCard({
           <div className={styles.miniBoxesContainer}>
             {miniBoxes.map((box, idx) => (
               <div key={idx} className={styles.miniBox}>
-                <div className={styles.miniBoxIcon}>
-                  <img
-                    src={box.icon}
-                    alt={box.title}
-                    style={{ width: '100%', height: '100%' }}
-                  />
+                <div className={styles.miniBoxIcon} aria-hidden>
+                  {box.icon}
                 </div>
                 <div className={styles.miniBoxContent}>
                   <h6>{box.title}</h6>

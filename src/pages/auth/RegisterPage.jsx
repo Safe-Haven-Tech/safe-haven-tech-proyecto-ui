@@ -5,7 +5,7 @@ import RegisterForm from '../../components/Register/RegisterForm';
 import background from '../../assets/FondoRegister.png';
 import { sanitizeInput } from '../../utils/validators';
 import { registrarUsuario } from '../../services/authServices';
-import useFormValidator from '../../hooks/useFormValidator'; // Importar el hook por defecto
+import useFormValidator from '../../hooks/useFormValidator'; 
 
 /**
  * Página de registro.

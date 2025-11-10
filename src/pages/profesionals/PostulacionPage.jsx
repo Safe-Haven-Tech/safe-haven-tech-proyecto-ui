@@ -3,7 +3,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { useAuth } from '../../hooks/useAuth';
 import { createPostulacion } from '../../services/postulacionService';
 import ChipsInput from '../../components/Postular/ChipsInput';
-import SummaryPanel from '../../components/Postular/SummaryPanel';
 import HeroCard from '../../components/Postular/HeroCard';
 import WelcomeCard from '../../components/Postular/WelcomeCard';
 import Testimonials from '../../components/Postular/Testimonials';
@@ -431,11 +430,7 @@ export default function PostulacionPage() {
 
           <div className={styles.summaryColumn}>
             <WelcomeCard onStart={focusForm} />
-            <SummaryPanel
-              values={watched}
-              onFocus={focusForm}
-              onPreview={openPreviewFromPanel}
-            />
+
             <Testimonials />
           </div>
         </div>

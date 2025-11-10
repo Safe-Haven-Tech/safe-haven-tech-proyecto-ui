@@ -121,33 +121,9 @@ const MessageInput = ({ onSend = async () => {} }) => {
           onChange={(e) => setText(e.target.value)}
         />
         <div className="d-flex align-items-center gap-2 mt-2">
-          <div className="form-check">
-            <input
-              id="msg-temporal"
-              className="form-check-input"
-              type="checkbox"
-              checked={esTemporal}
-              onChange={(e) => setEsTemporal(e.target.checked)}
-            />
-            <label className="form-check-label small" htmlFor="msg-temporal">
-              Mensaje efímero
-            </label>
-          </div>
 
-          {esTemporal && (
-            <select
-              className="form-select form-select-sm w-auto"
-              value={expiraOpcion}
-              onChange={(e) => setExpiraOpcion(e.target.value)}
-              aria-label="Tiempo de expiración"
-            >
-              <option value="1">1 hora</option>
-              <option value="6">6 horas</option>
-              <option value="12">12 horas</option>
-              <option value="24">24 horas</option>
-            </select>
-          )}
 
+        
           <div className="ms-auto small text-muted">
             {files.length}/{MAX_FILES} archivos
           </div>
