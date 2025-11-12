@@ -62,7 +62,7 @@ const NavButton = ({
 export default function Navbar() {
   const { usuario } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+
 
   const [_version, setVersion] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -87,8 +87,13 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [location]);
+    if (!isMobileMenuOpen) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setIsMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isMobileMenuOpen]);
 
   // load badge count
   useEffect(() => {
@@ -319,9 +324,10 @@ export default function Navbar() {
             )}
 
             <button
-              className={`${styles.hamburgerButton} ${isMobileMenuOpen ? styles.active : ''}`}
+              className={`${styles.hamburgerButton} ${isMobileMenuOpen ? 'active' : ''}`}
               onClick={toggleMobileMenu}
               aria-label="Menú"
+              aria-expanded={isMobileMenuOpen}
             >
               <span className={styles.hamburgerLine}></span>
               <span className={styles.hamburgerLine}></span>
@@ -331,11 +337,20 @@ export default function Navbar() {
         )}
       </nav>
 
-      {isMobile && isMobileMenuOpen && (
+        {isMobile && (
         <div
-          className={`${styles.mobileMenuOverlay} ${isMobileMenuOpen ? styles.open : ''}`}
+          className={`${styles.mobileMenuOverlay} ${isMobileMenuOpen ? styles.open : ''} ${isMobileMenuOpen ? 'open' : ''}`}
+          onClick={() => setIsMobileMenuOpen(false)}
         >
-          <div className={styles.mobileMenuContent}>
+          <div
+            className={styles.mobileMenuContent}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menú principal"
+            onClick={(e) => e.stopPropagation()} 
+          >
+
+
             <div className={styles.mobileMenuItems}>
               {menuItems.map((item, index) => (
                 <Link
@@ -360,7 +375,7 @@ export default function Navbar() {
                         setIsMobileMenuOpen(false);
                       }}
                     >
-                      ⚙️ Panel de Administración
+                     Panel de Administración
                     </button>
                   )}
                   <button
