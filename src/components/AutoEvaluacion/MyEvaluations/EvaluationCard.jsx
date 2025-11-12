@@ -8,6 +8,7 @@ import {
   getIconRiesgo,
   getTip,
 } from '../../../utils/riskUtils';
+import { formatearNivelRiesgo } from '../../../utils/formatUtils';
 
 const EvaluationCard = ({ r, idx, handleDownloadPDF, pdfLoading }) => {
   const [isAnimated, setIsAnimated] = useState(false);
@@ -20,6 +21,18 @@ const EvaluationCard = ({ r, idx, handleDownloadPDF, pdfLoading }) => {
 
     return () => clearTimeout(timer);
   }, [idx]);
+
+  // Usar recomendaciones personalizadas si existen, sino usar la por defecto
+  const hayRecomendacionesPersonalizadas = r.recomendaciones && r.recomendaciones.length > 0;
+  const recomendacionesTexto = hayRecomendacionesPersonalizadas
+    ? r.recomendaciones.length === 1 
+      ? r.recomendaciones[0]
+      : r.recomendaciones.slice(0, 2).join(' • ') + (r.recomendaciones.length > 2 ? ` • +${r.recomendaciones.length - 2} más` : '')
+    : getTip(r.nivelRiesgo);
+  
+  const todasLasRecomendaciones = hayRecomendacionesPersonalizadas
+    ? r.recomendaciones.join('\n• ')
+    : getTip(r.nivelRiesgo);
 
   return (
     <div
@@ -37,14 +50,19 @@ const EvaluationCard = ({ r, idx, handleDownloadPDF, pdfLoading }) => {
 
           <span
             className={`${styles.riskBadge} ${getBadgeColor(r.nivelRiesgo)}`}
-            data-tip={r.recomendaciones?.join(', ')}
-            title={r.recomendaciones?.join(', ')}
+            data-tip={todasLasRecomendaciones}
+            title={todasLasRecomendaciones}
           >
             {Icono && <Icono />}
-            <span>{r.nivelRiesgo?.toUpperCase() || 'N/A'}</span>
+            <span>{formatearNivelRiesgo(r.nivelRiesgo)}</span>
           </span>
 
-          <p className={styles.tipText}>{getTip(r.nivelRiesgo)}</p>
+          <p className={styles.tipText}>
+            <span style={{ fontSize: '0.85em', fontWeight: '600', color: '#2E7D32', marginRight: '5px' }}>
+              💡
+            </span>
+            {recomendacionesTexto}
+          </p>
         </div>
 
         <button

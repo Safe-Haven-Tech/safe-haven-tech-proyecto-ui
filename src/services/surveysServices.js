@@ -96,11 +96,11 @@ export const fetchEncuestaById = async (id) => {
 
 /**
  * Completa una encuesta.
- * Devuelve un Blob (PDF) en caso de éxito.
+ * Devuelve un objeto con la URL del PDF en Cloudinary y datos de la respuesta.
  * @param {string} encuestaId
  * @param {any} respuestas
  * @param {string|null} token
- * @returns {Promise<Blob>}
+ * @returns {Promise<Object>} {pdfUrl, respuesta: {puntajeTotal, nivelRiesgo, recomendaciones}}
  * @throws {Error}
  */
 export const completarEncuesta = async (
@@ -126,7 +126,7 @@ export const completarEncuesta = async (
       );
     }
 
-    return await res.blob();
+    return await res.json();
   } catch (error) {
     console.error('completarEncuesta:', error);
     throw error;

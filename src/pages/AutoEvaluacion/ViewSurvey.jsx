@@ -84,19 +84,22 @@ export default function ViewSurvey() {
           respuesta,
         }));
 
-      const blob = await completarEncuesta(
+      const resultado = await completarEncuesta(
         id,
         respuestas,
         isAuthenticated ? token : null
       );
 
-      if (blob instanceof Blob) {
-        const pdfUrl = URL.createObjectURL(blob);
-        window.open(pdfUrl, '_blank');
-        setTimeout(() => URL.revokeObjectURL(pdfUrl), 60000);
+      // Abrir el PDF desde Cloudinary en una nueva pestaña
+      if (resultado.pdfUrl) {
+        console.log('📄 Abriendo PDF desde Cloudinary:', resultado.pdfUrl);
+        window.open(resultado.pdfUrl, '_blank');
       }
 
-      showNotification('✅ Encuesta completada exitosamente');
+      // Mostrar resumen de resultados
+      const nivelRiesgo = resultado.respuesta?.nivelRiesgo || 'N/A';
+      const puntaje = resultado.respuesta?.puntajeTotal || 0;
+      showNotification(`✅ Encuesta completada. Nivel: ${nivelRiesgo} | Puntaje: ${puntaje}`, 'success', 4000);
       navigate('/autoevaluacion');
     } catch (error) {
       console.error('Error completing survey:', error);

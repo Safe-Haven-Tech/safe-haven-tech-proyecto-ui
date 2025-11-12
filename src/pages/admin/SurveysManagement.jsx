@@ -27,6 +27,13 @@ const validCategories = [
   { value: 'otro', label: 'Otro' },
 ];
 
+const nivelesRiesgo = [
+  { value: 'bajo', label: 'Bajo Riesgo', color: '#4CAF50' },
+  { value: 'medio', label: 'Riesgo Medio', color: '#FF9800' },
+  { value: 'alto', label: 'Alto Riesgo', color: '#FF5722' },
+  { value: 'crítico', label: 'Riesgo Crítico', color: '#D32F2F' },
+];
+
 // Reutilizable: modal de confirmación
 const ConfirmModal = ({
   show,
@@ -119,6 +126,7 @@ const SurveysManagement = () => {
     categoria: validCategories[0].value,
     activa: true,
     preguntas: [],
+    recomendacionesPorNivel: [],
   });
   const [estadisticas, setEstadisticas] = useState({
     total: 0,
@@ -132,6 +140,14 @@ const SurveysManagement = () => {
   const [nuevaPregunta, setNuevaPregunta] = useState({
     texto: '',
     orden: 1,
+  });
+  const [nuevoNivel, setNuevoNivel] = useState({
+    rangoMin: '',
+    rangoMax: '',
+    nivel: 'bajo', // Valor por defecto
+    descripcion: '',
+    recomendaciones: [''],
+    colorHexadecimal: '#4CAF50',
   });
   const [datosInicializados, setDatosInicializados] = useState(false);
   const inicializandoRef = useRef(false);
@@ -370,6 +386,42 @@ const SurveysManagement = () => {
         }
       });
     }
+
+    if (formulario.recomendacionesPorNivel && formulario.recomendacionesPorNivel.length > 0) {
+      const rangos = formulario.recomendacionesPorNivel.map(n => ({
+        min: n.rangoMin,
+        max: n.rangoMax,
+        nombre: n.nivel
+      }));
+
+      for (let i = 0; i < rangos.length; i++) {
+        for (let j = i + 1; j < rangos.length; j++) {
+          const r1 = rangos[i];
+          const r2 = rangos[j];
+          // Verificar si los rangos se superponen
+          if (
+            (r1.min >= r2.min && r1.min <= r2.max) ||
+            (r1.max >= r2.min && r1.max <= r2.max) ||
+            (r2.min >= r1.min && r2.min <= r1.max) ||
+            (r2.max >= r1.min && r2.max <= r1.max)
+          ) {
+            errores.recomendaciones = 
+              `Los rangos de "${r1.nombre}" y "${r2.nombre}" se superponen. Asegúrese de que los rangos no se traslapen.`;
+            break;
+          }
+        }
+        if (errores.recomendaciones) break;
+      }
+
+      // Validar que rangoMin < rangoMax
+      formulario.recomendacionesPorNivel.forEach((nivel, index) => {
+        if (nivel.rangoMin >= nivel.rangoMax) {
+          errores[`nivel_${index}`] = 
+            `En el nivel "${nivel.nivel}": el rango mínimo debe ser menor que el rango máximo`;
+        }
+      });
+    }
+
     return errores;
   };
 
@@ -430,6 +482,91 @@ const SurveysManagement = () => {
     }));
   };
 
+  // Funciones para gestionar niveles de recomendaciones
+  const agregarNivel = () => {
+    if (!nuevoNivel.rangoMin || !nuevoNivel.rangoMax || !nuevoNivel.nivel) {
+      setInfoState({
+        show: true,
+        title: 'Campos incompletos',
+        message: 'Debe completar al menos el rango mínimo, máximo y el nombre del nivel.',
+        onClose: null,
+      });
+      return;
+    }
+
+    const recomendacionesLimpias = nuevoNivel.recomendaciones.filter(
+      (r) => r.trim() !== ''
+    );
+
+    const nivelCompleto = {
+      rangoMin: Number(nuevoNivel.rangoMin),
+      rangoMax: Number(nuevoNivel.rangoMax),
+      nivel: nuevoNivel.nivel.trim(),
+      descripcion: nuevoNivel.descripcion.trim(),
+      recomendaciones: recomendacionesLimpias,
+      colorHexadecimal: nuevoNivel.colorHexadecimal,
+    };
+
+    setFormulario((prev) => ({
+      ...prev,
+      recomendacionesPorNivel: [...prev.recomendacionesPorNivel, nivelCompleto],
+    }));
+
+    // Obtener el color del siguiente nivel en la lista
+    const siguienteIndice = (nivelesRiesgo.findIndex(n => n.value === nuevoNivel.nivel) + 1) % nivelesRiesgo.length;
+    const siguienteNivel = nivelesRiesgo[siguienteIndice];
+    
+    setNuevoNivel({
+      rangoMin: '',
+      rangoMax: '',
+      nivel: siguienteNivel.value,
+      descripcion: '',
+      recomendaciones: [''],
+      colorHexadecimal: siguienteNivel.color,
+    });
+  };
+
+  const eliminarNivel = (index) => {
+    setFormulario((prev) => ({
+      ...prev,
+      recomendacionesPorNivel: prev.recomendacionesPorNivel.filter(
+        (_, i) => i !== index
+      ),
+    }));
+  };
+
+  const editarNivel = (index, campo, valor) => {
+    setFormulario((prev) => ({
+      ...prev,
+      recomendacionesPorNivel: prev.recomendacionesPorNivel.map((n, i) =>
+        i === index ? { ...n, [campo]: valor } : n
+      ),
+    }));
+  };
+
+  const agregarRecomendacionNuevoNivel = () => {
+    setNuevoNivel((prev) => ({
+      ...prev,
+      recomendaciones: [...prev.recomendaciones, ''],
+    }));
+  };
+
+  const eliminarRecomendacionNuevoNivel = (index) => {
+    setNuevoNivel((prev) => ({
+      ...prev,
+      recomendaciones: prev.recomendaciones.filter((_, i) => i !== index),
+    }));
+  };
+
+  const actualizarRecomendacionNuevoNivel = (index, valor) => {
+    setNuevoNivel((prev) => ({
+      ...prev,
+      recomendaciones: prev.recomendaciones.map((r, i) =>
+        i === index ? valor : r
+      ),
+    }));
+  };
+
   const abrirModalCrear = () => {
     setModoModal('crear');
     setEncuestaEditando(null);
@@ -439,29 +576,58 @@ const SurveysManagement = () => {
       categoria: validCategories[0].value,
       activa: true,
       preguntas: [],
+      recomendacionesPorNivel: [],
     });
     setErroresValidacion({});
     setNuevaPregunta({
       texto: '',
       orden: 1,
     });
+    setNuevoNivel({
+      rangoMin: '',
+      rangoMax: '',
+      nivel: 'bajo',
+      descripcion: '',
+      recomendaciones: [''],
+      colorHexadecimal: '#4CAF50',
+    });
     setMostrarModal(true);
   };
 
   const abrirModalEditar = (encuesta) => {
+    console.log('📝 Abriendo modal de edición para encuesta:', encuesta);
+    console.log('🎯 Niveles de recomendaciones:', encuesta.recomendacionesPorNivel);
+    
     setModoModal('editar');
     setEncuestaEditando(encuesta);
+    
+    // Asegurar que recomendacionesPorNivel sea un array válido
+    const nivelesExistentes = Array.isArray(encuesta.recomendacionesPorNivel) 
+      ? encuesta.recomendacionesPorNivel 
+      : [];
+    
+    console.log('✅ Niveles cargados en formulario:', nivelesExistentes);
+    
     setFormulario({
       titulo: encuesta.titulo,
       descripcion: encuesta.descripcion,
       categoria: encuesta.categoria,
       activa: encuesta.activa,
       preguntas: encuesta.preguntas || [],
+      recomendacionesPorNivel: nivelesExistentes,
     });
     setErroresValidacion({});
     setNuevaPregunta({
       texto: '',
       orden: (encuesta.preguntas?.length || 0) + 1,
+    });
+    setNuevoNivel({
+      rangoMin: '',
+      rangoMax: '',
+      nivel: 'bajo',
+      descripcion: '',
+      recomendaciones: [''],
+      colorHexadecimal: '#4CAF50',
     });
     setMostrarModal(true);
   };
@@ -494,11 +660,19 @@ const SurveysManagement = () => {
         categoria: formulario.categoria,
         activa: Boolean(formulario.activa),
         preguntas: preguntasLimpias,
+        recomendacionesPorNivel: formulario.recomendacionesPorNivel || [],
       };
+      
+      console.log('💾 Guardando encuesta con los siguientes datos:', datosLimpios);
+      console.log('📊 Niveles a guardar:', datosLimpios.recomendacionesPorNivel);
+      console.log('📝 Cantidad de niveles:', datosLimpios.recomendacionesPorNivel?.length || 0);
+      
       if (modoModal === 'crear') {
-        await crearEncuesta(datosLimpios, token);
+        const resultado = await crearEncuesta(datosLimpios, token);
+        console.log('✅ Respuesta del servidor (crear):', resultado);
       } else if (modoModal === 'editar' && encuestaEditando) {
-        await actualizarEncuesta(encuestaEditando._id, datosLimpios, token);
+        const resultado = await actualizarEncuesta(encuestaEditando._id, datosLimpios, token);
+        console.log('✅ Respuesta del servidor (actualizar):', resultado);
       }
       setMostrarModal(false);
       estadisticasCargadasRef.current = false;
@@ -1056,6 +1230,237 @@ const SurveysManagement = () => {
                   >
                     Todas las preguntas serán tipo <b>escala</b> con opciones:{' '}
                     {ESCALA_OPCIONES.join(', ')}
+                  </div>
+                </div>
+
+                {/* Recomendaciones Personalizadas por Nivel */}
+                <div className={styles.formSection}>
+                  <h3 className={styles.sectionTitle}>
+                    Recomendaciones Personalizadas por Nivel de Riesgo (Opcional)
+                  </h3>
+                  <p style={{ fontSize: '0.9em', color: '#666', marginBottom: '15px' }}>
+                    Configure rangos de puntaje y recomendaciones específicas para cada nivel. 
+                    Si no configura niveles, se usarán las recomendaciones por defecto del sistema.
+                  </p>
+
+                  {/* Niveles existentes */}
+                  {formulario.recomendacionesPorNivel.length > 0 ? (
+                    <div className={styles.nivelesExistentes}>
+                      <div style={{ 
+                        padding: '12px', 
+                        backgroundColor: '#e8f5e9', 
+                        borderRadius: '8px', 
+                        marginBottom: '15px',
+                        fontSize: '0.9em',
+                        color: '#2e7d32'
+                      }}>
+                        ✅ Esta encuesta tiene <strong>{formulario.recomendacionesPorNivel.length}</strong> nivel(es) de recomendaciones configurado(s)
+                      </div>
+                      {formulario.recomendacionesPorNivel.map((nivel, index) => {
+                        const nivelInfo = nivelesRiesgo.find(n => n.value === nivel.nivel);
+                        return (
+                        <div key={index} className={styles.nivelCard}>
+                          <div className={styles.nivelHeader}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <div
+                                style={{
+                                  width: '25px',
+                                  height: '25px',
+                                  borderRadius: '4px',
+                                  backgroundColor: nivel.colorHexadecimal,
+                                  border: '1px solid #ddd',
+                                }}
+                              ></div>
+                              <span className={styles.nivelNombre}>
+                                {nivelInfo?.label || nivel.nivel}
+                              </span>
+                              <span className={styles.nivelRango}>
+                                ({nivel.rangoMin} - {nivel.rangoMax} puntos)
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              className={styles.deleteQuestionButton}
+                              onClick={() => eliminarNivel(index)}
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                          <div className={styles.nivelContent}>
+                            {nivel.descripcion && (
+                              <p style={{ fontSize: '0.9em', color: '#666', marginBottom: '8px' }}>
+                                {nivel.descripcion}
+                              </p>
+                            )}
+                            <div style={{ fontSize: '0.85em', color: '#888' }}>
+                              <strong>Recomendaciones:</strong>
+                              <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
+                                {nivel.recomendaciones.map((rec, idx) => (
+                                  <li key={idx}>{rec}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div style={{ 
+                      padding: '15px', 
+                      backgroundColor: '#fff3cd', 
+                      borderRadius: '8px', 
+                      marginBottom: '15px',
+                      fontSize: '0.9em',
+                      color: '#856404',
+                      border: '1px solid #ffeaa7'
+                    }}>
+                      ℹ️ No hay niveles de recomendaciones configurados. Esta encuesta usará las recomendaciones por defecto del sistema. 
+                      Puedes agregar niveles personalizados a continuación.
+                    </div>
+                  )}
+
+                  {/* Agregar nuevo nivel */}
+                  <div className={styles.nuevoNivelForm}>
+                    <h4 style={{ fontSize: '1em', marginBottom: '10px', color: '#333' }}>
+                      Agregar Nuevo Nivel
+                    </h4>
+                    
+                    <div className={styles.formRow}>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Rango Mínimo (puntos)</label>
+                        <input
+                          type="number"
+                          className={styles.input}
+                          value={nuevoNivel.rangoMin}
+                          onChange={(e) =>
+                            setNuevoNivel((prev) => ({
+                              ...prev,
+                              rangoMin: e.target.value,
+                            }))
+                          }
+                          placeholder="Ej: 0"
+                          min="0"
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Rango Máximo (puntos)</label>
+                        <input
+                          type="number"
+                          className={styles.input}
+                          value={nuevoNivel.rangoMax}
+                          onChange={(e) =>
+                            setNuevoNivel((prev) => ({
+                              ...prev,
+                              rangoMax: e.target.value,
+                            }))
+                          }
+                          placeholder="Ej: 20"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+
+                    <div className={styles.formRow}>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Nivel de Riesgo</label>
+                        <select
+                          className={styles.select}
+                          value={nuevoNivel.nivel}
+                          onChange={(e) => {
+                            const nivelSeleccionado = nivelesRiesgo.find(n => n.value === e.target.value);
+                            setNuevoNivel((prev) => ({
+                              ...prev,
+                              nivel: e.target.value,
+                              colorHexadecimal: nivelSeleccionado?.color || prev.colorHexadecimal,
+                            }));
+                          }}
+                        >
+                          {nivelesRiesgo.map((nivel) => (
+                            <option key={nivel.value} value={nivel.value}>
+                              {nivel.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Color (auto-asignado)</label>
+                        <input
+                          type="color"
+                          className={styles.colorInput}
+                          value={nuevoNivel.colorHexadecimal}
+                          onChange={(e) =>
+                            setNuevoNivel((prev) => ({
+                              ...prev,
+                              colorHexadecimal: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Descripción del Nivel (opcional)</label>
+                      <textarea
+                        className={styles.textarea}
+                        value={nuevoNivel.descripcion}
+                        onChange={(e) =>
+                          setNuevoNivel((prev) => ({
+                            ...prev,
+                            descripcion: e.target.value,
+                          }))
+                        }
+                        placeholder="Breve descripción del nivel de riesgo"
+                        maxLength={200}
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Recomendaciones</label>
+                      {nuevoNivel.recomendaciones.map((rec, index) => (
+                        <div key={index} style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                          <textarea
+                            className={styles.textarea}
+                            value={rec}
+                            onChange={(e) =>
+                              actualizarRecomendacionNuevoNivel(index, e.target.value)
+                            }
+                            placeholder={`Escriba la recomendación ${index + 1}...`}
+                            maxLength={500}
+                            rows={4}
+                            style={{ flex: 1, minHeight: '100px' }}
+                          />
+                          {nuevoNivel.recomendaciones.length > 1 && (
+                            <button
+                              type="button"
+                              className={styles.deleteQuestionButton}
+                              onClick={() => eliminarRecomendacionNuevoNivel(index)}
+                              style={{ flexShrink: 0, height: 'fit-content' }}
+                            >
+                              🗑️
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        className={styles.addQuestionButton}
+                        onClick={agregarRecomendacionNuevoNivel}
+                        style={{ marginTop: '8px', fontSize: '0.9em' }}
+                      >
+                        ➕ Agregar otra recomendación
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      className={styles.saveButton}
+                      onClick={agregarNivel}
+                      style={{ marginTop: '10px', width: '100%' }}
+                    >
+                      ✅ Agregar Nivel
+                    </button>
                   </div>
                 </div>
               </form>

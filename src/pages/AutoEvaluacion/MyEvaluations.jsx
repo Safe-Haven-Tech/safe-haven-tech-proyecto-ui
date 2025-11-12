@@ -36,6 +36,18 @@ const MyEvaluations = () => {
   const handleDownloadPDF = async (r) => {
     try {
       setPdfLoading(true);
+      console.log('r', r);
+      
+      // Si la respuesta ya tiene el PDF guardado en Cloudinary, usarlo directamente
+      if (r.resultadoPDF) {
+        console.log('📄 Abriendo PDF desde Cloudinary:', r.resultadoPDF);
+        window.open(r.resultadoPDF, '_blank');
+        setPdfLoading(false);
+        return;
+      }
+
+      // Si no tiene PDF guardado, regenerarlo (fallback)
+      console.log('⚠️ PDF no encontrado en Cloudinary, regenerando...');
       const payload = {
         respuestas: r.respuestas,
         encuestaId: r.encuestaId._id || r.encuestaId,

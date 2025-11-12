@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './SurveysSection.module.css';
 import { fetchEncuestas } from '../../../services/surveysServices';
+import { formatearCategoria } from '../../../utils/formatUtils';
 
 // Mapeo de values a labels
 const topicLabels = {
@@ -115,7 +116,7 @@ export default function SurveysSection({ selectedTopic, batchSize = 3 }) {
                       {survey.descripcion}
                     </p>
                     <p className={styles.surveyCategory}>
-                      {topicLabels[survey.categoria] || survey.categoria}
+                      {topicLabels[survey.categoria] || formatearCategoria(survey.categoria)}
                     </p>
                   </div>
                 </div>

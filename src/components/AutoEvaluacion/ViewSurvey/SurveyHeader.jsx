@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './SurveyHeader.module.css';
+import { formatearCategoria } from '../../../utils/formatUtils';
 
 export default function SurveyHeader({
   title,
@@ -14,7 +15,7 @@ export default function SurveyHeader({
       {description && <p className={styles.surveyDescription}>{description}</p>}
 
       <div className={styles.badgeContainer}>
-        <span className={styles.categoryBadge}>{category}</span>
+        <span className={styles.categoryBadge}>{formatearCategoria(category)}</span>
 
         {estimatedTime && (
           <span className={styles.timeBadge}>{estimatedTime} min aprox.</span>
