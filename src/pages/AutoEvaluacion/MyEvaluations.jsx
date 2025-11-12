@@ -58,23 +58,51 @@ const MyEvaluations = () => {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({ respuestas: payload.respuestas }),
         }
       );
 
-      if (!res.ok) throw new Error('Error generando PDF');
-      const pdfBlob = await res.blob();
+      if (!res.ok) {
+        const txt = await res.text().catch(() => null);
+        let msg = 'Error generando PDF';
+        try {
+          const j = JSON.parse(txt);
+          msg = j?.mensaje || j?.error || msg;
+        } catch {
+          if (txt) msg = txt;
+        }
+        throw new Error(msg);
+      }
+
+      const blob = await res.blob();
+      const contentType = (res.headers.get('content-type') || blob.type || '').toLowerCase();
+      const pdfBlob =
+        contentType.includes('pdf') || blob.type === 'application/pdf'
+          ? blob
+          : new Blob([blob], { type: 'application/pdf' });
+
+      // Abrir PDF en nueva pestaña en lugar de forzar descarga
       const url = window.URL.createObjectURL(pdfBlob);
-      window.open(url, '_blank');
-      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+      const newTab = window.open(url, '_blank');
+      if (!newTab) {
+        // popup bloqueado: intentar fallback creando <a> para descarga
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+      // liberar URL tras un retraso para asegurar que la pestaña pueda cargarlo
+      setTimeout(() => window.URL.revokeObjectURL(url), 15000);
     } catch (error) {
       console.error('Error al generar PDF:', error);
-      alert('No se pudo generar el PDF. Intenta nuevamente.');
+      alert(error.message || 'No se pudo generar el PDF. Intenta nuevamente.');
     } finally {
       setPdfLoading(false);
     }
   };
-
   // Filtrado
   const filteredRespuestas = respuestas.filter((r) => {
     const tituloMatch = r.encuestaId?.titulo

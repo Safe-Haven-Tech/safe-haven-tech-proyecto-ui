@@ -14,33 +14,29 @@ Su objetivo es ofrecer una interfaz moderna, responsiva y organizada para intera
 
 ---
 
-## 📂 Estructura del proyecto
+##  Estructura del proyecto
 
 El código fuente se encuentra en la carpeta `src/` con la siguiente organización:
 
-src
-│── 📄 App.css         → Estilos principales
-│── ⚛️ App.jsx         → Componente raíz
-│── 🎨 index.css       → Estilos globales
-│── 🚪 main.jsx        → Punto de entrada
-│── 🗺️ routes.jsx      → Configuración de rutas
-│── 📝 lista.txt       → Archivo auxiliar
-│
-├── 🖼️ assets/         → Recursos estáticos (imágenes, íconos)
-│
-├── 🧩 components/     → Componentes reutilizables
-│
-├── 🌍 context/        → Context API y providers
-│
-├── 🪝 hooks/          → Custom Hooks
-│
-├── 📐 layouts/        → Layouts base de páginas
-│
-├── 📑 pages/          → Páginas principales
-│
-├── 🔌 services/       → Conexión a APIs y servicios externos
-│
-└── 🛠️ utils/          → Utilidades y validadores
+
+```
+safe-haven-tech-proyecto-ui/
+├── src/
+│   ├── App.css           # Estilos principales
+│   ├── App.jsx           # Componente raíz
+│   ├── index.css         # Estilos globales
+│   ├── main.jsx          # Punto de entrada
+│   ├── routes.jsx        # Configuración de rutas
+│   ├── utils/            # Utilidades y helpers
+│   ├── components/       # Componentes reutilizables
+│   ├── hooks/            # Custom Hooks
+│   ├── layouts/          # Layouts base de páginas
+│   ├── pages/            # Páginas principales
+│   ├── utils/            # Utilidades y helpers
+│   ├── services/         # Conexión a APIs y servicios externos
+├── package.json          # Dependencias del proyecto
+└── README.md             # Este archivo
+```
 
 ---
 
@@ -57,40 +53,30 @@ src
 
 1. Clonar el repositorio:
 
-   git clone https://github.com/tu-usuario/tu-repo-front.git
+### 1. Clonar el repositorio
+```bash
+git clone <url-del-repositorio>
+cd safe-haven-tech-proyecto-ui
+```
 
-2. Instalar dependencias:
-
-   npm install
-
+### 2. Instalar dependencias
+```bash
+npm install
+```
 ---
 
 ## ▶️ Ejecución en desarrollo
 
 Ejecuta el servidor con **hot reload**:
 
-   npm run dev
+```bash
+# Iniciar en modo desarrollo
+npm run dev
+```
 
 Luego abre en tu navegador:  
 👉 http://localhost:5173
 
----
 
-## 🧹 Calidad de código
 
-- 📌 Revisar código con ESLint:
 
-   npm run lint
-
-- 🛠️ Corregir errores automáticamente:
-
-   npm run lint:fix
-
-- 🎨 Formatear con Prettier:
-
-   npm run format
-
----
-
-✅ Con esta guía, puedes instalar, ejecutar y mantener el proyecto **de forma clara y rápida**.
- 
