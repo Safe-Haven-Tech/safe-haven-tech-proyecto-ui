@@ -104,6 +104,10 @@
   animation: slideInUp 0.6s ease-out 0.2s both;
 }
 
+.loginForm .inputGroup::before {
+  display: none;
+}
+
 @keyframes slideInUp {
   0% {
     opacity: 0;
@@ -174,15 +178,13 @@
   }
 }
 
-/* Focus - VERDE */
 .formInput:focus {
   outline: none;
   background: rgba(255, 255, 255, 0.95);
-  box-shadow:
-    0 0 0 3px rgba(76, 175, 80, 0.15),
-    0 4px 12px rgba(0, 0, 0, 0.1);
-  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
+  transform: none;
 }
+
 
 .formInput:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.9);
