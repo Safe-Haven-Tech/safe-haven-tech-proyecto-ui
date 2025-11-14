@@ -12,7 +12,7 @@ export default function NotificationsModal({ open, onClose, onUpdateBadge }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [notifs, setNotifs] = useState([]);
-  const [setUnreadCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (!open) return;
