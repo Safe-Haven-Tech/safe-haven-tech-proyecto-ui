@@ -34,6 +34,9 @@ const getResourceColorClass = (tipo) => {
   return colorClassMap[tipo] || styles.colorDefault;
 };
 
+
+
+
 /**
  * Modal informativo
  */
@@ -291,6 +294,56 @@ export default function ResourceDetail() {
     setShowImageModal(true);
   };
 
+  // Resolver formato de archivo (soporta string URL o objeto)
+  const resolveFile = (archivo) => {
+    if (!archivo) return { url: '', nombre: 'archivo', protegido: false };
+    if (typeof archivo === 'string') {
+      const url = archivo;
+      const rawName = url.split('/').pop().split('?')[0];
+      const nombre = decodeURIComponent(rawName || 'archivo.pdf');
+      return { url, nombre, protegido: false };
+    }
+    const url = archivo.url || archivo.ruta || archivo.path || '';
+    const nombre =
+      archivo.nombre ||
+      (url ? decodeURIComponent(url.split('/').pop().split('?')[0]) : 'archivo');
+    return { url, nombre, protegido: !!archivo.protegido };
+  };
+
+  // Abrir archivo (soporta URL pública o descarga autenticada con token)
+  const openFile = async (archivo) => {
+    const { url: fileUrl, nombre: fileName, protegido } = resolveFile(archivo);
+    if (!fileUrl) {
+      setInfoModal({
+        show: true,
+        title: 'Archivo no disponible',
+        message: 'No se encontró la URL del archivo.',
+      });
+      return;
+    }
+
+    if (protegido && token) {
+      try {
+        const res = await fetch(fileUrl, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Error al descargar el archivo');
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank', 'noopener');
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+      } catch (err) {
+        console.error('Error abriendo archivo protegido:', err);
+        setInfoModal({
+          show: true,
+          title: 'Error al abrir archivo',
+          message: `No fue posible abrir "${fileName}". Intenta descargarlo manualmente.`,
+        });
+      }
+    } else {
+      window.open(fileUrl, '_blank', 'noopener,noreferrer');
+    }
+  }
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
@@ -474,30 +527,39 @@ export default function ResourceDetail() {
                         Archivos para descargar
                       </h5>
                       <div className="row g-3">
-                        {resource.archivosAdjuntos.map((archivo, idx) => (
-                          <div key={idx} className="col-md-6">
-                            <div className={styles.fileItem}>
-                              <i
-                                className={`bi bi-file-earmark-arrow-down ${styles.fileIcon}`}
-                                style={{ color: `var(--resource-color)` }}
-                              ></i>
-                              <div className={styles.fileContent}>
-                                <div className={styles.fileName}>
-                                  {archivo.nombre}
-                                </div>
-                                {archivo.tamaño && (
-                                  <small className={styles.fileSize}>
-                                    {archivo.tamaño}
-                                  </small>
-                                )}
-                              </div>
-                              <i
-                                className={`bi bi-download ${styles.downloadIcon}`}
-                                style={{ color: `var(--resource-color)` }}
-                              ></i>
-                            </div>
-                          </div>
-                        ))}
+{resource.archivosAdjuntos.map((archivo, idx) => {
+  const file = resolveFile(archivo);
+  return (
+    <div key={idx} className="col-md-6">
+      <div
+        className={styles.fileItem}
+        role="button"
+        tabIndex={0}
+        onClick={() => openFile(archivo)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') openFile(archivo);
+        }}
+        style={{ cursor: 'pointer' }}
+        aria-label={`Abrir archivo ${file.nombre}`}
+      >
+        <i
+          className={`bi bi-file-earmark-arrow-down ${styles.fileIcon}`}
+          style={{ color: `var(--resource-color)` }}
+        ></i>
+        <div className={styles.fileContent}>
+          <div className={styles.fileName}>{file.nombre}</div>
+          {archivo.tamaño && (
+            <small className={styles.fileSize}>{archivo.tamaño}</small>
+          )}
+        </div>
+        <i
+          className={`bi bi-download ${styles.downloadIcon}`}
+          style={{ color: `var(--resource-color)` }}
+        ></i>
+      </div>
+    </div>
+  );
+})}
                       </div>
                     </div>
                   )}
