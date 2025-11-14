@@ -10,7 +10,7 @@ export default function ProfessionalsHome() {
   const [professionals, setProfessionals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({});
+  const [filters] = useState({});
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const LIMIT = 12;
@@ -43,10 +43,6 @@ export default function ProfessionalsHome() {
     return () => (mounted = false);
   }, [filters, page]);
 
-  const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
-    setPage(1);
-  };
 
   const loadMore = () => setPage((p) => p + 1);
 
@@ -64,10 +60,7 @@ export default function ProfessionalsHome() {
 
       <div className={styles.container}>
         <BenefitsSection />
-        <ProfessionalsFilter
-          onChange={handleFilterChange}
-          initialValues={filters}
-        />
+
         {error ? (
           <div className={styles.error} role="alert">
             Error: {error.message || 'Problema al cargar profesionales'}

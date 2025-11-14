@@ -3,6 +3,8 @@
 Este es el **frontend** de la aplicación **SafeHaven**, desarrollado con **React**, **Vite** y **Bootstrap**.  
 Su objetivo es ofrecer una interfaz moderna, responsiva y organizada para interactuar con el backend.
 
+Creado por: Gerardo Benavides y Alvaro Serey.
+
 ---
 
 ## 🚀 Tecnologías utilizadas
